@@ -1,0 +1,75 @@
+.contentQS{
+    margin-top: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainform{
+    background-color: white;
+    padding: 20px;
+    width: 750px;
+    text-align: center;
+    box-shadow: 0px 3px 5px 3px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.mainform h2 {
+    color: rgb(41, 94, 34);
+    font-size: 20px; 
+    font-weight: bold;   
+}
+
+ .mainform h3{
+    color: rgb(41, 94, 34);
+    font-size: 13px;
+ }
+
+.contentinputs{
+    text-align: left;
+    margin-top: 20px;
+    margin-left: 75px;
+    margin-right: 75px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputgroup{
+    display: flex;
+    flex-direction: column;
+}
+
+.radiogroup{
+    display: flex;
+    gap: 30px;
+}
+
+.input{
+    padding: 5px;
+    border: 1 solid black;
+}
+
+.submit{
+    background-color: #008237;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 10px;
+}
+
+.submit:hover{
+    background-color: #01662c;
+    cursor: pointer;
+}
+
+.input:focus, .textarea:focus {
+    border: solid 1px;
+}
+
+.textarea{
+    height: 55px;
+    padding: 10px;
+    border: 1px solid black;
+}

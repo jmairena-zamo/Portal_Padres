@@ -1,0 +1,15 @@
+.body{
+  min-height: 100vh;
+  background-color: rgb(246, 246, 246);
+}
+
+.main {
+  display: flex;
+  margin-top: 65px;
+}
+
+.content {
+  width: 100%;
+  margin-left: 270px;  
+  margin-right: 20px;
+}

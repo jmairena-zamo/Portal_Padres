@@ -1,0 +1,40 @@
+.header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 15px;
+    height: 55px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    box-shadow: 0 3px 5px rgb(0, 0, 0, 0.4);
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    background-color: white;
+}
+.navbar {
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    width: 100%;
+    padding: 0 10px;
+}
+
+.navbarright {    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px; 
+    margin-right: 40px;   
+}
+
+.navbarright img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.navicons{
+    cursor: pointer;
+}
