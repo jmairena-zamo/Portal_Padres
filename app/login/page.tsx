@@ -3,7 +3,8 @@
 import styles from "./page.module.css"
 import zamorano from "../img/Logo-Universidad-Zamorano.png"
 import Image from "next/image"
-import { ReactEventHandler, useState } from "react"
+import React, { useState } from "react"
+import { useRouter } from "next/navigation"
 
 type FormData = {
     correo: string;
@@ -11,6 +12,13 @@ type FormData = {
 }
 
 export default function Login() {
+
+    const router = useRouter();
+
+    const correos = [
+        {correo: "padre1", hijos: 1},
+        {correo: "padre2", hijos: 2},
+    ]
 
     const [form, setForm] = useState<FormData>({
         correo: '',
@@ -25,9 +33,27 @@ export default function Login() {
         }));
     }
 
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const user = correos.find(c => c.correo === form.correo);
+
+        if(!user){
+            alert("Usuario No existe");
+            return;
+        }
+
+        if(user){
+            alert(`hola ${user.correo}`)
+        }
+
+        localStorage.setItem("hijos", user.hijos.toString());
+
+        router.push("/resumenEstudiante");
+    }
+
     return (
         <div className={styles.contentlogin}>
-            <form className={styles.loginform}>
+            <form className={styles.loginform} onSubmit={handleSubmit}>
                 <div className={styles.logo}>
                     <Image src={zamorano} alt="Logo Zamorano" 
                         width={200} 
@@ -44,7 +70,8 @@ export default function Login() {
                         </label>
                         <input type="password" name="contrasena" placeholder="Ingrese Contraseña" value={form.contrasena} onChange={handleOnChange}/>
                     </div>
-                    <button>Ingresar</button>
+                    <button type="submit">Ingresar</button>
+                    <a>¿Has olvidado tu contraseña?</a>
                 </div>
             </form>
         </div>
