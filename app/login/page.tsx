@@ -5,6 +5,7 @@ import zamorano from "../img/Logo-Universidad-Zamorano.png"
 import Image from "next/image"
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
+import { cifrarDato } from "../utils/encrypt"
 
 type FormData = {
     correo: string;
@@ -13,11 +14,14 @@ type FormData = {
 
 export default function Login() {
 
+    const [esValidoCorreo, setEsValidoCorreo] = useState(true);
+    const [esValidoPass, setEsValidoPass] = useState(true);
+
     const router = useRouter();
 
     const correos = [
-        {correo: "padre1", hijos: 1},
-        {correo: "padre2", hijos: 2},
+        { correo: "padre1@test.com", hijos: 1 },
+        { correo: "padre2", hijos: 2 },
     ]
 
     const [form, setForm] = useState<FormData>({
@@ -25,52 +29,92 @@ export default function Login() {
         contrasena: ''
     });
 
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) =>{
-        const { name, value} = e.target;
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
         setForm((values) => ({
             ...values,
             [name]: value,
         }));
+        if (name === "correo") {
+            if (!esValidoCorreo) setEsValidoCorreo(true);
+        }
+
+        if (name === "contrasena") {
+            if (!esValidoPass) setEsValidoPass(true);
+        }
     }
+
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const user = correos.find(c => c.correo === form.correo);
 
-        if(!user){
+        const passwordEncrypt = cifrarDato(form.contrasena);
+
+        if (!user) {
             alert("Usuario No existe");
             return;
         }
 
-        if(user){
-            alert(`hola ${user.correo}`)
+        if (user) {
+            alert(`hola ${user.correo}`);
+            console.log(passwordEncrypt);
+            console.log(form.contrasena);
         }
 
         localStorage.setItem("hijos", user.hijos.toString());
 
-        router.push("/resumenEstudiante");
+        //router.push("/resumenEstudiante");
     }
+
+
+    const validationCorreo = () => {
+        const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (form.correo.trim() === "" || !regexCorreo.test(form.correo.trim())) {
+            setEsValidoCorreo(false);
+        } else {
+            setEsValidoCorreo(true);
+        }
+    }
+
+
+    const validationPass = () => {
+        if (form.contrasena.trim() === "") {
+            setEsValidoPass(false);
+        } else {
+            setEsValidoPass(true);
+        }
+    }
+
+
 
     return (
         <div className={styles.contentlogin}>
             <form className={styles.loginform} onSubmit={handleSubmit}>
                 <div className={styles.logo}>
-                    <Image src={zamorano} alt="Logo Zamorano" 
-                        width={200} 
-                        height={200}  />
+                    <Image src={zamorano} alt="Logo Zamorano"
+                        width={200}
+                        height={200} />
                 </div>
                 <div className={styles.inputslogin}>
                     <div className={styles.inputlogin}>
                         <label>Correo Electrónico:
                         </label>
-                        <input type="text" name="correo" placeholder="Ingrese Correo" value={form.correo} onChange={handleOnChange}/>
+                        <input id="correo" type="text" name="correo" placeholder="Ingrese Correo"
+                            value={form.correo} onChange={handleOnChange} onBlur={validationCorreo}
+                            className={!esValidoCorreo ? styles.inputError : ""} />
+                        <span className={`${styles.spanError} ${!esValidoCorreo ? styles.err : ""}`}>El correo no es valido</span>
                     </div>
                     <div className={styles.inputlogin}>
                         <label>Contraseña:
                         </label>
-                        <input type="password" name="contrasena" placeholder="Ingrese Contraseña" value={form.contrasena} onChange={handleOnChange}/>
+                        <input type="password" name="contrasena" placeholder="Ingrese Contraseña"
+                            value={form.contrasena} onChange={handleOnChange} onBlur={validationPass}
+                            className={!esValidoPass ? styles.inputError : ""} />
+                        <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>La contraseña no es valido</span>
                     </div>
-                    <button type="submit">Ingresar</button>
+                    <button type="submit" disabled={!esValidoPass || !esValidoCorreo}>Ingresar</button>
                     <a>¿Has olvidado tu contraseña?</a>
                 </div>
             </form>
