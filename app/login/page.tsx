@@ -6,25 +6,18 @@ import Image from "next/image"
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cifrarDato } from "../utils/encrypt"
-
-type FormData = {
-    correo: string;
-    contrasena: string;
-}
+import { loginSchema, LoginFormData } from "../utils/validations"
 
 export default function Login() {
 
     const [esValidoCorreo, setEsValidoCorreo] = useState(true);
     const [esValidoPass, setEsValidoPass] = useState(true);
+    const [errorServidor, setErrorServidor] = useState('');
+    const [cargando, setCargando] = useState(false);
 
     const router = useRouter();
 
-    const correos = [
-        { correo: "padre1@test.com", hijos: 1 },
-        { correo: "padre2", hijos: 2 },
-    ]
-
-    const [form, setForm] = useState<FormData>({
+    const [form, setForm] = useState<LoginFormData>({
         correo: '',
         contrasena: ''
     });
@@ -44,50 +37,53 @@ export default function Login() {
         }
     }
 
+    const validationCorreo = () => {
+        const result = loginSchema.shape.correo.safeParse(form.correo);
+        setEsValidoCorreo(result.success);
+    }
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const validationPass = () => {
+        const result = loginSchema.shape.contrasena.safeParse(form.contrasena);
+        setEsValidoPass(result.success);
+    }
+
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const user = correos.find(c => c.correo === form.correo);
+        setErrorServidor("");
 
-        const passwordEncrypt = cifrarDato(form.contrasena);
-
-        if (!user) {
-            alert("Usuario No existe");
+        const validate = loginSchema.safeParse(form);
+        if (!validate.success) {
+            setEsValidoCorreo(false);
+            setEsValidoPass(false);
             return;
         }
 
-        if (user) {
-            alert(`hola ${user.correo}`);
-            console.log(passwordEncrypt);
-            console.log(form.contrasena);
-        }
+        setCargando(true);
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(validate.data),
+            });
 
-        localStorage.setItem("hijos", user.hijos.toString());
+            const data = await res.json();
 
-        //router.push("/resumenEstudiante");
-    }
+            if (!res.ok) {
+                setErrorServidor(data.error);                
+                return;
+            }
 
+            router.push("/resumenEstudiante");
 
-    const validationCorreo = () => {
-        const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-        if (form.correo.trim() === "" || !regexCorreo.test(form.correo.trim())) {
-            setEsValidoCorreo(false);
-        } else {
-            setEsValidoCorreo(true);
-        }
-    }
-
-
-    const validationPass = () => {
-        if (form.contrasena.trim() === "") {
-            setEsValidoPass(false);
-        } else {
-            setEsValidoPass(true);
+        } catch (error) {
+            setErrorServidor('Error de conexión. Intenta de nuevo.');
+            console.log("Error: ", error);
+            alert("Error al enviar datos");
+        } finally {
+            setCargando(false);
         }
     }
-
-
 
     return (
         <div className={styles.contentlogin}>
@@ -95,7 +91,9 @@ export default function Login() {
                 <div className={styles.logo}>
                     <Image src={zamorano} alt="Logo Zamorano"
                         width={200}
-                        height={200} />
+                        height={200}
+                        loading="eager"
+                    />
                 </div>
                 <div className={styles.inputslogin}>
                     <div className={styles.inputlogin}>
@@ -114,9 +112,13 @@ export default function Login() {
                             className={!esValidoPass ? styles.inputError : ""} />
                         <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>La contraseña no es valido</span>
                     </div>
-                    <button type="submit" disabled={!esValidoPass || !esValidoCorreo}>Ingresar</button>
+                    <button type="submit" disabled={!esValidoPass || !esValidoCorreo || cargando}>Ingresar</button>
                     <a>¿Has olvidado tu contraseña?</a>
+                    <span className={`${styles.spanError} ${errorServidor ? styles.err : ""}`}>
+                        {errorServidor || "."}
+                    </span>
                 </div>
+
             </form>
         </div>
     )

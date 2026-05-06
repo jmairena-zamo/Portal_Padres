@@ -27,7 +27,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 50px;
+    gap: 30px;
     background-color: white;
     width: 500px;
     height: 425px;
@@ -36,7 +36,6 @@
 }
 
 .logo{
-    position: relative;
     width: 100%;
     height: 60%;
     border-radius: 5px;
@@ -94,7 +93,7 @@
     cursor: pointer;
 }
 
-.inputlogin span {
+.spanError {
     font-size: 10px;
     color: red;
     margin-top: 4px;
