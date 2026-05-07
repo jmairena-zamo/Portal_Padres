@@ -1,6 +1,11 @@
+'use client'
+
+import { useAuth } from '@/app/hooks/useAuth'
 import styles from './page.module.css'
 
 export default function QuejasSugerencias(){
+    //useAuth();
+
     return (
         <div className={styles.contentQS}>
             <form className={styles.mainform}>

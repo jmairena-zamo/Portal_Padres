@@ -3,8 +3,10 @@
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react"
 import styles from "./page.module.css"
+import { useAuth } from "@/app/hooks/useAuth";
 
 export default function HistorialDisciplinario() {
+    //useAuth();
 
     const [data, setData] = useState([
         { id: 1, faltas: 1, clase: 'Quimica', estado: 'Leve' },

@@ -3,8 +3,10 @@
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react"
 import styles from "./page.module.css"
+import { useAuth } from "@/app/hooks/useAuth";
 
 export default function Clases() {
+    //useAuth();
 
     const [data, setData] = useState([
         { id: 1, clase: 'Ecología', seccion: '123', codigo: 'CS69', acumulativo: 50, examenes: 35, faltas: 2 },

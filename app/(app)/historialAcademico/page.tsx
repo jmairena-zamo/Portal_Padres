@@ -3,8 +3,11 @@
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react";
 import styles from './page.module.css'
+import { useAuth } from "@/app/hooks/useAuth";
 
 export default function HistorialAcademico() {
+    //useAuth();
+
     const [data, setData] = useState([
         { id: 1, clase: 'Quimica', seccion: '123', codigo: 'CC05', anio: '2025', periodo: 3, nota: 90.98, estado: 'APB', uv: 4 },
         { id: 2, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 }

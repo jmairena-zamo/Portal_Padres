@@ -83,7 +83,7 @@
     width: 90%;
 }
 
-.logout a{
+.logoutBTN{
     display: flex;
     align-items: end;
     gap: 8px;
@@ -91,7 +91,7 @@
     padding: 5px;
 }
 
-.logout a:hover{
+.logoutBTN:hover{
     background-color: white;
     color: rgb(40, 100, 48);
     width: 100%;

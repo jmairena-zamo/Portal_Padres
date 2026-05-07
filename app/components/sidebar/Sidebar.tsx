@@ -4,16 +4,34 @@ import Link from 'next/link';
 import styles from './Sidebar.module.css'
 import Image from 'next/image';
 import imagen from '../../img/Zamorano1.jpg'
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { FaSignOutAlt, FaFile, FaFileAlt, FaHome, FaCoins, FaBook, FaRibbon, FaClipboardCheck } from "react-icons/fa";
 
 
 export const Sidebar = () => {
 
     const pathname = usePathname();
+    const route = useRouter();
 
     const linkClass = (path: any) =>
         pathname === path ? styles.active : styles.link;
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch('/api/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                route.replace('/');
+                route.refresh();
+            }
+
+        } catch (error) {
+            console.log("Error al cerrar sesión:", error);
+        }
+    }
 
     return (
         <div className={styles.sidebar}>
@@ -47,7 +65,7 @@ export const Sidebar = () => {
             </div>
 
             <div className={styles.logout}>
-                <a>Cerrar Sesion <FaSignOutAlt size={25} /></a>
+                <button className={styles.logoutBTN} onClick={handleLogout}>Cerrar Sesion <FaSignOutAlt size={25} /></button>
             </div>
         </div>
     )

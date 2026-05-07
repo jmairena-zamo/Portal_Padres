@@ -5,8 +5,11 @@ import { useState } from 'react';
 import { FaExclamationTriangle, FaExclamationCircle, FaExclamation, FaClock } from 'react-icons/fa';
 import { RadialBarChart, RadialBar, PolarAngleAxis, Legend } from 'recharts';
 import styles from './page.module.css'
+import { useAuth } from '@/app/hooks/useAuth';
 
 export default function ResumenEstudiante() {
+    //useAuth();
+
     const [estudiante, setEstudiante] = useState({
         Nombre: 'xxxxxx',
         Apellido: 'xxxxx',

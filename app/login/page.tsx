@@ -102,7 +102,7 @@ export default function Login() {
                         <input id="correo" type="text" name="correo" placeholder="Ingrese Correo"
                             value={form.correo} onChange={handleOnChange} onBlur={validationCorreo}
                             className={!esValidoCorreo ? styles.inputError : ""} />
-                        <span className={`${styles.spanError} ${!esValidoCorreo ? styles.err : ""}`}>El correo no es valido</span>
+                        <span className={`${styles.spanError} ${!esValidoCorreo ? styles.err : ""}`}>El correo no es válido</span>
                     </div>
                     <div className={styles.inputlogin}>
                         <label>Contraseña:
@@ -110,7 +110,7 @@ export default function Login() {
                         <input type="password" name="contrasena" placeholder="Ingrese Contraseña"
                             value={form.contrasena} onChange={handleOnChange} onBlur={validationPass}
                             className={!esValidoPass ? styles.inputError : ""} />
-                        <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>La contraseña no es valido</span>
+                        <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>La contraseña no es válida</span>
                     </div>
                     <button type="submit" disabled={!esValidoPass || !esValidoCorreo || cargando}>Ingresar</button>
                     <a>¿Has olvidado tu contraseña?</a>

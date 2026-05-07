@@ -20,28 +20,43 @@ export async function POST(request: NextRequest) {
     }
 
     const { correo } = parsed.data;
+    const { contrasena } = parsed.data;
 
     const correoLimpio = correo.trim();
+    const contrasenaLimpia = contrasena.trim();
 
     try {
         const res = await fetch(`https://localhost:7233/portalpadres/v1/useremail/ListarPorCorreo/${correoLimpio}`);
 
         if (!res.ok) {
             return NextResponse.json(
-                { error: 'Correo no encontrado' },
+                { error: 'Correo o Contraseña Incorrectos' },
                 { status: 401 }
             );
         }
 
         const data = await res.json();
-        console.log(data);
+        //console.log(data);
+
+        if ( contrasenaLimpia != data.response.contrasena){
+            return NextResponse.json(
+                { error: 'Correo o Contraseña Incorrectos' },
+                { status: 401 }
+            );
+        }
+
+        const saveData = {
+            id: data.response.iD_UserEmail,
+            email: data.response.correoElectronico
+        }
+        //console.log(saveData);
 
         const response = NextResponse.json({ ok: true });
-        response.cookies.set('session', JSON.stringify(data), {
+        response.cookies.set('session', JSON.stringify(saveData), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60,
+            maxAge: 30 * 60,
             path: '/',
         });
 

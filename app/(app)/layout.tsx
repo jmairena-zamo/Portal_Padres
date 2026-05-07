@@ -8,6 +8,7 @@ import Modal from "../components/modal/Modal";
 
 export default function AppLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
 
+    
     const [showModal, setShowModal] = useState<boolean>(false);
     const [loading, setLoading] = useState(true); 
 
