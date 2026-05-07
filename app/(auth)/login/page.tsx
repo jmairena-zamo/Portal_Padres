@@ -1,12 +1,12 @@
 "use client"
 
 import styles from "./page.module.css"
-import zamorano from "../img/Logo-Universidad-Zamorano.png"
+import zamorano from "../../img/Logo-Universidad-Zamorano.png"
 import Image from "next/image"
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import { cifrarDato } from "../utils/encrypt"
-import { loginSchema, LoginFormData } from "../utils/validations"
+import { cifrarDato } from "../../utils/encrypt"
+import { loginSchema, LoginFormData } from "../../utils/validations"
 
 export default function Login() {
 
