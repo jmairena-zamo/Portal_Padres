@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
         }
 
         const data = await res.json();
-        //console.log(data);
 
         if ( contrasenaLimpia != data.response.contrasena){
             return NextResponse.json(
@@ -49,7 +48,6 @@ export async function POST(request: NextRequest) {
             id: data.response.iD_UserEmail,
             email: data.response.correoElectronico
         }
-        //console.log(saveData);
 
         const response = NextResponse.json({ ok: true });
         response.cookies.set('session', JSON.stringify(saveData), {

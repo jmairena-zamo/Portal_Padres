@@ -61,7 +61,7 @@ export default function Login() {
 
         setCargando(true);
         try {
-            const res = await fetch('/api/login', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(validate.data),

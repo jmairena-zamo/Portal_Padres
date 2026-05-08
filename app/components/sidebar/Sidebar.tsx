@@ -18,7 +18,7 @@ export const Sidebar = () => {
 
     const handleLogout = async () => {
         try {
-            const res = await fetch('/api/logout', {
+            const res = await fetch('/api/auth/logout', {
                 method: 'POST',
                 credentials: 'include'
             });
