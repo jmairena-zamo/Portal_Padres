@@ -1,60 +1,191 @@
 'use client'
 
-import { useAuth } from '@/app/hooks/useAuth'
+import React, { useState } from 'react'
 import styles from './page.module.css'
+import { quejaData, quejaSchema } from '@/app/utils/validations'
 
-export default function QuejasSugerencias(){
-    //useAuth();
+export default function QuejasSugerencias() {
+
+    const [formData, setFormData] = useState<quejaData>({
+        telefono: '',
+        tipo: 'queja',
+        asunto: '',
+        mensaje: ''
+    })
+
+    const [esValidoTelefono, setEsValidoTelefono] = useState(true);
+    const [esValidoTipo, setEsValidoTipo] = useState(true);
+    const [esValidoAsunto, setEsValidoAsunto] = useState(true);
+    const [esValidoMensaje, setEsValidoMensaje] = useState(true);
+    const [error, setError] = useState('');
+    const [mensaje, setMensaje] = useState('');
+    const [cargando, setCargando] = useState(false);
+
+    const handlerOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+
+        setFormData((values) => ({
+            ...values,
+            [name]: value,
+        }));
+
+        if (name === "telefono" && !esValidoTelefono) {
+            setEsValidoTelefono(true);
+        }
+
+        if (name === "tipo" && !esValidoTipo) {
+            setEsValidoTipo(true);
+        }
+
+        if (name === "asunto" && !esValidoAsunto) {
+            setEsValidoAsunto(true);
+        }
+
+        if (name === "mensaje" && !esValidoMensaje) {
+            setEsValidoMensaje(true);
+        }
+    }
+
+    const validationTelefono = () => {
+        const result = quejaSchema.shape.telefono.safeParse(formData.telefono);
+        setEsValidoTelefono(result.success)
+    }
+
+    const validationTipo = () => {
+        const result = quejaSchema.shape.tipo.safeParse(formData.tipo);
+        setEsValidoTipo(result.success);
+    }
+
+    const validationAsunto = () => {
+        const result = quejaSchema.shape.asunto.safeParse(formData.asunto);
+        setEsValidoAsunto(result.success);
+    }
+
+    const validationMensaje = () => {
+        const result = quejaSchema.shape.mensaje.safeParse(formData.mensaje);
+        setEsValidoMensaje(result.success);
+    }
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+        e.preventDefault();
+
+        const validate = quejaSchema.safeParse(formData);
+
+        if (!validate.success) {
+
+            setEsValidoTelefono(false);
+            setEsValidoTipo(false);
+            setEsValidoAsunto(false);
+            setEsValidoMensaje(false);
+
+            return;
+        }
+
+        console.log(validate.data);
+
+        try {
+            const res = await fetch("/api/quejas/insertarQueja",
+                {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(validate.data),
+                }
+            )
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.error);
+                return;
+            }
+
+            setMensaje(data.message);
+
+            setFormData({
+                telefono: '',
+                tipo: 'queja',
+                asunto: '',
+                mensaje: '',
+            })
+
+        } catch (error) {
+            setError('Error de conexión. Intenta de nuevo.');
+        } finally {
+            setCargando(false);
+        }
+    }
 
     return (
         <div className={styles.contentQS}>
-            <form className={styles.mainform}>
+            <form className={styles.mainform} onSubmit={handleSubmit}>
                 <h2>¡Quejas y Sugerencias!</h2>
                 <h3>Siempre es un gusto saber su opinión sobre nuestro servicio</h3>
                 <div className={styles.contentinputs}>
                     <div className={styles.inputgroup}>
-                        <label>Telefono:
+                        <label>Teléfono:
                         </label>
-                        <input type="text" placeholder="Ingrese Telefono" className={styles.input}/>
+                        <input name="telefono" type="text" placeholder="Ingrese Telefono"
+                            onChange={handlerOnChange}
+                            onBlur={validationTelefono}
+                            className={!esValidoTelefono ? styles.inputError : styles.input} />
+                        <span className={`${styles.spanError} ${!esValidoTelefono ? styles.err : ""}`}>El teléfono no es válido</span>
                     </div>
                     <div className={styles.inputgroup}>
                         <label>Opción:</label>
                         <hr />
                         <div className={styles.radiogroup}>
-                            <label htmlFor="">
+                            <label>
                                 <input
                                     type="radio"
                                     name="tipo"
                                     value="queja"
+                                    checked={formData.tipo === "queja"}
+                                    onChange={handlerOnChange}
+                                    onBlur={validationTipo}
                                 /> Queja
                             </label>
-                            <label htmlFor="">
+                            <label>
 
                                 <input
                                     type="radio"
                                     name="tipo"
                                     value="sugerencia"
+                                    checked={formData.tipo === "sugerencia"}
+                                    onChange={handlerOnChange}
+                                    onBlur={validationTipo}
                                 /> Sugerencia</label>
                         </div>
-
+                        <span className={`${styles.spanError} ${!esValidoTipo ? styles.err : ""}`}>Seleccione una opción válida</span>
                     </div>
                     <div className={styles.inputgroup}>
-                        <label htmlFor="">Asunto:</label>
-                        <textarea 
+                        <label>Asunto:</label>
+                        <textarea
+                            name="asunto"
                             placeholder="Ingrese Asunto"
-                            className={styles.textarea }
-
-                        /> 
+                            className={!esValidoAsunto ? styles.inputErrorArea : styles.textarea}
+                            onChange={handlerOnChange}
+                            onBlur={validationAsunto}
+                        />
+                        <span className={`${styles.spanError} ${!esValidoAsunto ? styles.err : ""}`}>Asunto no válido</span>
                     </div>
                     <div className={styles.inputgroup}>
-                        <label htmlFor="">Mensaje:</label>
-                        <textarea 
+                        <label>Mensaje:</label>
+                        <textarea
+                            name="mensaje"
                             placeholder="Ingrese su Comentario..."
-                            className={styles.textarea }
-                        /> 
+                            className={!esValidoMensaje ? styles.inputErrorArea : styles.textarea}
+                            onChange={handlerOnChange}
+                            onBlur={validationMensaje}
+                        />
+                        <span className={`${styles.spanError} ${!esValidoMensaje ? styles.err : ""}`}>Mensaje no válido</span>
                     </div>
 
-                    <input className={styles.submit} type="submit" value="Enviar" />
+                    <button className={styles.submit} type="submit"
+                        disabled={!esValidoTelefono || !esValidoTipo ||
+                            !esValidoAsunto || !esValidoMensaje} >
+                        {cargando ? 'Enviando...' : 'Enviar'}
+                    </button>
 
                 </div>
 

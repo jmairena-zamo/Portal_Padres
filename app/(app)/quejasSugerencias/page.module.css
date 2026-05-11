@@ -33,7 +33,7 @@
     margin-right: 75px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 3px;
 }
 
 .inputgroup{
@@ -70,6 +70,24 @@
 
 .textarea{
     height: 55px;
-    padding: 10px;
+    padding: 5px;
     border: 1px solid black;
+}
+
+.spanError {
+    font-size: 10px;
+    color: red;
+    margin-top: 4px;
+    visibility: hidden; 
+    height: 12px; 
+    text-align: center;
+}
+
+.err {
+    visibility: visible !important; 
+}
+
+.inputError, .inputErrorArea {
+    border: 1px solid red !important;
+    padding: 5px;
 }

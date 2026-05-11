@@ -5,7 +5,7 @@ import styles from './Sidebar.module.css'
 import Image from 'next/image';
 import imagen from '../../img/Zamorano1.jpg'
 import { usePathname, useRouter } from 'next/navigation';
-import { FaSignOutAlt, FaFile, FaFileAlt, FaHome, FaCoins, FaBook, FaRibbon, FaClipboardCheck } from "react-icons/fa";
+import { FaSignOutAlt, FaFile, FaFileAlt, FaHome, FaCoins, FaBook, FaFolder, FaClipboardCheck } from "react-icons/fa";
 
 
 export const Sidebar = () => {
@@ -57,7 +57,7 @@ export const Sidebar = () => {
                     <Link href="/estadoCuenta" className={linkClass("/estadoCuenta")}><FaCoins size={20} />Estado de Cuenta</Link>
                     <Link href="/historialAcademico" className={linkClass("/historialAcademico")}><FaFileAlt size={20} />Historial Academico</Link >
                     <Link href="/clases" className={linkClass("/clases")}><FaBook size={20} />Clases</Link >
-                    <Link href="/historialDisciplinario" className={linkClass("/historialDisciplinario")}><FaRibbon size={20} />Historial Disciplinario</Link >
+                    <Link href="/historialDisciplinario" className={linkClass("/historialDisciplinario")}><FaFolder size={20} />Historial Disciplinario</Link >
                     <Link href="/documentos" className={linkClass("/documentos")}><FaFile size={20} />Documentos</Link >
                     <Link href="/quejasSugerencias" className={linkClass("/quejasSugerencias")}><FaClipboardCheck size={20} />Quejas o Sugerencias</Link >
                 </nav>

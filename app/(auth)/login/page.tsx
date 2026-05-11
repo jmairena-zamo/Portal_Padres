@@ -113,7 +113,7 @@ export default function Login() {
                         <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>La contraseña no es válida</span>
                     </div>
                     <button type="submit" disabled={!esValidoPass || !esValidoCorreo || cargando}>Ingresar</button>
-                    <a>¿Has olvidado tu contraseña?</a>
+                    <a href="/recuperarContrasena">¿Has olvidado tu contraseña?</a>
                     <span className={`${styles.spanError} ${errorServidor ? styles.err : ""}`}>
                         {errorServidor || "."}
                     </span>

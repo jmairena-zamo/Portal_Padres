@@ -32,7 +32,7 @@ export default function RecuperarContrasena() {
         setMensaje('');
 
         try {
-            const res = await fetch('/api/auth/recuperarContrasena', {
+            const res = await fetch('/api/auth/enviarCorreo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ correo }),
@@ -75,7 +75,7 @@ export default function RecuperarContrasena() {
                     </p>
                 )}
 
-                <a href="/login" style={{ display: 'block', marginTop: '16px', textAlign: 'center' }}>
+                <a href="/" style={{ display: 'block', marginTop: '16px', textAlign: 'center' }}>
                     Volver al login
                 </a>
             </div>

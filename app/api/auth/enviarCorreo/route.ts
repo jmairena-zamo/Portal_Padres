@@ -1,6 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import { Resend } from "resend";
 import { recuperarContrasenaSchema } from "@/app/utils/validations";
+import React from "react";
+import { EmailTemplate } from "@/app/components/plantillaCorreo/plantillaCorreo";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
         }
 
         const token = crypto.randomUUID();
-        const expiracion = Date.now() + 60 * 60 * 1000;
+        //const expiracion = Date.now() + 30 * 60 * 1000;
 
         const linkReset = `http://localhost:3000/cambiarContrasena?token=${token}&correo=${correoLimpio}`;
 
@@ -50,22 +52,20 @@ export async function POST(request: NextRequest) {
             //to: "diegocastrol2017@gmail.com",
             subject: 'Recuperar contraseña - Portal Padres Zamorano',
             html: `
-                <div style="font-family: Arial, sans-serif;">
+                <div>
                     <h2>Recuperar contraseña</h2>
                     <p>Haz click en el botón para cambiar tu contraseña:</p>
-                    <a href="${linkReset}" style="background:#0070f3; color:white; padding:12px 24px; text-decoration:none; border-radius:5px;">
+                    <a href="${linkReset}">
                         Cambiar contraseña
                     </a>
-                    <p style="color:gray; font-size:12px; margin-top:20px;">
-                        Este link expira en 1 hora.
-                    </p>
                 </div>
             `
+            //react: EmailTemplate({link: linkReset})
         });
 
 
         return NextResponse.json(
-            { message: 'Si el correo existe, recibirás un email' },
+            { message: 'Email enviado correctamente.' },
             { status: 200 }
         );
 

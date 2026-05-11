@@ -1,6 +1,5 @@
 'use client'
 
-import { useAuth } from '@/app/hooks/useAuth'
 import styles from './page.module.css' 
 import { InformacionEstudiante } from '@/app/components/informacionEstudiante/InformacionEstudiante'
 
