@@ -10,9 +10,9 @@ export const loginSchema = z.object({
     }),
   contrasena: z
     .string()
-    .min(5, "La contraseña no es válida")
-    .max(100, "La contraseña no es válida")
-    .regex(/^[^<>{}[\]\\|]+$/, "La contraseña no es válida"),
+    .min(8, "La contraseña debe tener un mínimo de 8 caracteres")
+    .max(12, "La contraseña debe tener un maximo de 12 caracteres")
+    .regex(/^[a-zA-Z0-9]+$/, "La contraseña solo puede tener letras y numeros"),
 });
 
 export const recuperarContrasenaSchema = z.object({
@@ -23,9 +23,9 @@ export const nuevaContrasenaSchema = z.object({
   id_useremail: z.number(),
   correoElectronico: z.string().email().trim().regex(/^[^<>{}[\]\\|]+$/),
   contrasena: z.string()
-    .min(5, "La contraseña no es válida")
-    .max(100, "La contraseña no es válida")
-    .regex(/^[^<>{}[\]\\|]+$/, "La contraseña no es válida"),
+    .min(8, "La contraseña debe tener un mínimo de 8 caracteres")
+    .max(12, "La contraseña debe tener un maximo de 12 caracteres")
+    .regex(/^[a-zA-Z0-9]+$/, "La contraseña solo puede tener letras y numeros"),
   relacion: z.string().regex(/^[^<>{}[\]\\|]+$/),
   tipoUsuario: z.string().regex(/^[^<>{}[\]\\|]+$/),
   usuario: z.string().regex(/^[^<>{}[\]\\|]+$/),

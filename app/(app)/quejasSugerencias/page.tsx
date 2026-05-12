@@ -69,6 +69,8 @@ export default function QuejasSugerencias() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
         e.preventDefault();
+        setError(''); 
+        setMensaje('');
 
         const validate = quejaSchema.safeParse(formData);
 
@@ -81,6 +83,8 @@ export default function QuejasSugerencias() {
 
             return;
         }
+
+        setCargando(true);
 
         console.log(validate.data);
 
@@ -101,6 +105,8 @@ export default function QuejasSugerencias() {
             }
 
             setMensaje(data.message);
+
+            setTimeout(() => setMensaje(''), 2000)
 
             setFormData({
                 telefono: '',
@@ -125,7 +131,7 @@ export default function QuejasSugerencias() {
                     <div className={styles.inputgroup}>
                         <label>Teléfono:
                         </label>
-                        <input name="telefono" type="text" placeholder="Ingrese Telefono"
+                        <input name="telefono" type="text" placeholder="Ingrese Telefono" value={formData.telefono}
                             onChange={handlerOnChange}
                             onBlur={validationTelefono}
                             className={!esValidoTelefono ? styles.inputError : styles.input} />
@@ -163,6 +169,7 @@ export default function QuejasSugerencias() {
                         <textarea
                             name="asunto"
                             placeholder="Ingrese Asunto"
+                            value={formData.asunto}
                             className={!esValidoAsunto ? styles.inputErrorArea : styles.textarea}
                             onChange={handlerOnChange}
                             onBlur={validationAsunto}
@@ -174,6 +181,7 @@ export default function QuejasSugerencias() {
                         <textarea
                             name="mensaje"
                             placeholder="Ingrese su Comentario..."
+                            value={formData.mensaje}
                             className={!esValidoMensaje ? styles.inputErrorArea : styles.textarea}
                             onChange={handlerOnChange}
                             onBlur={validationMensaje}
@@ -188,7 +196,12 @@ export default function QuejasSugerencias() {
                     </button>
 
                 </div>
-
+                {error && (
+                    <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
+                )}
+                {mensaje && (
+                    <p style={{ color: 'green', textAlign: 'center' }}>{mensaje}</p>
+                )}
             </form>
         </div>
     )

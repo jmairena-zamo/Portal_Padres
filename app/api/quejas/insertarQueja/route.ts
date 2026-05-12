@@ -15,17 +15,30 @@ export async function POST(request: NextRequest){
 
     const { telefono, tipo, asunto, mensaje } = parsed.data;
 
+    const session = request.cookies.get('session');
+
+    if(!session){
+        return NextResponse.json(
+            { error: 'No hay sesion'},
+            { status: 400 }
+        )
+    }
+
+    const usuario = JSON.parse(session.value);
+    const ID_UserEmail = usuario.id;
+
     try {
         const res = await fetch('https://localhost:7233/portalpadres/v1/quejassugerencias/Crear',
             {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    iD_UserEmail: 3,
+                    iD_UserEmail: ID_UserEmail,
                     telefono: telefono,
                     tipo: tipo,
                     asunto: asunto,
                     mensaje: mensaje,
+                    usuario: 'string',
                 })
             }
         );

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import logozamorano from '../../img/Logo-Universidad-Zamorano.png'
 import Image from "next/image"
 import styles from './page.module.css'
-import { loginSchema } from "@/app/utils/validations"
+import { nuevaContrasenaSchema } from "@/app/utils/validations"
 
 export default function CambiarContrasena() {
     const searchParams = useSearchParams();
@@ -19,13 +19,16 @@ export default function CambiarContrasena() {
     const [confirmContrasena, setConfirmContrasena] = useState('');
     const [esValidoConfirmContras, setesValidoConfirmContras] = useState(true);
     const [error, setError] = useState('');
+    const [errorServidor, setErrorServidor] = useState('');
     const [mensaje, setMensaje] = useState('');
     const [cargando, setCargando] = useState(false);
     const [userData, setUserData] = useState<any>(null);
+    const [errorNewContras, setErrorNewContras] = useState('');
+    const [errorConfirmContras, setErrorConfirmContras] = useState('');
 
     useEffect(() => {
         if (!correo || !token) {
-            setError("Link Invalido o Expirado");
+            setErrorServidor("Link Invalido o Expirado");
             return;
         }
 
@@ -33,18 +36,18 @@ export default function CambiarContrasena() {
             .then(res => res.json())
             .then(data => {
                 if (data.error) {
-                    setError("Link Invalido o Expirado");
+                    setErrorServidor("Link Invalido");
                 }
 
                 setUserData(data);
-            }).catch(() => setError('Error de conexión 1'));
+            }).catch(() => setErrorServidor('Error de conexión 1'));
 
     }, [correo, token])
 
-    if (error) {
+    if (errorServidor) {
         return (
             <div style={{ textAlign: 'center', marginTop: '100px' }}>
-                <p style={{ color: 'red' }}>{error}</p>
+                <p style={{ color: 'red' }}>{errorServidor}</p>
                 <a href="/login">Volver al login</a>
             </div>
         );
@@ -53,14 +56,27 @@ export default function CambiarContrasena() {
     const handleOnChangeNew = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewContrasena(value);
+
+        if (!value) {
+            setConfirmContrasena('');
+            setesValidoConfirmContras(true);
+        }
+
         if (name === "contrasena") {
             if (!esValidoNewContras) setesValidoNewContras(true);
         }
     }
 
     const validationNewContra = () => {
-        const result = loginSchema.shape.contrasena.safeParse(newContrasena);
-        setesValidoNewContras(result.success);
+        const result = nuevaContrasenaSchema.shape.contrasena.safeParse(newContrasena);
+
+        if (!result.success) {
+            setesValidoNewContras(false);
+            setErrorNewContras(result.error.issues[0].message);
+        } else {
+            setesValidoNewContras(true);
+            setErrorNewContras('');
+        }
     }
 
     const handleOnChangeConfirm = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,16 +88,33 @@ export default function CambiarContrasena() {
     }
 
     const validationConfirmContra = () => {
-        const result = loginSchema.shape.contrasena.safeParse(confirmContrasena);
-        setesValidoConfirmContras(result.success);
+        const result = nuevaContrasenaSchema.shape.contrasena.safeParse(confirmContrasena);
+        if (!result.success) {
+            setesValidoConfirmContras(false);
+            setErrorConfirmContras(result.error.issues[0].message);
+        } else {
+            setesValidoConfirmContras(true);
+            setErrorConfirmContras('');
+        }
     }
 
     const handlerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
 
+        if (!newContrasena || !confirmContrasena) {
+            setesValidoNewContras(false);
+            setesValidoConfirmContras(false);
+            return;
+        }
+
         if (newContrasena !== confirmContrasena) {
             setError("Las contraseñas no coinciden");
+            return;
+        }        
+
+        if (!userData) {
+            setError("Usuario no válido");
             return;
         }
 
@@ -105,7 +138,7 @@ export default function CambiarContrasena() {
 
             const data = await res.json();
 
-            if(!res.ok){
+            if (!res.ok) {
                 setError(data.error);
                 return;
             }
@@ -132,18 +165,19 @@ export default function CambiarContrasena() {
                     <div className={styles.inputlogin}>
                         <label>Nueva Contraseña:
                         </label>
-                        <input id="contrasena" type="password" name="contrasena" placeholder="Ingrese su nueva contraseña"
+                        <input type="password" name="contrasena" placeholder="Ingrese su nueva contraseña"
                             onChange={handleOnChangeNew} onBlur={validationNewContra}
                             className={!esValidoNewContras ? styles.inputError : ""} />
-                        <span className={`${styles.spanError} ${!esValidoNewContras ? styles.err : ""}`}>La contraseña no es válida</span>
+                        <span className={`${styles.spanError} ${!esValidoNewContras ? styles.err : ""}`}>{errorNewContras}</span>
                     </div>
                     <div className={styles.inputlogin}>
                         <label>Confirmar Contraseña:
                         </label>
-                        <input id="contrasena" type="password" name="confirmcontrasena" placeholder="Confirmar su nueva contraseña"
+                        <input type="password" name="confirmcontrasena" placeholder="Confirmar su nueva contraseña"
                             onChange={handleOnChangeConfirm} onBlur={validationConfirmContra}
+                            disabled={!newContrasena}
                             className={!esValidoConfirmContras ? styles.inputError : ""} />
-                        <span className={`${styles.spanError} ${!esValidoConfirmContras ? styles.err : ""}`}>La contraseña no es válida</span>
+                        <span className={`${styles.spanError} ${!esValidoConfirmContras ? styles.err : ""}`}>{errorConfirmContras}</span>
                     </div>
                     <button className={styles.resBTN} type="submit" disabled={!esValidoNewContras || !esValidoConfirmContras || cargando}>
                         {cargando ? 'Enviando...' : 'Cambiar Contraseña'}
@@ -152,6 +186,11 @@ export default function CambiarContrasena() {
                 {mensaje && (
                     <p style={{ marginTop: '16px', color: 'green', textAlign: 'center' }}>
                         {mensaje}
+                    </p>
+                )}
+                {error && (
+                    <p style={{ marginTop: '16px', color: 'red', textAlign: 'center' }}>
+                        {error}
                     </p>
                 )}
             </div>

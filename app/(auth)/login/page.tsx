@@ -14,6 +14,7 @@ export default function Login() {
     const [esValidoPass, setEsValidoPass] = useState(true);
     const [errorServidor, setErrorServidor] = useState('');
     const [cargando, setCargando] = useState(false);
+    const [errorContra, setErrorContra] = useState('');
 
     const router = useRouter();
 
@@ -44,7 +45,13 @@ export default function Login() {
 
     const validationPass = () => {
         const result = loginSchema.shape.contrasena.safeParse(form.contrasena);
-        setEsValidoPass(result.success);
+        if (!result.success) {
+            setEsValidoPass(false);
+            setErrorContra(result.error.issues[0].message);
+        } else {
+            setEsValidoPass(true);
+            setErrorContra('');
+        }
     }
 
 
@@ -110,7 +117,7 @@ export default function Login() {
                         <input type="password" name="contrasena" placeholder="Ingrese Contraseña"
                             value={form.contrasena} onChange={handleOnChange} onBlur={validationPass}
                             className={!esValidoPass ? styles.inputError : ""} />
-                        <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>La contraseña no es válida</span>
+                        <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>{errorContra}</span>
                     </div>
                     <button type="submit" disabled={!esValidoPass || !esValidoCorreo || cargando}>Ingresar</button>
                     <a href="/recuperarContrasena">¿Has olvidado tu contraseña?</a>
