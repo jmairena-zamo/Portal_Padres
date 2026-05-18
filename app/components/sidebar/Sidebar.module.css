@@ -46,6 +46,8 @@
     padding: 10px;
     gap: 8px;
     border-top: solid 1px white;
+    max-height: 57vh;   
+    overflow-y: auto;
 }
 
 .nav a {
