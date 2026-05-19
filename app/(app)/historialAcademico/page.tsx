@@ -3,7 +3,6 @@
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react";
 import styles from './page.module.css'
-import { useAuth } from "@/app/hooks/useAuth";
 
 export default function HistorialAcademico() {
     //useAuth();

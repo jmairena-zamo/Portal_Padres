@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getRutasPermitidas } from './app/utils/menu';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
 
     const session = request.cookies.get('session');
 
     const path = request.nextUrl.pathname;
 
-    if (path === '/' && session) {
+    if (!session) {
         return NextResponse.redirect(
-            new URL('/resumenEstudiante', request.url)
+            new URL('/', request.url)
         );
     }
 
@@ -20,6 +21,7 @@ export function middleware(request: NextRequest) {
         '/historialDisciplinario',
         '/documentos',
         '/quejasSugerencias',
+        '/administracion',
     ];
 
     const esRutaProtegida = rutasProtegidas.some((ruta) =>
@@ -29,6 +31,18 @@ export function middleware(request: NextRequest) {
     if (esRutaProtegida && !session) {
         return NextResponse.redirect(new URL('/', request.url));
     }
+
+    const rutaactual = rutasProtegidas.find((ruta) => path.startsWith(ruta));
+    if(!rutaactual) return NextResponse.next();
+
+    const usuario = JSON.parse(session.value);
+    const ID_rol = 2;
+
+    const rutaspermitidas = await getRutasPermitidas(ID_rol);
+
+    const permiso = rutaspermitidas.some(ruta => path.startsWith(ruta));
+
+    if(!permiso) return NextResponse.redirect(new URL('/noAutorizado', request.url));
 
     return NextResponse.next();
 
@@ -44,7 +58,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/',
         '/resumenEstudiante/:path*',
         '/estadoCuenta/:path*',
         '/historialAcademico/:path*',
@@ -52,5 +65,6 @@ export const config = {
         '/historialDisciplinario/:path*',
         '/documentos/:path*',
         '/quejasSugerencias/:path*',
+        '/administracion/:path*',
     ]
 };

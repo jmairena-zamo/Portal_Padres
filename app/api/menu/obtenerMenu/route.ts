@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest){
 
-    const idrol = 1;
+    const idrol = 2;
 
     const resRol = await fetch(`https://localhost:7233/portalpadres/v1/menurol/ListarPorRol/${idrol}`);
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest){
         } )
     )
 
-    const menusfiltrados = menus.filter(m => m !== null && m.estado === 1)
+    const menusfiltrados = menus.filter(m => m !== null && m.habilitado === 1)
                                 .sort((a,b) => a.posicion - b.posicion);
                                 
     return NextResponse.json({menus: menusfiltrados})

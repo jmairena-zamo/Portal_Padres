@@ -13,7 +13,7 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
     const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
-        const cantidadHijos = localStorage.getItem("hijos");
+        const cantidadHijos = 1;
         
         if(cantidadHijos && Number(cantidadHijos) > 1){
             setShowModal(true);
