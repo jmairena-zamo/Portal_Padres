@@ -19,7 +19,7 @@ export const getPath = (opcion: string): string => {
     const rutas: Record<string, string> = {
         'RESUMEN ESTUDIANTE': '/resumenEstudiante',
         'CLASES': '/clases',
-        'ESTADO DE CUENTA': '/estadoCuenta',
+        'ESTADO DE CUENTA': '/ESTADODECUENTA',
         'HISTORIAL ACADEMICO': '/historialAcademico',
         'HISTORIAL DISCIPLINARIO': '/historialDisciplinario',
         'DOCUMENTOS': '/documentos',
@@ -29,7 +29,6 @@ export const getPath = (opcion: string): string => {
 
     return rutas[opcion.toUpperCase()] || '/';
 };
-
 
 export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
 
@@ -75,4 +74,17 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
     } catch {
         return [];
     }
+};
+
+export const generarRuta = (opcion: string): string => {
+  return "/" + opcion
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "");       
+};
+
+export const getSubPath = (menuOpcion: string, subOpcion: string): string => {
+    const basePath = generarRuta(menuOpcion);
+    return `${basePath}/${subOpcion.toLowerCase().replace(/\s+/g, '')}`;
 };

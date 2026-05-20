@@ -2,15 +2,15 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function PUT(request: NextRequest){
     const body = await request.json();
-    const {iD_Menu, opcion, posicion, habilitado, estado, icono} = body;
+    const {iD_SubMenu, opcion, posicion,menu_ID, habilitado, estado, icono} = body;
 
-    const res = await fetch(`https://localhost:7233/portalpadres/v1/menu/Actualizar/${iD_Menu}`,
+    const res = await fetch(`https://localhost:7233/portalpadres/v1/submenu/Actualizar/${iD_SubMenu}`,
         {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({opcion, posicion, habilitado, estado, icono, usuario:"DiegoC"})
+            body: JSON.stringify({opcion, posicion,menu_ID, habilitado, estado, icono, usuario: "Diego"})
         }
     )
 

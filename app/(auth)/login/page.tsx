@@ -81,7 +81,7 @@ export default function Login() {
                 return;
             }
 
-            router.push("/resumenEstudiante");
+            router.push("/resumenestudiante");
 
         } catch (error) {
             setErrorServidor('Error de conexión. Intenta de nuevo.');

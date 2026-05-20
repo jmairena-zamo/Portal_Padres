@@ -10,12 +10,15 @@ export async function GET(){
 
         const menus = await Promise.all(
             datamenus.response.map( async (menu: any) => {
-                const resmenurol = await fetch(`https://localhost:7233/portalpadres/v1/menurol/ListarPorMenu/${menu.iD_Menu}`);
-                const datamenurol = await resmenurol.json();
+                const resMenurol = await fetch(`https://localhost:7233/portalpadres/v1/menurol/ListarPorMenu/${menu.iD_Menu}`);
+                const dataMenurol = await resMenurol.json();
+                const resSubmenurol = await fetch(`https://localhost:7233/portalpadres/v1/submenu/ListarPorMenu/${menu.iD_Menu}`);
+                const dataSubmenu = await resSubmenurol.json();
 
                 return {
                     ...menu,
-                    rolesAsignados: datamenurol.response || []
+                    rolesAsignados: dataMenurol.response || [],
+                    submenus: dataSubmenu.response || []
                 };
             })
         )

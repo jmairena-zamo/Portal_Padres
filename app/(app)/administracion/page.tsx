@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import styles from './page.module.css';
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import React from "react";
+
 
 interface Rol {
     iD_Rol: number;
@@ -14,6 +17,16 @@ interface MenuRol {
     rol_ID: number;
 }
 
+interface SubMenu {
+    iD_SubMenu: number;
+    opcion: string;
+    posicion: number;
+    menu_ID: number;
+    habilitado: number;
+    estado: number;
+    icono: string;
+}
+
 interface Menu {
     iD_Menu: number;
     opcion: string;
@@ -22,6 +35,7 @@ interface Menu {
     estado: number;
     icono: string;
     rolesAsignados: MenuRol[];
+    submenus: SubMenu[];
 }
 
 export default function Administracion() {
@@ -31,6 +45,7 @@ export default function Administracion() {
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
     const [error, setError] = useState('');
+    const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
 
     useEffect(() => {
         cargarDatos();
@@ -81,6 +96,21 @@ export default function Administracion() {
         cargarDatos();
     }
 
+    const cambiarPosicionSUB = async (submenu: SubMenu, nuevaPosicion: number) => {
+        await fetch('/api/menu/actualizarSubMenu',
+            {
+                method: 'put',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...submenu,
+                    posicion: nuevaPosicion
+                })
+            }
+        );
+        mostrarMensaje(`Posición de ${submenu.opcion} actualizada`);
+        cargarDatos();
+    }
+
     const gestionRoles = async (menu: Menu, rol: Rol) => {
         const rolAsignado = menu.rolesAsignados.find(r => r.rol_ID === rol.iD_Rol);
 
@@ -115,6 +145,10 @@ export default function Administracion() {
         setTimeout(() => setMensaje(''), 3000);
     }
 
+    const gestionSubmenu = (idMenu: number) => {
+        setMenuAbierto(e => e === idMenu ? null : idMenu);
+    }
+
     return (
         <div className={styles.cards}>
 
@@ -133,43 +167,95 @@ export default function Administracion() {
                     </thead>
                     <tbody>
                         {menus.map(menu => (
-                            <tr key={menu.iD_Menu}>
+                            <React.Fragment key={menu.iD_Menu}>
 
-                                <td>{menu.opcion}</td>
+                                <tr key={menu.iD_Menu}>
 
-                                <td>
-                                    <input
-                                        type="number"
-                                        defaultValue={menu.posicion}
-                                        className={styles.inputPos}
-                                        onBlur={(e) => {
-                                            const nueva = Number(e.target.value);
-                                            if (nueva !== menu.posicion) {
-                                                cambiarPosicion(menu, nueva);
-                                            }
-                                        }}
-                                    />
-                                </td>
+                                    <td>
+                                        <button
+                                            className={styles.menuBtn}
+                                            onClick={() => gestionSubmenu(menu.iD_Menu)}
+                                        >
+                                            {menu.opcion}
+                                            {menu.submenus?.length > 0 && (
+                                                menuAbierto === menu.iD_Menu
+                                                    ? <FaChevronDown size={12} />
+                                                    : <FaChevronRight size={12} />
+                                            )}
+                                        </button>
+                                    </td>
 
-                                {roles.map(rol => (
-                                    <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
+                                    <td>
                                         <input
-                                            type="checkbox"
-                                            checked={menu.rolesAsignados.some(r => r.rol_ID === rol.iD_Rol)}
-                                            onChange={() => gestionRoles(menu, rol)}
+                                            type="number"
+                                            defaultValue={menu.posicion}
+                                            className={styles.inputPos}
+                                            onBlur={(e) => {
+                                                const nueva = Number(e.target.value);
+                                                if (nueva !== menu.posicion) {
+                                                    cambiarPosicion(menu, nueva);
+                                                }
+                                            }}
                                         />
                                     </td>
-                                ))}
 
-                                <td>
-                                    <button
-                                        onClick={() => Habilitar(menu)}
-                                        className={menu.habilitado === 1 ? styles.btnHabilitar : styles.btnDeshabilitar}
-                                    >
-                                        {menu.habilitado === 1 ? 'Deshabilitar' : 'Habilitar'}
-                                    </button>
-                                </td>
-                            </tr>
+                                    {roles.map(rol => (
+                                        <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={menu.rolesAsignados.some(r => r.rol_ID === rol.iD_Rol)}
+                                                onChange={() => gestionRoles(menu, rol)}
+                                            />
+                                        </td>
+                                    ))}
+
+                                    <td>
+                                        <button
+                                            onClick={() => Habilitar(menu)}
+                                            className={menu.habilitado === 1 ? styles.btnHabilitar : styles.btnDeshabilitar}
+                                        >
+                                            {menu.habilitado === 1 ? 'Deshabilitar' : 'Habilitar'}
+                                        </button>
+                                    </td>
+                                </tr>
+                                {
+                                    menuAbierto === menu.iD_Menu && menu.submenus?.length > 0 && (
+                                        menu.submenus.map(sub => (
+                                            <tr key={sub.iD_SubMenu} className={styles.submenurow}>
+                                                <td>{sub.opcion}</td>
+                                                <td><input
+                                                    type="number"
+                                                    defaultValue={sub.posicion}
+                                                    className={styles.inputPos}
+                                                    onBlur={(e) => {
+                                                        const nueva = Number(e.target.value);
+                                                        if (nueva !== sub.posicion) {
+                                                            cambiarPosicionSUB(sub, nueva);
+                                                        }
+                                                    }}
+                                                />
+                                                </td>
+                                                {roles.map(rol => (
+                                                    <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            onChange={() => console.log("Asignar rol a submenú")}
+                                                        />
+                                                    </td>
+                                                ))}
+                                                <td>
+                                                    <button
+                                                        className={styles.btnSubmenu}
+                                                        onClick={() => console.log("Habilitar/Deshabilitar submenú")}
+                                                    >
+                                                        Estado
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )
+                                }
+                            </React.Fragment>
                         ))}
                     </tbody>
                 </table>
