@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
                 const dataSub = await resSub.json();
 
                 const submenus = (dataSub.response || []).filter((sub: any) =>
-                    submenuIDs.includes(sub.iD_SubMenu) && sub.estado === 1
+                    submenuIDs.includes(sub.iD_SubMenu) && sub.habilitado === 1
                 );
 
                 return { ...menu, submenus };

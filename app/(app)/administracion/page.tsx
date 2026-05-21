@@ -17,6 +17,12 @@ interface MenuRol {
     rol_ID: number;
 }
 
+interface SubMenuRol {
+    iD_Menu_Rol: number;
+    subMenu_ID: number;
+    rol_ID: number;
+}
+
 interface SubMenu {
     iD_SubMenu: number;
     opcion: string;
@@ -25,6 +31,7 @@ interface SubMenu {
     habilitado: number;
     estado: number;
     icono: string;
+    rolesAsignados: SubMenuRol[];
 }
 
 interface Menu {
@@ -78,6 +85,22 @@ export default function Administracion() {
         });
 
         mostrarMensaje(`${menu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
+        cargarDatos();
+    }
+
+    const HabilitarSUB = async (submenu: SubMenu) => {
+        const nuevoHabilitado = submenu.habilitado === 1 ? 0 : 1;
+
+        await fetch('/api/menu/actualizarSubMenu', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ...submenu,
+                habilitado: nuevoHabilitado
+            })
+        });
+
+        mostrarMensaje(`${submenu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
         cargarDatos();
     }
 
@@ -136,6 +159,35 @@ export default function Administracion() {
                 }
             );
             mostrarMensaje(`Rol ${rol.rol} asignado a ${menu.opcion}`);
+        }
+        cargarDatos();
+    }
+
+    const gestionRolesSUB = async (submenu: SubMenu, rol: Rol) => {
+        const rolAsignado = submenu.rolesAsignados.find(r => r.rol_ID === rol.iD_Rol);
+
+        if (rolAsignado) {
+            await fetch('/api/menu/asignarSubMenuRol',
+                {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ iD_Menu_Rol: rolAsignado.iD_Menu_Rol })
+                }
+            );
+            mostrarMensaje(`Rol ${rol.rol} quitado de ${submenu.opcion}`);
+        } else {
+            await fetch('api/menu/asignarMenuRol',
+                {
+                    method: 'POST',
+                    headers: { 'Content-type': 'application/json' },
+                    body: JSON.stringify({
+                        subMenu_ID: submenu.iD_SubMenu,
+                        rol_ID: rol.iD_Rol,
+                        usuario: 'ADMIN',
+                    })
+                }
+            );
+            mostrarMensaje(`Rol ${rol.rol} asignado a ${submenu.opcion}`);
         }
         cargarDatos();
     }
@@ -203,7 +255,7 @@ export default function Administracion() {
                                         <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
                                             <input
                                                 type="checkbox"
-                                                checked={menu.rolesAsignados.some(r => r.rol_ID === rol.iD_Rol)}
+                                                checked={menu.rolesAsignados.some(r => r.rol_ID === rol.iD_Rol) || false}
                                                 onChange={() => gestionRoles(menu, rol)}
                                             />
                                         </td>
@@ -239,16 +291,17 @@ export default function Administracion() {
                                                     <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
                                                         <input
                                                             type="checkbox"
-                                                            onChange={() => console.log("Asignar rol a submenú")}
+                                                            checked={sub.rolesAsignados.some(r => r.rol_ID === rol.iD_Rol) || false}
+                                                            onChange={() => gestionRolesSUB(sub, rol)}
                                                         />
                                                     </td>
                                                 ))}
                                                 <td>
                                                     <button
-                                                        className={styles.btnSubmenu}
-                                                        onClick={() => console.log("Habilitar/Deshabilitar submenú")}
+                                                        onClick={() => HabilitarSUB(sub)}
+                                                        className={sub.habilitado === 1 ? styles.btnHabilitar : styles.btnDeshabilitar}
                                                     >
-                                                        Estado
+                                                        {sub.habilitado === 1 ? 'Deshabilitar' : 'Habilitar'}
                                                     </button>
                                                 </td>
                                             </tr>

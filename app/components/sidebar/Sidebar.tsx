@@ -7,7 +7,7 @@ import imagen from '../../img/Zamorano1.jpg'
 import { usePathname, useRouter } from 'next/navigation';
 import { FaSignOutAlt, FaFile, FaFileAlt, FaHome, FaCoins, FaBook, FaFolder, FaClipboardCheck, FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { useEffect, useState } from 'react';
-import { getPath, getIcono, generarRuta, getSubPath} from '@/app/utils/menu';
+import { getIcono, generarRuta, getSubPath} from '@/app/utils/menu';
 
 interface SubMenu {
     iD_SubMenu: number;
@@ -83,16 +83,18 @@ export const Sidebar = () => {
 
                 <nav className={styles.nav}>
 
-                    {/*<Link href="/resumenEstudiante" className={linkClass("/resumenEstudiante")}><FaHome size={20} />Home</Link >
-                    <Link href="/estadoCuenta" className={linkClass("/estadoCuenta")}><FaCoins size={20} />Estado de Cuenta</Link>
-                    <Link href="/historialAcademico" className={linkClass("/historialAcademico")}><FaFileAlt size={20} />Historial Academico</Link >
+                    <Link href="/resumenestudiante" className={linkClass("/resumenestudiante")}><FaHome size={20} />Home</Link >
+                    <Link href="/estadodecuenta" className={linkClass("/estadodecuenta")}><FaCoins size={20} />Estado de Cuenta</Link>
+                    <Link href="/historialacademico" className={linkClass("/historialacademico")}><FaFileAlt size={20} />Historial Academico</Link >
                     <Link href="/clases" className={linkClass("/clases")}><FaBook size={20} />Clases</Link >
-                    <Link href="/historialDisciplinario" className={linkClass("/historialDisciplinario")}><FaFolder size={20} />Historial Disciplinario</Link >
+                    <Link href="/historialdisciplinario" className={linkClass("/historialdisciplinario")}><FaFolder size={20} />Historial Disciplinario</Link >
                     <Link href="/documentos" className={linkClass("/documentos")}><FaFile size={20} />Documentos</Link >
-                    <Link href="/quejasSugerencias" className={linkClass("/quejasSugerencias")}><FaClipboardCheck size={20} />Quejas o Sugerencias</Link >*/}
-                    {
+                    <Link href="/quejasosugerencias" className={linkClass("/quejasosugerencias")}><FaClipboardCheck size={20} />Quejas o Sugerencias</Link >
+                    
+                    {/* {
                         menus.map((menu)=> {
                             const path = generarRuta(menu.opcion);
+                            console.log(path);
                             const tieneSubmenus = menu.submenus && menu.submenus.length > 0;
                             const estaAbierto = menuAbierto === menu.iD_Menu;
                             return (
@@ -140,7 +142,7 @@ export const Sidebar = () => {
                             
                             );
                         })
-                    }
+                    } */}
                 </nav>
 
             </div>

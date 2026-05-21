@@ -14,13 +14,13 @@ export async function middleware(request: NextRequest) {
     }
 
     const rutasProtegidas = [
-        '/resumenEstudiante',
-        '/estadoCuenta',
-        '/historialAcademico',
+        '/resumenestudiante',
+        '/estadocuenta',
+        '/historialacademico',
         '/clases',
-        '/historialDisciplinario',
+        '/historialdisciplinario',
         '/documentos',
-        '/quejasSugerencias',
+        '/quejasosugerencias',
         '/administracion',
     ];
 
@@ -33,16 +33,16 @@ export async function middleware(request: NextRequest) {
     }
 
     const rutaactual = rutasProtegidas.find((ruta) => path.startsWith(ruta));
-    if(!rutaactual) return NextResponse.next();
+    if (!rutaactual) return NextResponse.next();
 
     const usuario = JSON.parse(session.value);
     const ID_rol = 2;
 
     const rutaspermitidas = await getRutasPermitidas(ID_rol);
 
-    const permiso = rutaspermitidas.some(ruta => path.startsWith(ruta));
+    const permiso = rutaspermitidas.includes(path);
 
-    if(!permiso) return NextResponse.redirect(new URL('/noAutorizado', request.url));
+    if (!permiso) return NextResponse.redirect(new URL('/noautorizado', request.url));
 
     return NextResponse.next();
 
@@ -58,13 +58,13 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/resumenEstudiante/:path*',
-        '/estadoCuenta/:path*',
-        '/historialAcademico/:path*',
+        '/resumenestudiante/:path*',
+        '/estadocuenta/:path*',
+        '/historialacademico/:path*',
         '/clases/:path*',
-        '/historialDisciplinario/:path*',
+        '/historialdisciplinario/:path*',
         '/documentos/:path*',
-        '/quejasSugerencias/:path*',
+        '/quejasosugerencias/:path*',
         '/administracion/:path*',
     ]
 };
