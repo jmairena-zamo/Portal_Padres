@@ -50,7 +50,16 @@ export const quejaSchema = z.object({
     .regex(/^[^<>{}[\]\\|]+$/)
 })
 
+export const menuSchema = z.object({
+  opcion: z.string()
+  .min(5)
+  .max(30)
+  .regex(/^[^<>{}[\]\\|]+$/),
+  posicion: z.number()
+})
+
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RecuperarContrasenaData = z.infer<typeof recuperarContrasenaSchema>;
 export type nuevaContrasenaData = z.infer<typeof nuevaContrasenaSchema>;
 export type quejaData = z.infer<typeof quejaSchema>;
+export type menuData = z.infer<typeof menuSchema>;

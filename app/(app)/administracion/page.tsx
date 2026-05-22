@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import styles from './page.module.css';
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import React from "react";
+import { menuData, menuSchema } from "@/app/utils/validations";
+import Toast from "@/app/components/toast/Toast";
+import { useToast } from "@/app/hooks/useToast";
 
 
 interface Rol {
@@ -47,12 +50,23 @@ interface Menu {
 
 export default function Administracion() {
 
+    const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
+
     const [menus, setMenus] = useState<Menu[]>([]);
     const [roles, setRoles] = useState<Rol[]>([]);
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
     const [error, setError] = useState('');
     const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
+
+    //constantes para modal menu
+    const [modalMenu, setModalMenu] = useState(false);
+    const [formDataMenu, setFormDataMenu] = useState<menuData>({
+        opcion: '',
+        posicion: 1,
+    })
+    const [esValidoOpcion, setEsValidoOpcion] = useState(true);
+    const [esValidoPosicion, setEsValidoPosicion] = useState(true);
 
     useEffect(() => {
         cargarDatos();
@@ -75,7 +89,7 @@ export default function Administracion() {
     const Habilitar = async (menu: Menu) => {
         const nuevoHabilitado = menu.habilitado === 1 ? 0 : 1;
 
-        await fetch('/api/menu/actualizarMenu', {
+        const res = await fetch('/api/menu/actualizarMenu', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -84,14 +98,18 @@ export default function Administracion() {
             })
         });
 
-        mostrarMensaje(`${menu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
+        if (res.ok) {
+            mostrarExito(`${menu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
+        } else {
+            mostrarError(`Error al actualizar ${menu.opcion}`);
+        }
         cargarDatos();
     }
 
     const HabilitarSUB = async (submenu: SubMenu) => {
         const nuevoHabilitado = submenu.habilitado === 1 ? 0 : 1;
 
-        await fetch('/api/menu/actualizarSubMenu', {
+        const res = await fetch('/api/menu/actualizarSubMenu', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -100,12 +118,16 @@ export default function Administracion() {
             })
         });
 
-        mostrarMensaje(`${submenu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
+        if (res.ok) {
+            mostrarExito(`${submenu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
+        } else {
+            mostrarError(`Error al actualizar ${submenu.opcion}`);
+        }
         cargarDatos();
     }
 
     const cambiarPosicion = async (menu: Menu, nuevaPosicion: number) => {
-        await fetch('/api/menu/actualizarMenu',
+        const res = await fetch('/api/menu/actualizarMenu',
             {
                 method: 'put',
                 headers: { 'Content-Type': 'application/json' },
@@ -115,12 +137,16 @@ export default function Administracion() {
                 })
             }
         );
-        mostrarMensaje(`Posición de ${menu.opcion} actualizada`);
+        if (res.ok) {
+            mostrarExito(`Cambio de Posicion de ${menu.opcion}`);
+        } else {
+            mostrarError(`Error al actualizar posición ${menu.opcion}`);
+        }
         cargarDatos();
     }
 
     const cambiarPosicionSUB = async (submenu: SubMenu, nuevaPosicion: number) => {
-        await fetch('/api/menu/actualizarSubMenu',
+        const res = await fetch('/api/menu/actualizarSubMenu',
             {
                 method: 'put',
                 headers: { 'Content-Type': 'application/json' },
@@ -130,7 +156,11 @@ export default function Administracion() {
                 })
             }
         );
-        mostrarMensaje(`Posición de ${submenu.opcion} actualizada`);
+        if (res.ok) {
+            mostrarExito(`Cambio de Posicion de ${submenu.opcion}`);
+        } else {
+            mostrarError(`Error al actualizar posición ${submenu.opcion}`);
+        }
         cargarDatos();
     }
 
@@ -138,16 +168,20 @@ export default function Administracion() {
         const rolAsignado = menu.rolesAsignados.find(r => r.rol_ID === rol.iD_Rol);
 
         if (rolAsignado) {
-            await fetch('/api/menu/asignarMenuRol',
+            const res = await fetch('/api/menu/asignarMenuRol',
                 {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ iD_Menu_Rol: rolAsignado.iD_Menu_Rol })
                 }
             );
-            mostrarMensaje(`Rol ${rol.rol} quitado de ${menu.opcion}`);
+            if (res.ok) {
+                mostrarExito(`Rol ${rol.rol} eliminado de ${menu.opcion}`);
+            } else {
+                mostrarError(`Error al Eliminar Rol ${rol.rol} de ${menu.opcion}`);
+            }
         } else {
-            await fetch('api/menu/asignarMenuRol',
+            const res = await fetch('api/menu/asignarMenuRol',
                 {
                     method: 'POST',
                     headers: { 'Content-type': 'application/json' },
@@ -158,7 +192,11 @@ export default function Administracion() {
                     })
                 }
             );
-            mostrarMensaje(`Rol ${rol.rol} asignado a ${menu.opcion}`);
+            if (res.ok) {
+                mostrarExito(`Rol ${rol.rol} Asignado a ${menu.opcion}`);
+            } else {
+                mostrarError(`Error al Asignar Rol ${rol.rol} a ${menu.opcion}`);
+            }
         }
         cargarDatos();
     }
@@ -167,16 +205,20 @@ export default function Administracion() {
         const rolAsignado = submenu.rolesAsignados.find(r => r.rol_ID === rol.iD_Rol);
 
         if (rolAsignado) {
-            await fetch('/api/menu/asignarSubMenuRol',
+            const res = await fetch('/api/menu/asignarSubMenuRol',
                 {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ iD_Menu_Rol: rolAsignado.iD_Menu_Rol })
                 }
             );
-            mostrarMensaje(`Rol ${rol.rol} quitado de ${submenu.opcion}`);
+            if (res.ok) {
+                mostrarExito(`Rol ${rol.rol} eliminado de ${submenu.opcion}`);
+            } else {
+                mostrarError(`Error al Eliminar Rol ${rol.rol} de ${submenu.opcion}`);
+            }
         } else {
-            await fetch('api/menu/asignarMenuRol',
+            const res = await fetch('api/menu/asignarSubMenuRol',
                 {
                     method: 'POST',
                     headers: { 'Content-type': 'application/json' },
@@ -187,25 +229,99 @@ export default function Administracion() {
                     })
                 }
             );
-            mostrarMensaje(`Rol ${rol.rol} asignado a ${submenu.opcion}`);
+            if (res.ok) {
+                mostrarExito(`Rol ${rol.rol} Asignado a ${submenu.opcion}`);
+            } else {
+                mostrarError(`Error al Asignar Rol ${rol.rol} a ${submenu.opcion}`);
+            }
         }
         cargarDatos();
-    }
-
-    const mostrarMensaje = (msg: string) => {
-        setMensaje(msg);
-        setTimeout(() => setMensaje(''), 3000);
     }
 
     const gestionSubmenu = (idMenu: number) => {
         setMenuAbierto(e => e === idMenu ? null : idMenu);
     }
 
+    //Validacion modal menu
+    const handlerOnChangeMenu = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+
+        setFormDataMenu((values) => ({
+            ...values,
+            [name]: value,
+        }));
+
+        if (name === "opcion" && !esValidoOpcion) {
+            setEsValidoOpcion(true);
+        }
+
+        if (name === "posicion" && !esValidoPosicion) {
+            setEsValidoPosicion(true);
+        }
+    }
+
+    const validationOpcion = () => {
+        const result = menuSchema.shape.opcion.safeParse(formDataMenu.opcion);
+        setEsValidoOpcion(result.success)
+    }
+
+    const validationPosicion = () => {
+        const result = menuSchema.shape.posicion.safeParse(formDataMenu.posicion);
+        setEsValidoPosicion(result.success)
+    }
+
+    const cancelarModal = () => {
+        setFormDataMenu({
+            opcion: '',
+            posicion: 1
+        })
+        setModalMenu(false)
+    }
+
+    const crearMenu = async () => {
+        if (!formDataMenu.opcion.trim()) return;
+        const res = await fetch('/api/menu/crearMenu',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    opcion: formDataMenu.opcion,
+                    posicion: formDataMenu.posicion
+                }
+                )
+            }
+        );
+
+        if (res.ok) {
+            mostrarExito(`Menú ${formDataMenu.opcion} creado correctamente`); 
+        } else {
+            mostrarError('Error al crear el menú'); 
+        }
+
+        setModalMenu(false);
+        cargarDatos();
+    }
+
     return (
         <div className={styles.cards}>
 
+            {toast && (
+                <Toast
+                    mensaje={toast.mensaje}
+                    tipo={toast.tipo}
+                    onClose={cerrarToast}
+                />
+            )}
+
             <div className={styles.card}>
-                <h2>Administración de Menú</h2>
+                <div className={styles.header}>
+                    <h2>Administración de Menú</h2>
+                    <div className={styles.headerBtn}>
+                        <button onClick={() => setModalMenu(true)} className={styles.Btncrear}>+ Menu</button>
+                        {/* <button className={styles.Btncrear}>+ Submenu</button> */}
+                    </div>
+                </div>
+
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -264,9 +380,9 @@ export default function Administracion() {
                                     <td>
                                         <button
                                             onClick={() => Habilitar(menu)}
-                                            className={menu.habilitado === 1 ? styles.btnHabilitar : styles.btnDeshabilitar}
+                                            className={menu.habilitado === 1 ? styles.btnDeshabilitar : styles.btnHabilitar}
                                         >
-                                            {menu.habilitado === 1 ? 'Deshabilitar' : 'Habilitar'}
+                                            {menu.habilitado === 1 ? 'Habilitado' : 'Deshabilitado'}
                                         </button>
                                     </td>
                                 </tr>
@@ -299,9 +415,9 @@ export default function Administracion() {
                                                 <td>
                                                     <button
                                                         onClick={() => HabilitarSUB(sub)}
-                                                        className={sub.habilitado === 1 ? styles.btnHabilitar : styles.btnDeshabilitar}
+                                                        className={sub.habilitado === 1 ? styles.btnDeshabilitar : styles.btnHabilitar}
                                                     >
-                                                        {sub.habilitado === 1 ? 'Deshabilitar' : 'Habilitar'}
+                                                        {sub.habilitado === 1 ? 'Habilitado' : 'Deshabilitado'}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -317,6 +433,49 @@ export default function Administracion() {
                     <p>{mensaje}</p>
                 )}
                 */}
+                {
+                    modalMenu && (
+                        <div className={styles.modalOverlay}>
+                            <div className={styles.modal}>
+                                <div className={styles.headModal}>
+                                    <h2>Nuevo Menú</h2>
+                                </div>
+
+                                <div className={styles.formGroup}>
+                                    <label>Nombre:</label>
+                                    <input
+                                        type="text"
+                                        name="opcion"
+                                        className={!esValidoOpcion ? styles.inputError : styles.input}
+                                        value={formDataMenu.opcion}
+                                        onChange={handlerOnChangeMenu}
+                                        onBlur={validationOpcion}
+                                        placeholder="Ingrese el nombre de la nueva opción"
+                                    />
+                                    <span className={`${styles.spanError} ${!esValidoOpcion ? styles.err : ""}`}>La Opción no es válido</span>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Posición:</label>
+                                    <input
+                                        type="number"
+                                        name="posicion"
+                                        className={!esValidoPosicion ? styles.inputError : styles.input}
+                                        value={formDataMenu.posicion}
+                                        onChange={handlerOnChangeMenu}
+                                    />
+                                </div>
+                                <div className={styles.modalBtns}>
+                                    <button className={styles.Btncrear}
+                                        disabled={!esValidoOpcion || !esValidoPosicion}
+                                        onClick={crearMenu}>
+                                        Crear
+                                    </button>
+                                    <button onClick={cancelarModal} className={styles.Btncancelar}>Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
             </div>
         </div>
     )

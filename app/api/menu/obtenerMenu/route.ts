@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
         const resSubRol = await fetch(`https://localhost:7233/portalpadres/v1/submenurol/ListarPorRol/${idrol}`);
 
         const datasubrol = await resSubRol.json();
-        const submenuIDs: number[] = datasubrol.response.map((item: any) => item.subMenu_ID);
+        const submenuIDs: number[] = (datasubrol.response || []).map((item: any) => item.subMenu_ID);
 
         const menus = await Promise.all(
             menuIDs.map(async (id) => {
@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ menus: menusfiltrados })
     } catch (error) {
+        console.log("❌ Error exacto:", error);
         return NextResponse.json({ error: 'Error al obtener menús' }, { status: 500 });
     }
 }

@@ -83,15 +83,15 @@ export const Sidebar = () => {
 
                 <nav className={styles.nav}>
 
-                    <Link href="/resumenestudiante" className={linkClass("/resumenestudiante")}><FaHome size={20} />Home</Link >
+                    {/* <Link href="/resumenestudiante" className={linkClass("/resumenestudiante")}><FaHome size={20} />Home</Link >
                     <Link href="/estadodecuenta" className={linkClass("/estadodecuenta")}><FaCoins size={20} />Estado de Cuenta</Link>
                     <Link href="/historialacademico" className={linkClass("/historialacademico")}><FaFileAlt size={20} />Historial Academico</Link >
                     <Link href="/clases" className={linkClass("/clases")}><FaBook size={20} />Clases</Link >
                     <Link href="/historialdisciplinario" className={linkClass("/historialdisciplinario")}><FaFolder size={20} />Historial Disciplinario</Link >
                     <Link href="/documentos" className={linkClass("/documentos")}><FaFile size={20} />Documentos</Link >
-                    <Link href="/quejasosugerencias" className={linkClass("/quejasosugerencias")}><FaClipboardCheck size={20} />Quejas o Sugerencias</Link >
+                    <Link href="/quejasosugerencias" className={linkClass("/quejasosugerencias")}><FaClipboardCheck size={20} />Quejas o Sugerencias</Link > */}
                     
-                    {/* {
+                    {
                         menus.map((menu)=> {
                             const path = generarRuta(menu.opcion);
                             console.log(path);
@@ -142,7 +142,7 @@ export const Sidebar = () => {
                             
                             );
                         })
-                    } */}
+                    }
                 </nav>
 
             </div>
