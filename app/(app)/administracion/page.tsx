@@ -7,52 +7,54 @@ import React from "react";
 import { menuData, menuSchema } from "@/app/utils/validations";
 import Toast from "@/app/components/toast/Toast";
 import { useToast } from "@/app/hooks/useToast";
+import { useMenu } from "@/app/hooks/useMenu";
+import { Menu, Rol, SubMenu } from "@/app/interfaces/menus";
 
+// interface Rol {
+//     iD_Rol: number;
+//     rol: string;
+// }
 
-interface Rol {
-    iD_Rol: number;
-    rol: string;
-}
+// interface MenuRol {
+//     iD_Menu_Rol: number;
+//     menu_ID: number;
+//     rol_ID: number;
+// }
 
-interface MenuRol {
-    iD_Menu_Rol: number;
-    menu_ID: number;
-    rol_ID: number;
-}
+// interface SubMenuRol {
+//     iD_Menu_Rol: number;
+//     subMenu_ID: number;
+//     rol_ID: number;
+// }
 
-interface SubMenuRol {
-    iD_Menu_Rol: number;
-    subMenu_ID: number;
-    rol_ID: number;
-}
+// interface SubMenu {
+//     iD_SubMenu: number;
+//     opcion: string;
+//     posicion: number;
+//     menu_ID: number;
+//     habilitado: number;
+//     estado: number;
+//     icono: string;
+//     rolesAsignados: SubMenuRol[];
+// }
 
-interface SubMenu {
-    iD_SubMenu: number;
-    opcion: string;
-    posicion: number;
-    menu_ID: number;
-    habilitado: number;
-    estado: number;
-    icono: string;
-    rolesAsignados: SubMenuRol[];
-}
-
-interface Menu {
-    iD_Menu: number;
-    opcion: string;
-    posicion: number;
-    habilitado: number;
-    estado: number;
-    icono: string;
-    rolesAsignados: MenuRol[];
-    submenus: SubMenu[];
-}
+// interface Menu {
+//     iD_Menu: number;
+//     opcion: string;
+//     posicion: number;
+//     habilitado: number;
+//     estado: number;
+//     icono: string;
+//     rolesAsignados: MenuRol[];
+//     submenus: SubMenu[];
+// }
 
 export default function Administracion() {
 
     const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
 
     const [menus, setMenus] = useState<Menu[]>([]);
+    const { cargarMenus } = useMenu();
     const [roles, setRoles] = useState<Rol[]>([]);
     const [cargando, setCargando] = useState(true);
     const [mensaje, setMensaje] = useState('');
@@ -68,6 +70,16 @@ export default function Administracion() {
     const [esValidoOpcion, setEsValidoOpcion] = useState(true);
     const [esValidoPosicion, setEsValidoPosicion] = useState(true);
 
+    //constantes para modal Submenu
+    const [modalSubMenu, setModalSubMenu] = useState(false);
+    const [formDataSubMenu, setFormDataSubMenu] = useState<menuData>({
+        opcion: '',
+        posicion: 1,
+    })
+    const [esValidoOpcionSub, setEsValidoOpcionSub] = useState(true);
+    const [esValidoPosicionSub, setEsValidoPosicionSub] = useState(true);
+    const [menuSeleccionado, setMenuSeleccionado] = useState<number | null>(null);
+
     useEffect(() => {
         cargarDatos();
     }, []);
@@ -77,8 +89,9 @@ export default function Administracion() {
         try {
             const res = await fetch('/api/menu/adminMenuRol');
             const data = await res.json();
-            setMenus(data.menus);
             setRoles(data.roles);
+            setMenus(data.menus)
+            
         } catch (error) {
             setError('Error de conexión. Intenta de nuevo.');
         } finally {
@@ -104,6 +117,7 @@ export default function Administracion() {
             mostrarError(`Error al actualizar ${menu.opcion}`);
         }
         cargarDatos();
+        await cargarMenus();
     }
 
     const HabilitarSUB = async (submenu: SubMenu) => {
@@ -124,6 +138,7 @@ export default function Administracion() {
             mostrarError(`Error al actualizar ${submenu.opcion}`);
         }
         cargarDatos();
+        await cargarMenus();
     }
 
     const cambiarPosicion = async (menu: Menu, nuevaPosicion: number) => {
@@ -143,6 +158,7 @@ export default function Administracion() {
             mostrarError(`Error al actualizar posición ${menu.opcion}`);
         }
         cargarDatos();
+        await cargarMenus();
     }
 
     const cambiarPosicionSUB = async (submenu: SubMenu, nuevaPosicion: number) => {
@@ -162,6 +178,7 @@ export default function Administracion() {
             mostrarError(`Error al actualizar posición ${submenu.opcion}`);
         }
         cargarDatos();
+        await cargarMenus();
     }
 
     const gestionRoles = async (menu: Menu, rol: Rol) => {
@@ -199,6 +216,7 @@ export default function Administracion() {
             }
         }
         cargarDatos();
+        await cargarMenus();
     }
 
     const gestionRolesSUB = async (submenu: SubMenu, rol: Rol) => {
@@ -278,6 +296,40 @@ export default function Administracion() {
         setModalMenu(false)
     }
 
+    //Validacion modal Submenu
+    const handlerOnChangeSubMenu = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+
+        if (name === "opcionSub") {
+            setFormDataSubMenu(prev => ({ ...prev, opcion: value }));
+            if (!esValidoOpcionSub) setEsValidoOpcionSub(true);
+        }
+
+        if (name === "posicionSub") {
+            setFormDataSubMenu(prev => ({ ...prev, posicion: Number(value) }));
+            if (!esValidoPosicionSub) setEsValidoPosicionSub(true);
+        }
+    }
+
+
+    const validationOpcionSub = () => {
+        const result = menuSchema.shape.opcion.safeParse(formDataSubMenu.opcion);
+        setEsValidoOpcionSub(result.success);
+    }
+
+    const validationPosicionSub = () => {
+        const result = menuSchema.shape.posicion.safeParse(formDataSubMenu.posicion);
+        setEsValidoPosicionSub(result.success);
+    }
+
+    const cancelarModalSub = () => {
+        setFormDataSubMenu({
+            opcion: '',
+            posicion: 1
+        })
+        setModalSubMenu(false)
+    }
+
     const crearMenu = async () => {
         if (!formDataMenu.opcion.trim()) return;
         const res = await fetch('/api/menu/crearMenu',
@@ -293,13 +345,54 @@ export default function Administracion() {
         );
 
         if (res.ok) {
-            mostrarExito(`Menú ${formDataMenu.opcion} creado correctamente`); 
+            mostrarExito(`Menú ${formDataMenu.opcion} creado correctamente`);
         } else {
-            mostrarError('Error al crear el menú'); 
+            mostrarError('Error al crear el menú');
         }
 
+        setFormDataMenu({
+            opcion: '',
+            posicion: 1
+        })
         setModalMenu(false);
         cargarDatos();
+        await cargarMenus();
+    }
+
+    const crearSubMenu = async () => {
+        if (!formDataSubMenu.opcion.trim()) {
+            mostrarError('Ingrese un nombre para el submenu');
+            return;
+        }
+
+        if (!menuSeleccionado) {
+            mostrarError('Seleccione un menú padre');
+            return;
+        }
+        const res = await fetch('api/menu/crearSubmenu',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    opcion: formDataSubMenu.opcion,
+                    posicion: formDataSubMenu.posicion,
+                    menu_ID: menuSeleccionado
+                })
+            }
+        );
+        if (res.ok) {
+            mostrarExito(`Submenú ${formDataSubMenu.opcion} creado correctamente`);
+        } else {
+            mostrarError('Error al crear el Submenú');
+        }
+
+        setFormDataSubMenu({
+            opcion: '',
+            posicion: 1
+        })
+        setModalSubMenu(false);
+        cargarDatos();
+        await cargarMenus();
     }
 
     return (
@@ -318,6 +411,7 @@ export default function Administracion() {
                     <h2>Administración de Menú</h2>
                     <div className={styles.headerBtn}>
                         <button onClick={() => setModalMenu(true)} className={styles.Btncrear}>+ Menu</button>
+                        <button onClick={() => setModalSubMenu(true)} className={styles.Btncrear}>+ SubMenu</button>
                         {/* <button className={styles.Btncrear}>+ Submenu</button> */}
                     </div>
                 </div>
@@ -371,7 +465,7 @@ export default function Administracion() {
                                         <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
                                             <input
                                                 type="checkbox"
-                                                checked={menu.rolesAsignados.some(r => r.rol_ID === rol.iD_Rol) || false}
+                                                checked={menu.rolesAsignados?.some(r => r.rol_ID === rol.iD_Rol) || false}
                                                 onChange={() => gestionRoles(menu, rol)}
                                             />
                                         </td>
@@ -407,7 +501,7 @@ export default function Administracion() {
                                                     <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
                                                         <input
                                                             type="checkbox"
-                                                            checked={sub.rolesAsignados.some(r => r.rol_ID === rol.iD_Rol) || false}
+                                                            checked={sub.rolesAsignados?.some(r => r.rol_ID === rol.iD_Rol) || false}
                                                             onChange={() => gestionRolesSUB(sub, rol)}
                                                         />
                                                     </td>
@@ -452,7 +546,7 @@ export default function Administracion() {
                                         onBlur={validationOpcion}
                                         placeholder="Ingrese el nombre de la nueva opción"
                                     />
-                                    <span className={`${styles.spanError} ${!esValidoOpcion ? styles.err : ""}`}>La Opción no es válido</span>
+                                    <span className={`${styles.spanError} ${!esValidoOpcion ? styles.err : ""}`}>La Opción no es válida</span>
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label>Posición:</label>
@@ -462,7 +556,10 @@ export default function Administracion() {
                                         className={!esValidoPosicion ? styles.inputError : styles.input}
                                         value={formDataMenu.posicion}
                                         onChange={handlerOnChangeMenu}
+                                        onBlur={validationPosicion}
+                                        placeholder="Ingrese el posicion de la nueva opción"
                                     />
+                                    <span className={`${styles.spanError} ${!esValidoPosicion ? styles.err : ""}`}>La Posicion no es válida</span>
                                 </div>
                                 <div className={styles.modalBtns}>
                                     <button className={styles.Btncrear}
@@ -471,6 +568,63 @@ export default function Administracion() {
                                         Crear
                                     </button>
                                     <button onClick={cancelarModal} className={styles.Btncancelar}>Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    modalSubMenu && (
+                        <div className={styles.modalOverlay}>
+                            <div className={styles.modal}>
+                                <div className={styles.headModal}>
+                                    <h2>Nuevo SubMenú</h2>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Menú padre:</label>
+                                    <select
+                                        value={menuSeleccionado || ''}
+                                        onChange={e => setMenuSeleccionado(Number(e.target.value))}
+                                    >
+                                        <option value="">Selecciona un menú</option>
+                                        {menus.map(m => (
+                                            <option key={m.iD_Menu} value={m.iD_Menu}>{m.opcion}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Nombre:</label>
+                                    <input
+                                        type="text"
+                                        name="opcionSub"
+                                        className={!esValidoOpcionSub ? styles.inputError : styles.input}
+                                        value={formDataSubMenu.opcion}
+                                        onChange={handlerOnChangeSubMenu}
+                                        onBlur={validationOpcionSub}
+                                        placeholder="Ingrese el nombre de el nuevo submenu"
+                                    />
+                                    <span className={`${styles.spanError} ${!esValidoOpcionSub ? styles.err : ""}`}>La Opción no es válido</span>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Posición:</label>
+                                    <input
+                                        type="number"
+                                        name="posicionSub"
+                                        className={!esValidoPosicionSub ? styles.inputError : styles.input}
+                                        value={formDataSubMenu.posicion}
+                                        onChange={handlerOnChangeSubMenu}
+                                        onBlur={validationPosicionSub}
+                                        placeholder="Ingrese posicion del nuevo submenu"
+                                    />
+                                    <span className={`${styles.spanError} ${!esValidoPosicionSub ? styles.err : ""}`}>La Posicion no es válida</span>
+                                </div>
+                                <div className={styles.modalBtns}>
+                                    <button className={styles.Btncrear}
+                                        disabled={!esValidoOpcionSub}
+                                        onClick={crearSubMenu}>
+                                        Crear
+                                    </button>
+                                    <button onClick={cancelarModalSub} className={styles.Btncancelar}>Cancelar</button>
                                 </div>
                             </div>
                         </div>

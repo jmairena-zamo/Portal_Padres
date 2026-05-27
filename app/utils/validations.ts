@@ -53,9 +53,9 @@ export const quejaSchema = z.object({
 export const menuSchema = z.object({
   opcion: z.string()
   .min(5)
-  .max(30)
+  .max(40)
   .regex(/^[^<>{}[\]\\|]+$/),
-  posicion: z.number()
+  posicion: z.coerce.number().min(0)
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>;

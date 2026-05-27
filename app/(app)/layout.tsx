@@ -5,6 +5,7 @@ import { Sidebar } from "../components/sidebar/Sidebar";
 import styles from "./layout.module.css"
 import { useEffect, useState } from "react";
 import Modal from "../components/modal/Modal";
+import { MenuProvider } from "../hooks/useMenu";
 
 export default function AppLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
 
@@ -25,7 +26,7 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
     if (loading) return null;
 
     return (
-        <>
+        <MenuProvider>
             {showModal && <Modal OnClose={() => setShowModal(false)}/>}
 
             {!showModal && (
@@ -40,6 +41,6 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
                 </div>
             )}
 
-        </>
+        </MenuProvider>
     )
 }

@@ -8,36 +8,39 @@ import { usePathname, useRouter } from 'next/navigation';
 import { FaSignOutAlt, FaFile, FaFileAlt, FaHome, FaCoins, FaBook, FaFolder, FaClipboardCheck, FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { useEffect, useState } from 'react';
 import { getIcono, generarRuta, getSubPath} from '@/app/utils/menu';
+import { useMenu } from '@/app/hooks/useMenu';
+import { Menu } from '@/app/interfaces/menus';
 
-interface SubMenu {
-    iD_SubMenu: number;
-    opcion: string;
-    posicion: number;
-    menu_ID: number;
-}
+// interface SubMenu {
+//     iD_SubMenu: number;
+//     opcion: string;
+//     posicion: number;
+//     menu_ID: number;
+// }
 
-interface Menu {
-    iD_Menu: number;
-    opcion: string;
-    posicion: number;
-    icono: string;
-    submenus: SubMenu[];
-}
+// interface Menu {
+//     iD_Menu: number;
+//     opcion: string;
+//     posicion: number;
+//     icono: string;
+//     submenus: SubMenu[];
+// }
 
 export const Sidebar = () => {
 
     const pathname = usePathname();
     const route = useRouter();
-    const [menus, setMenus] = useState<Menu[]>([]);
+    // const [menus, setMenus] = useState<Menu[]>([]);
     const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
+    const {menus} = useMenu();
 
-    useEffect(() => {
-        fetch('api/menu/obtenerMenu').then(res => res.json())
-        .then(data => {
-            if (data.menus) setMenus(data.menus);
-        })
-        .catch(err => console.log('Error al cargar menús:', err));
-    }, [])
+    // useEffect(() => {
+    //     fetch('api/menu/obtenerMenu').then(res => res.json())
+    //     .then(data => {
+    //         if (data.menus) setMenus(data.menus);
+    //     })
+    //     .catch(err => console.log('Error al cargar menús:', err));
+    // }, [])
 
     const linkClass = (path: any) =>
         pathname === path ? styles.active : styles.link;
@@ -94,7 +97,6 @@ export const Sidebar = () => {
                     {
                         menus.map((menu)=> {
                             const path = generarRuta(menu.opcion);
-                            console.log(path);
                             const tieneSubmenus = menu.submenus && menu.submenus.length > 0;
                             const estaAbierto = menuAbierto === menu.iD_Menu;
                             return (
