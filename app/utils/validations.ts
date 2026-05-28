@@ -58,8 +58,15 @@ export const menuSchema = z.object({
   posicion: z.coerce.number().min(0)
 })
 
+export const rolSchema = z.object({
+  rol: z.string()
+    .max(25)
+    .regex(/^[^<>{}[\]\\|]+$/)
+})
+
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RecuperarContrasenaData = z.infer<typeof recuperarContrasenaSchema>;
 export type nuevaContrasenaData = z.infer<typeof nuevaContrasenaSchema>;
 export type quejaData = z.infer<typeof quejaSchema>;
 export type menuData = z.infer<typeof menuSchema>;
+export type rolData = z.infer<typeof rolSchema>;
