@@ -6,7 +6,11 @@ export async function POST(request: NextRequest){
     const res = await fetch('https://localhost:7233/portalpadres/v1/menurol/Crear',{
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+            menu_ID: body.menu_ID,
+            rol_ID: body.rol_ID,
+            usuario: "ADMIN"
+        })
     });
 
     if(!res.ok){
@@ -16,15 +20,18 @@ export async function POST(request: NextRequest){
     return NextResponse.json({ok: true})
 }
 
-export async function DELETE(request: NextRequest){
+export async function PUT(request: NextRequest){
     const body = await request.json();
-    const { iD_Menu_Rol } = body;
 
-    const res = await fetch(
-        `https://localhost:7233/portalpadres/v1/menurol/Eliminar/${iD_Menu_Rol}`,
+    const res = await fetch(`https://localhost:7233/portalpadres/v1/menurol/Actualizar`,
         {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                iD_Menu_Rol: body.iD_Menu_Rol,
+                habilitado: body.habilitado,
+                usuario: "ADMIN"
+            })
         }
     );
 

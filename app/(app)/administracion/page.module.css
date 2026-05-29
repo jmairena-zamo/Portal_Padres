@@ -70,6 +70,17 @@
 .listaRoles {
     display: flex;
     flex-direction: column;
+    height: 250px;
+    overflow-y: auto;
+}
+
+.listaRoles::-webkit-scrollbar {
+  width: 4px;
+}
+
+.listaRoles::-webkit-scrollbar-thumb {
+  background-color: #008237;
+  border-radius: 20px;       
 }
 
 .rolItem{    
@@ -185,6 +196,7 @@
 
 .headModal h2{
     padding: 5px 0;
+    font-size: 18px;
 }
 
 .formGroup {

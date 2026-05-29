@@ -8,12 +8,12 @@ export async function GET(request: NextRequest) {
         const resRol = await fetch(`https://localhost:7233/portalpadres/v1/menurol/ListarPorRol/${idrol}`);
 
         const datarol = await resRol.json();
-        const menuIDs: number[] = datarol.response.map((item: any) => item.menu_ID);
+        const menuIDs: number[] = datarol.response.filter((item: any) => item.habilitado === 1).map((item: any) => item.menu_ID);
 
         const resSubRol = await fetch(`https://localhost:7233/portalpadres/v1/submenurol/ListarPorRol/${idrol}`);
 
         const datasubrol = await resSubRol.json();
-        const submenuIDs: number[] = (datasubrol.response || []).map((item: any) => item.subMenu_ID);
+        const submenuIDs: number[] = (datasubrol.response || []).filter((item: any) => item.habilitado === 1).map((item: any) => item.subMenu_ID);
 
         const menus = await Promise.all(
             menuIDs.map(async (id) => {

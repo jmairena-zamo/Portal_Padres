@@ -11,45 +11,6 @@ import { useMenu } from "@/app/hooks/useMenu";
 import { Menu, Rol, SubMenu } from "@/app/interfaces/menus";
 import ConfirmModal from "@/app/components/confirmModal/confirmModal";
 
-// interface Rol {
-//     iD_Rol: number;
-//     rol: string;
-// }
-
-// interface MenuRol {
-//     iD_Menu_Rol: number;
-//     menu_ID: number;
-//     rol_ID: number;
-// }
-
-// interface SubMenuRol {
-//     iD_Menu_Rol: number;
-//     subMenu_ID: number;
-//     rol_ID: number;
-// }
-
-// interface SubMenu {
-//     iD_SubMenu: number;
-//     opcion: string;
-//     posicion: number;
-//     menu_ID: number;
-//     habilitado: number;
-//     estado: number;
-//     icono: string;
-//     rolesAsignados: SubMenuRol[];
-// }
-
-// interface Menu {
-//     iD_Menu: number;
-//     opcion: string;
-//     posicion: number;
-//     habilitado: number;
-//     estado: number;
-//     icono: string;
-//     rolesAsignados: MenuRol[];
-//     submenus: SubMenu[];
-// }
-
 export default function Administracion() {
 
     const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
@@ -203,81 +164,6 @@ export default function Administracion() {
         await cargarMenus();
     }
 
-    const gestionRoles = async (menu: Menu, rol: Rol) => {
-        const rolAsignado = menu.rolesAsignados.find(r => r.rol_ID === rol.iD_Rol);
-
-        if (rolAsignado) {
-            const res = await fetch('/api/menu/asignarMenuRol',
-                {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ iD_Menu_Rol: rolAsignado.iD_Menu_Rol })
-                }
-            );
-            if (res.ok) {
-                mostrarExito(`Rol ${rol.rol} eliminado de ${menu.opcion}`);
-            } else {
-                mostrarError(`Error al Eliminar Rol ${rol.rol} de ${menu.opcion}`);
-            }
-        } else {
-            const res = await fetch('api/menu/asignarMenuRol',
-                {
-                    method: 'POST',
-                    headers: { 'Content-type': 'application/json' },
-                    body: JSON.stringify({
-                        menu_ID: menu.iD_Menu,
-                        rol_ID: rol.iD_Rol,
-                        usuario: 'ADMIN',
-                    })
-                }
-            );
-            if (res.ok) {
-                mostrarExito(`Rol ${rol.rol} Asignado a ${menu.opcion}`);
-            } else {
-                mostrarError(`Error al Asignar Rol ${rol.rol} a ${menu.opcion}`);
-            }
-        }
-        cargarDatos();
-        await cargarMenus();
-    }
-
-    const gestionRolesSUB = async (submenu: SubMenu, rol: Rol) => {
-        const rolAsignado = submenu.rolesAsignados.find(r => r.rol_ID === rol.iD_Rol);
-
-        if (rolAsignado) {
-            const res = await fetch('/api/menu/asignarSubMenuRol',
-                {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ iD_Menu_Rol: rolAsignado.iD_Menu_Rol })
-                }
-            );
-            if (res.ok) {
-                mostrarExito(`Rol ${rol.rol} eliminado de ${submenu.opcion}`);
-            } else {
-                mostrarError(`Error al Eliminar Rol ${rol.rol} de ${submenu.opcion}`);
-            }
-        } else {
-            const res = await fetch('api/menu/asignarSubMenuRol',
-                {
-                    method: 'POST',
-                    headers: { 'Content-type': 'application/json' },
-                    body: JSON.stringify({
-                        subMenu_ID: submenu.iD_SubMenu,
-                        rol_ID: rol.iD_Rol,
-                        usuario: 'ADMIN',
-                    })
-                }
-            );
-            if (res.ok) {
-                mostrarExito(`Rol ${rol.rol} Asignado a ${submenu.opcion}`);
-            } else {
-                mostrarError(`Error al Asignar Rol ${rol.rol} a ${submenu.opcion}`);
-            }
-        }
-        cargarDatos();
-    }
-
     const gestionSubmenu = (idMenu: number) => {
         setMenuAbierto(e => e === idMenu ? null : idMenu);
     }
@@ -285,7 +171,7 @@ export default function Administracion() {
     //Gestion de roles
     const abrirPermisos = (item: Menu | SubMenu) => {
         setItemPermisos(item);
-        setRolesTemp(item.rolesAsignados.map(r => r.rol_ID));
+        setRolesTemp(item.rolesAsignados.filter(r => r.habilitado === 1).map(r => r.rol_ID));
         setModalPermisos(true);
     };
 
@@ -298,32 +184,55 @@ export default function Administracion() {
         setGuardandoPermisos(true);
 
         const esMenu = 'iD_Menu' in itemPermisos;
-        const rolesOriginales = itemPermisos.rolesAsignados.map(r => r.rol_ID);
+        const rolesConRegistro = itemPermisos.rolesAsignados;
 
-        const agregar = rolesTemp.filter(id => !rolesOriginales.includes(id));
-        const eliminar = itemPermisos.rolesAsignados.filter(r => !rolesTemp.includes(r.rol_ID));
+        const activar = rolesTemp.filter(idRol => {
+            const registro = rolesConRegistro.find(r => r.rol_ID === idRol);
+            return !registro || registro.habilitado === 0;
+        });
 
-        const promesasAgregar = agregar.map(idRol =>
+        const desactivar = rolesConRegistro.filter(r =>
+            r.habilitado === 1 && !rolesTemp.includes(r.rol_ID)
+        );
+
+        const nuevos = activar.filter(idRol =>
+            !rolesConRegistro.find(r => r.rol_ID === idRol)
+        );
+
+        const reactivar = activar.filter(idRol =>
+            rolesConRegistro.find(r => r.rol_ID === idRol && r.habilitado === 0)
+        );
+
+        const promesasAgregar = nuevos.map(idRol =>
             fetch(`/api/menu/${esMenu ? 'asignarMenuRol' : 'asignarSubMenuRol'}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(
                     esMenu
-                        ? { menu_ID: (itemPermisos as Menu).iD_Menu, rol_ID: idRol, usuario: 'ADMIN' }
-                        : { subMenu_ID: (itemPermisos as SubMenu).iD_SubMenu, rol_ID: idRol, usuario: 'ADMIN' }
+                        ? { menu_ID: (itemPermisos as Menu).iD_Menu, rol_ID: idRol }
+                        : { subMenu_ID: (itemPermisos as SubMenu).iD_SubMenu, rol_ID: idRol }
                 )
             })
         );
 
-        const promesasEliminar = eliminar.map(r =>
-            fetch(`/api/menu/${esMenu ? 'asignarMenuRol' : 'asignarSubMenuRol'}`, {
-                method: 'DELETE',
+        const promesasReactivar = reactivar.map(idRol => {
+            const registro = rolesConRegistro.find(r => r.rol_ID === idRol)!;
+            return fetch(`/api/menu/${esMenu ? 'asignarMenuRol' : 'asignarSubMenuRol'}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ iD_Menu_Rol: r.iD_Menu_Rol })
+                body: JSON.stringify({ iD_Menu_Rol: registro.iD_Menu_Rol, habilitado: 1 })
+            });
+        });
+
+        const promesasDesactivar = desactivar.map(r =>
+            fetch(`/api/menu/${esMenu ? 'asignarMenuRol' : 'asignarSubMenuRol'}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ iD_Menu_Rol: r.iD_Menu_Rol, habilitado: 0 })
             })
         );
 
-        await Promise.all([...promesasAgregar, ...promesasEliminar]);
+        await Promise.all([...promesasAgregar, ...promesasDesactivar, ...promesasReactivar]);
 
         mostrarExito(`Permisos de "${itemPermisos.opcion}" actualizados`);
         setModalPermisos(false);
@@ -658,7 +567,7 @@ export default function Administracion() {
                                                 <button
                                                     className={styles.Btnpermisos}
                                                     onClick={() => abrirPermisos(menu)}>
-                                                    {menu.rolesAsignados.length} de {roles.length}
+                                                    {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
                                                 </button>
                                             </td>
 
@@ -688,15 +597,13 @@ export default function Administracion() {
                                                             }}
                                                         />
                                                         </td>
-                                                        {roles.map(rol => (
-                                                            <td key={rol.iD_Rol} style={{ textAlign: 'center' }}>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={sub.rolesAsignados?.some(r => r.rol_ID === rol.iD_Rol) || false}
-                                                                    onChange={() => gestionRolesSUB(sub, rol)}
-                                                                />
-                                                            </td>
-                                                        ))}
+                                                        <td>
+                                                            <button
+                                                                className={styles.Btnpermisos}
+                                                                onClick={() => abrirPermisos(sub)}>
+                                                                {sub.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
+                                                            </button>
+                                                        </td>
                                                         <td>
                                                             <button
                                                                 onClick={() => HabilitarSUB(sub)}
@@ -821,21 +728,22 @@ export default function Administracion() {
                                 <div className={styles.modalOverlay}>
                                     <div className={styles.modal}>
                                         <div className={styles.headModal}>
-                                            <h2>Permisos — {itemPermisos.opcion}</h2>
+                                            <h2>Permisos</h2>
+                                            <h2>{itemPermisos.opcion}</h2>
                                         </div>
 
                                         <div className={styles.listaRoles}>
                                             {roles.map(rol => (
-                                                    <label key={rol.iD_Rol} className={styles.rolItem}>
-                                                        <span>{rol.rol}</span>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={rolesTemp.includes(rol.iD_Rol)}
-                                                            onChange={() => toggleRolTemp(rol.iD_Rol)}
-                                                        />
-                                                        
-                                                    </label>
-                                                ))
+                                                <label key={rol.iD_Rol} className={styles.rolItem}>
+                                                    <span>{rol.rol}</span>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={rolesTemp.includes(rol.iD_Rol)}
+                                                        onChange={() => toggleRolTemp(rol.iD_Rol)}
+                                                    />
+
+                                                </label>
+                                            ))
                                             }
                                         </div>
 
@@ -857,7 +765,7 @@ export default function Administracion() {
                                         </div>
                                     </div>
                                 </div>
-                        )}
+                            )}
                     </div>
                 )
             }

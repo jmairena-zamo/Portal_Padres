@@ -7,12 +7,14 @@ export interface MenuRol {
     iD_Menu_Rol: number;
     menu_ID: number;
     rol_ID: number;
+    habilitado: number;
 }
 
 export interface SubMenuRol {
     iD_Menu_Rol: number;
     subMenu_ID: number;
     rol_ID: number;
+    habilitado: number;
 }
 
 export interface SubMenu {

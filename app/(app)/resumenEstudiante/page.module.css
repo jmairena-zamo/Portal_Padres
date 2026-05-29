@@ -1,31 +1,30 @@
 .contentresumen {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 10px;
-    padding: 20px;
+    gap: 1rem;
+    padding: 1rem;
 }
 
 .cards{
     display: flex;
-    height: 315px;
-    gap: 12px;
+    flex-wrap: wrap; 
+    gap: 1rem;
     width: 100%;
 }
 
 .cards2{
     display: flex;
-    height: 150px;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
 }
 
 .card {
+    flex: 1 1 300px; 
     background: white;
-    padding: 15px 10px;
+    padding: 1rem;
     border-radius: 5px;
-    box-shadow: 0px 3px 5px 3px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    height: 100%;
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
 }
 
 .cards h3{
@@ -45,19 +44,16 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
-    gap: 15px;
-    width: 550px;
-    height: 100%;
+    gap: 1rem;
+    flex: 2 1 400px;
 }
 
 .cardgraphics{
+    flex: 1 1 200px;
     background: white;
-    width: 237px;
-    height: 150px;
-    padding: 15px;
+    padding: 1rem;
     border-radius: 5px;
-    box-shadow: 5px 3px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
     text-align: center;
 }
 
@@ -103,14 +99,11 @@
 }
 
 .faltas{
+    flex: 1 1 300px;
     background: white;
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    box-shadow: 5px 3px 5px rgba(0, 0, 0, 0.2);
+    padding: 1rem;
     border-radius: 5px;
-    width: 500px;
-    height: 100%;
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
 }
 
 .cardsfaltas {
@@ -133,13 +126,11 @@
 }
 
 .stats {
+    flex: 1 1 250px;
     background: white;
-    padding: 15px 10px;
+    padding: 1rem;
     border-radius: 5px;
-    box-shadow: 5px 3px 5px rgba(0, 0, 0, 0.2);
-    align-items: center;
-    width: 420px;
-    height: 100%;
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
 }
 
 .cardsstats{

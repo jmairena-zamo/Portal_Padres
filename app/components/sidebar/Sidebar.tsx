@@ -11,21 +11,6 @@ import { getIcono, generarRuta, getSubPath} from '@/app/utils/menu';
 import { useMenu } from '@/app/hooks/useMenu';
 import { Menu } from '@/app/interfaces/menus';
 
-// interface SubMenu {
-//     iD_SubMenu: number;
-//     opcion: string;
-//     posicion: number;
-//     menu_ID: number;
-// }
-
-// interface Menu {
-//     iD_Menu: number;
-//     opcion: string;
-//     posicion: number;
-//     icono: string;
-//     submenus: SubMenu[];
-// }
-
 export const Sidebar = () => {
 
     const pathname = usePathname();
