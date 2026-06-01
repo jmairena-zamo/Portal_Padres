@@ -2,6 +2,19 @@ import { menuSchema } from "@/app/utils/validations";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+
+    const session = request.cookies.get('session');
+
+    if(!session){
+        return NextResponse.json(
+            { error: 'No hay sesion'},
+            { status: 400 }
+        )
+    }
+
+    const usuarioData = JSON.parse(session.value);
+    const usuario = usuarioData.email;
+
     const body = await request.json();
 
     const datosParseados = {
@@ -19,7 +32,7 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const {opcion, posicion} = parsed.data;
+    const {opcion, posicion, icono} = parsed.data;
 
     const res = await fetch('https://localhost:7233/portalpadres/v1/menu/Crear',
         {
@@ -29,10 +42,10 @@ export async function POST(request: NextRequest) {
                 {
                     opcion: opcion,
                     posicion: posicion,
-                    icono: 'string',
+                    icono: icono,
                     habilitado: 0,
                     estado: 1,
-                    usuario: 'DIEGO',
+                    usuario: usuario,
                 }
             ),
         }

@@ -1,4 +1,4 @@
-import { menuSchema } from "@/app/utils/validations";
+import { subMenuSchema } from "@/app/utils/validations";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
         posicion: Number(body.posicion)
     };
 
-    const parsed = menuSchema.safeParse(datosParseados);
+    const parsed = subMenuSchema.safeParse(datosParseados);
 
     if (!parsed.success) {
         console.log("Error Zod:", parsed.error);

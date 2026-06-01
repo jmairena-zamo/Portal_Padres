@@ -5,11 +5,10 @@ import styles from './Sidebar.module.css'
 import Image from 'next/image';
 import imagen from '../../img/Zamorano1.jpg'
 import { usePathname, useRouter } from 'next/navigation';
-import { FaSignOutAlt, FaFile, FaFileAlt, FaHome, FaCoins, FaBook, FaFolder, FaClipboardCheck, FaChevronDown, FaChevronRight } from "react-icons/fa";
-import { useEffect, useState } from 'react';
-import { getIcono, generarRuta, getSubPath} from '@/app/utils/menu';
+import { FaChevronDown, FaChevronRight, FaSignOutAlt} from "react-icons/fa";
+import { useState } from 'react';
+import { iconos, generarRuta, getSubPath } from '@/app/utils/menu';
 import { useMenu } from '@/app/hooks/useMenu';
-import { Menu } from '@/app/interfaces/menus';
 
 export const Sidebar = () => {
 
@@ -17,7 +16,7 @@ export const Sidebar = () => {
     const route = useRouter();
     // const [menus, setMenus] = useState<Menu[]>([]);
     const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
-    const {menus} = useMenu();
+    const { menus } = useMenu();
 
     // useEffect(() => {
     //     fetch('api/menu/obtenerMenu').then(res => res.json())
@@ -49,7 +48,7 @@ export const Sidebar = () => {
         } catch (error) {
             console.log("Error al cerrar sesión:", error);
         }
-    }
+    }  
 
     return (
         <div className={styles.sidebar}>
@@ -64,7 +63,7 @@ export const Sidebar = () => {
                 <div className={styles.tag}>
                     <div className={styles.contenttag}>
                         <Image src={imagen} alt="Logo Zamorano" />
-                        <h4><strong>NombreUsuario</strong></h4>
+                        <h4><strong>usuario</strong></h4>
                         <p>NombreAlumno</p>
                     </div>
                 </div>
@@ -78,55 +77,56 @@ export const Sidebar = () => {
                     <Link href="/historialdisciplinario" className={linkClass("/historialdisciplinario")}><FaFolder size={20} />Historial Disciplinario</Link >
                     <Link href="/documentos" className={linkClass("/documentos")}><FaFile size={20} />Documentos</Link >
                     <Link href="/quejasosugerencias" className={linkClass("/quejasosugerencias")}><FaClipboardCheck size={20} />Quejas o Sugerencias</Link > */}
-                    
+
                     {
-                        menus.map((menu)=> {
+                        menus.map((menu) => {
                             const path = generarRuta(menu.opcion);
                             const tieneSubmenus = menu.submenus && menu.submenus.length > 0;
                             const estaAbierto = menuAbierto === menu.iD_Menu;
+                            const Icono = iconos[menu.icono];
                             return (
                                 <div key={menu.iD_Menu}>
-                                {tieneSubmenus ? (
-                                    <>
-                                        <button
-                                            className={`${styles.link} ${styles.menuBtn}`}
-                                            onClick={() => gestionSubmenu(menu.iD_Menu)}
-                                        >
-                                            {getIcono(menu.opcion)}
-                                            {menu.opcion}
-                                            {estaAbierto
-                                                ? <FaChevronDown size={12} />
-                                                : <FaChevronRight size={12} />
-                                            }
-                                        </button>
+                                    {tieneSubmenus ? (
+                                        <>
+                                            <button
+                                                className={`${styles.link} ${styles.menuBtn}`}
+                                                onClick={() => gestionSubmenu(menu.iD_Menu)}
+                                            >
+                                                {Icono && <Icono size={20} />}
+                                                {menu.opcion}
+                                                {estaAbierto
+                                                    ? <FaChevronDown size={12} />
+                                                    : <FaChevronRight size={12} />
+                                                }
+                                            </button>
 
-                                        {estaAbierto && (
-                                            <div className={styles.submenus}>
-                                                {menu.submenus
-                                                    .sort((a, b) => a.posicion - b.posicion)
-                                                    .map(sub => {
-                                                        const subPath = getSubPath(menu.opcion, sub.opcion);
-                                                        return (
-                                                            <Link
-                                                                key={sub.iD_SubMenu}
-                                                                href={subPath}
-                                                                className={linkClass(subPath)}
-                                                            >
-                                                                {sub.opcion}
-                                                            </Link>
-                                                        );
-                                                    })}
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    <Link href={path} className={linkClass(path)}>
-                                        {getIcono(menu.opcion)}
-                                        {menu.opcion}
-                                    </Link>
-                                )}
-                            </div>
-                            
+                                            {estaAbierto && (
+                                                <div className={styles.submenus}>
+                                                    {menu.submenus
+                                                        .sort((a, b) => a.posicion - b.posicion)
+                                                        .map(sub => {
+                                                            const subPath = getSubPath(menu.opcion, sub.opcion);
+                                                            return (
+                                                                <Link
+                                                                    key={sub.iD_SubMenu}
+                                                                    href={subPath}
+                                                                    className={linkClass(subPath)}
+                                                                >
+                                                                    {sub.opcion}
+                                                                </Link>
+                                                            );
+                                                        })}
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Link href={path} className={linkClass(path)}>
+                                            {Icono && <Icono size={20} />}
+                                            {menu.opcion}
+                                        </Link>
+                                    )}
+                                </div>
+
                             );
                         })
                     }

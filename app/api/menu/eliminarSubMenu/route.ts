@@ -1,12 +1,12 @@
-import { NextResponse,NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 export async function DELETE(request: NextRequest) {
 
     const session = request.cookies.get('session');
 
-    if(!session){
+    if (!session) {
         return NextResponse.json(
-            { error: 'No hay sesion'},
+            { error: 'No hay sesion' },
             { status: 400 }
         )
     }
@@ -16,20 +16,25 @@ export async function DELETE(request: NextRequest) {
 
     const body = await request.json();
 
-    const {iD_Rol} = body;
+    const { iD_SubMenu } = body;
 
-    const res = await fetch('https://localhost:7233/portalpadres/v1/roles/Eliminar',
+    const res = await fetch('https://localhost:7233/portalpadres/v1/submenu/Eliminar',
         {
             method: 'DELETE',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                iD_Rol: iD_Rol,
+                iD_SubMenu: iD_SubMenu,
                 usuario: usuario
             })
         }
     )
 
-    if (!res.ok) return NextResponse.json({ error: "Error al eliminar Rol" }, { status: 500 })
+    if (!res.ok) {
+        return NextResponse.json(
+            { error: 'Error al Crear Queja o Sugerencia' },
+            { status: 500 }
+        )
+    }
 
     return NextResponse.json({ ok: true });
 }

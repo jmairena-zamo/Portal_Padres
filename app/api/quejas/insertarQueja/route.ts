@@ -24,8 +24,9 @@ export async function POST(request: NextRequest){
         )
     }
 
-    const usuario = JSON.parse(session.value);
-    const ID_UserEmail = usuario.id;
+    const usuarioData = JSON.parse(session.value);
+    const ID_UserEmail = usuarioData.id;
+    const usuario = usuarioData.email;
 
     try {
         const res = await fetch('https://localhost:7233/portalpadres/v1/quejassugerencias/Crear',
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest){
                     tipo: tipo,
                     asunto: asunto,
                     mensaje: mensaje,
-                    usuario: 'string',
+                    usuario: usuario
                 })
             }
         );

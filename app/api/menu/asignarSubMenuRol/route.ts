@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest){
+
+    const session = request.cookies.get('session');
+
+    if(!session){
+        return NextResponse.json(
+            { error: 'No hay sesion'},
+            { status: 400 }
+        )
+    }
+
+    const usuarioData = JSON.parse(session.value);
+    const usuario = usuarioData.email;
+
     const body = await request.json();
 
     const res = await fetch('https://localhost:7233/portalpadres/v1/submenurol/Crear',{
@@ -9,7 +22,7 @@ export async function POST(request: NextRequest){
         body: JSON.stringify({
             subMenu_ID: body.subMenu_ID,
             rol_ID: body.rol_ID,
-            usuario: "ADMIN"
+            usuario: usuario
         })
     });
 
@@ -21,6 +34,19 @@ export async function POST(request: NextRequest){
 }
 
 export async function PUT(request: NextRequest){
+
+    const session = request.cookies.get('session');
+
+    if(!session){
+        return NextResponse.json(
+            { error: 'No hay sesion'},
+            { status: 400 }
+        )
+    }
+
+    const usuarioData = JSON.parse(session.value);
+    const usuario = usuarioData.email;
+
     const body = await request.json();
 
     const res = await fetch(`https://localhost:7233/portalpadres/v1/submenurol/Actualizar`,
@@ -30,7 +56,7 @@ export async function PUT(request: NextRequest){
             body: JSON.stringify({
                 iD_Menu_Rol: body.iD_Menu_Rol,
                 habilitado: body.habilitado,
-                usuario: "ADMIN"
+                usuario: usuario
             })
         }
     );

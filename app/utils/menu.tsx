@@ -1,18 +1,31 @@
-import { FaHome, FaCoins, FaFileAlt, FaBook, FaFolder, FaFile, FaClipboardCheck } from "react-icons/fa";
 import { ReactNode } from "react";
 
-export const getIcono = (opcion: string): ReactNode => {
-    const iconos: Record<string, ReactNode> = {
-        'RESUMEN ESTUDIANTE': <FaHome size={20} />,
-        'CLASES': <FaBook size={20} />,
-        'ESTADO DE CUENTA': <FaCoins size={20} />,
-        'HISTORIAL ACADEMICO': <FaFileAlt size={20} />,
-        'HISTORIAL DISCIPLINARIO': <FaFolder size={20} />,
-        'DOCUMENTOS': <FaFile size={20} />,
-        'QUEJAS O SUGERENCIAS': <FaClipboardCheck size={20} />,
-    };
+import {
+    FaHome, FaUser, FaCog, FaSignOutAlt, FaChartBar, 
+  FaBook, FaEnvelope, FaBell, FaCalendarAlt, FaUsers, 
+  FaClipboardCheck,
+  FaFile,
+  FaCoins,
+  FaFileAlt,
+  FaFolder
+} from "react-icons/fa";
 
-    return iconos[opcion.toUpperCase()] || <FaFile size={20} />;
+export const iconos: Record<string, React.ElementType> = {
+    FaHome,
+    FaBook,
+    FaCoins,
+    FaFileAlt,
+    FaFolder,
+    FaFile,
+    FaClipboardCheck,
+    FaUser,
+    FaCog,
+    FaChartBar,
+    FaSignOutAlt,
+    FaEnvelope,
+    FaBell,
+    FaCalendarAlt,
+    FaUsers
 };
 
 export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {

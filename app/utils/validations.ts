@@ -55,8 +55,15 @@ export const menuSchema = z.object({
   .min(5)
   .max(40)
   .regex(/^[^<>{}[\]\\|]+$/),
-  posicion: z.coerce.number().min(0)
+  posicion: z.coerce.number().min(0),
+  icono: z.string()
+  .regex(/^[^<>{}[\]\\|]+$/),
 })
+
+export const subMenuSchema = z.object({
+    opcion: z.string().min(1),
+    posicion: z.number().min(1)
+});
 
 export const rolSchema = z.object({
   rol: z.string()
@@ -69,4 +76,5 @@ export type RecuperarContrasenaData = z.infer<typeof recuperarContrasenaSchema>;
 export type nuevaContrasenaData = z.infer<typeof nuevaContrasenaSchema>;
 export type quejaData = z.infer<typeof quejaSchema>;
 export type menuData = z.infer<typeof menuSchema>;
+export type subMenuData = z.infer<typeof subMenuSchema>;
 export type rolData = z.infer<typeof rolSchema>;

@@ -1,0 +1,32 @@
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.iconBtn {
+  background: #f3f4f6;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.iconBtn:hover {
+  background: #e5e7eb;
+}
+
+.iconSelected {
+  background: #008237;
+  color: white;
+  border: 2px solid #006f2a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
