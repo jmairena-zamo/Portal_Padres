@@ -1,18 +1,18 @@
 'use client'
 
-import styles from './page.module.css' 
 import { InformacionEstudiante } from '@/app/components/informacionEstudiante/InformacionEstudiante'
+import styles from "../../styles/tablas.module.css"
 
 export default function EstadoCuenta(){
     //useAuth();
 
     return(
-        <div className={styles.cardsestadocuenta}>
+        <div className={styles.pageContent}>
             {/*< InformacionEstudiante />*/}
-            <div className={styles.cardestadocuenta}>
+            <div className={styles.pageCard}>
                 <h2>Estado de Cuenta</h2>
-                <table className={styles.tableestadocuenta}>
-                    <thead>
+                <table className={styles.table}>
+                    <thead className={styles.tableHead}>
                         <tr>
                             <th>ID</th>
                             <th>Fecha</th>
@@ -22,7 +22,7 @@ export default function EstadoCuenta(){
                             <th>Crédito</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={styles.tableBody}>
                         <tr>
                             <td>1</td>
                             <td>{new Date().getFullYear()}</td>
@@ -33,14 +33,10 @@ export default function EstadoCuenta(){
                         </tr>
                     </tbody>
                 </table>
-                <div className={styles.btnpages}>
-                    <button>
-                        Anterior
-                    </button>
+                <div className={styles.btnPages}>
+                    <button>Anterior</button>
                     <span>Página 1</span>
-                    <button>
-                        Siguiente
-                    </button>
+                    <button>Siguiente</button>
                 </div>
             </div>
         </div>

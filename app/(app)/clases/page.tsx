@@ -2,10 +2,14 @@
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react"
-import styles from "./page.module.css"
+import styles from "../../styles/tablas.module.css"
+import Paginacion from "@/app/components/paginacion/Paginacion";
 
 export default function Clases() {
     //useAuth();
+
+    
+
 
     const [data, setData] = useState([
         { id: 1, clase: 'Ecología', seccion: '123', codigo: 'CS69', acumulativo: 50, examenes: 35, faltas: 2 },
@@ -16,13 +20,16 @@ export default function Clases() {
         return (a + b);
     }
 
+    
+    
+
     return (
-        <div className={styles.cardsclases}>
+        <div className={styles.pageContent}>
             <InformacionEstudiante />
-            <div className={styles.cardclases}>
+            <div className={styles.pageCard}>
                 <h3>Información academica, Año {new Date().getFullYear()}, Periodo 1</h3>
-                <table className={styles.tableclases}>
-                    <thead>
+                <table className={styles.table}>
+                    <thead className={styles.tableHead}>
                         <tr>
                             <th>ID</th>
                             <th>Nombre Materia</th>
@@ -34,7 +41,7 @@ export default function Clases() {
                             <th>Faltas</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={styles.tableBody}>
                         {
                             data.map((item) => (
                                 <tr key={item.id}>
@@ -52,7 +59,9 @@ export default function Clases() {
 
                     </tbody>
                 </table>
-            </div>
+            </div>      
+            
         </div>
+        
     )
 }

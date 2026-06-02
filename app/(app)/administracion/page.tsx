@@ -11,8 +11,13 @@ import { useMenu } from "@/app/hooks/useMenu";
 import { Menu, Rol, SubMenu } from "@/app/interfaces/menus";
 import ConfirmModal from "@/app/components/confirmModal/confirmModal";
 import IconSelector from "@/app/components/selectorIconos/selectorIconos";
+import Paginacion from "@/app/components/paginacion/Paginacion";
 
 export default function Administracion() {
+
+    const [paginaActualMenus, setPaginaActualMenus] = useState(1);
+    const [paginaActualRoles, setPaginaActualRoles] = useState(1);
+    const REGISTROS_POR_PAGINA = 10;
 
     const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
 
@@ -688,6 +693,14 @@ export default function Administracion() {
         cargarDatos();
     }
 
+    const indexInicioMenus = (paginaActualMenus - 1) * REGISTROS_POR_PAGINA;
+    const indexFinMenus = indexInicioMenus + REGISTROS_POR_PAGINA;
+    const datosPaginadosMenus = menus.slice(indexInicioMenus, indexFinMenus);
+
+    const indexInicioRoles = (paginaActualRoles - 1) * REGISTROS_POR_PAGINA;
+    const indexFinRoles = indexInicioRoles + REGISTROS_POR_PAGINA;
+    const datosPaginadosRoles = roles.slice(indexInicioRoles, indexFinRoles);
+
     return (
         <div className={styles.cards}>
 
@@ -721,155 +734,163 @@ export default function Administracion() {
                             </div>
                         </div>
 
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>Menú</th>
-                                    <th>Posición</th>
-                                    <th>Roles</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {menus.map(menu => (
-                                    <React.Fragment key={menu.iD_Menu}>
+                        <div className={styles.tableContainer}>
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Menú</th>
+                                        <th>Posición</th>
+                                        <th>Roles</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {datosPaginadosMenus.map(menu => (
+                                        <React.Fragment key={menu.iD_Menu}>
 
-                                        <tr key={menu.iD_Menu}>
+                                            <tr key={menu.iD_Menu}>
 
-                                            <td>
-                                                <button
-                                                    className={styles.menuBtn}
-                                                    onClick={() => gestionSubmenu(menu.iD_Menu)}
-                                                >
-                                                    {menu.opcion}
-                                                    {menu.submenus?.length > 0 && (
-                                                        menuAbierto === menu.iD_Menu
-                                                            ? <FaChevronDown size={12} />
-                                                            : <FaChevronRight size={12} />
-                                                    )}
-                                                </button>
-                                            </td>
-
-                                            <td>
-                                                <input
-                                                    type="number"
-                                                    defaultValue={menu.posicion}
-                                                    className={styles.inputPos}
-                                                    onBlur={(e) => {
-                                                        const nueva = Number(e.target.value);
-                                                        if (nueva !== menu.posicion) {
-                                                            cambiarPosicion(menu, nueva);
-                                                        }
-                                                    }}
-                                                />
-                                            </td>
-
-                                            <td>
-                                                <button
-                                                    className={styles.Btnpermisos}
-                                                    onClick={() => abrirPermisos(menu)}>
-                                                    {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
-                                                </button>
-                                            </td>
-
-                                            {/* <td>
-                                                <button
-                                                    onClick={() => Habilitar(menu)}
-                                                    className={menu.habilitado === 1 ? styles.btnDeshabilitar : styles.btnHabilitar}
-                                                >
-                                                    {menu.habilitado === 1 ? 'Habilitado' : 'Deshabilitado'}
-                                                </button>
-                                            </td> */}
-                                            <td>
-                                                <label className={styles.switch}>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={menu.habilitado === 1}
-                                                        onChange={() => Habilitar(menu)}
-                                                    />
-                                                    <span className={styles.slider}></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <div className={styles.acciones}>
-                                                    <button className={styles.Btncrear}
-                                                        onClick={() => {
-                                                            setMenuSeleccionadoEditar(menu);
-                                                            setFormDataMenu({
-                                                                opcion: menu.opcion,
-                                                                icono: menu.icono,
-                                                                posicion: menu.posicion
-                                                            });
-                                                            setModalMenu(true);
-                                                            setModoMenu("editar")
-                                                        }}><FaEdit />
+                                                <td>
+                                                    <button
+                                                        className={styles.menuBtn}
+                                                        onClick={() => gestionSubmenu(menu.iD_Menu)}
+                                                    >
+                                                        {menu.opcion}
+                                                        {menu.submenus?.length > 0 && (
+                                                            menuAbierto === menu.iD_Menu
+                                                                ? <FaChevronDown size={12} />
+                                                                : <FaChevronRight size={12} />
+                                                        )}
                                                     </button>
-                                                    <button className={styles.Btncancelar}
-                                                        onClick={() => pedirConfirmacionEliminarMenu(menu)}><FaTrash /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {
-                                            menuAbierto === menu.iD_Menu && menu.submenus?.length > 0 && (
-                                                menu.submenus.map(sub => (
-                                                    <tr key={sub.iD_SubMenu} className={styles.submenurow}>
-                                                        <td>{sub.opcion}</td>
-                                                        <td><input
-                                                            type="number"
-                                                            defaultValue={sub.posicion}
-                                                            className={styles.inputPos}
-                                                            onBlur={(e) => {
-                                                                const nueva = Number(e.target.value);
-                                                                if (nueva !== sub.posicion) {
-                                                                    cambiarPosicionSUB(sub, nueva);
-                                                                }
-                                                            }}
+                                                </td>
+
+                                                <td>
+                                                    <input
+                                                        type="number"
+                                                        defaultValue={menu.posicion}
+                                                        className={styles.inputPos}
+                                                        onBlur={(e) => {
+                                                            const nueva = Number(e.target.value);
+                                                            if (nueva !== menu.posicion) {
+                                                                cambiarPosicion(menu, nueva);
+                                                            }
+                                                        }}
+                                                    />
+                                                </td>
+
+                                                <td>
+                                                    <button
+                                                        className={styles.Btnpermisos}
+                                                        onClick={() => abrirPermisos(menu)}>
+                                                        {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
+                                                    </button>
+                                                </td>
+
+                                                {/* <td>
+                                                    <button
+                                                        onClick={() => Habilitar(menu)}
+                                                        className={menu.habilitado === 1 ? styles.btnDeshabilitar : styles.btnHabilitar}
+                                                    >
+                                                        {menu.habilitado === 1 ? 'Habilitado' : 'Deshabilitado'}
+                                                    </button>
+                                                </td> */}
+                                                <td>
+                                                    <label className={styles.switch}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={menu.habilitado === 1}
+                                                            onChange={() => Habilitar(menu)}
                                                         />
-                                                        </td>
-                                                        <td>
-                                                            <button
-                                                                className={styles.Btnpermisos}
-                                                                onClick={() => abrirPermisos(sub)}>
-                                                                {sub.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
-                                                            </button>
-                                                        </td>
-                                                        <td>
-                                                            <label className={styles.switch}>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={sub.habilitado === 1}
-                                                                    onChange={() => HabilitarSUB(sub)}
-                                                                />
-                                                                <span className={styles.slider}></span>
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <div className={styles.acciones}>
-                                                                <button className={styles.Btncrear}
-                                                                    onClick={() => {
-                                                                        setSubMenuSeleccionadoEditar(sub);
-                                                                        setFormDataSubMenu({
-                                                                            opcion: sub.opcion,
-                                                                            posicion: sub.posicion
-                                                                        });
-                                                                        setModalSubMenu(true);
-                                                                        setModoSubMenu("editar")
-                                                                    }}>
-                                                                    <FaEdit />
+                                                        <span className={styles.slider}></span>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <div className={styles.acciones}>
+                                                        <button className={styles.Btncrear}
+                                                            onClick={() => {
+                                                                setMenuSeleccionadoEditar(menu);
+                                                                setFormDataMenu({
+                                                                    opcion: menu.opcion,
+                                                                    icono: menu.icono,
+                                                                    posicion: menu.posicion
+                                                                });
+                                                                setModalMenu(true);
+                                                                setModoMenu("editar")
+                                                            }}><FaEdit />
+                                                        </button>
+                                                        <button className={styles.Btncancelar}
+                                                            onClick={() => pedirConfirmacionEliminarMenu(menu)}><FaTrash /></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {
+                                                menuAbierto === menu.iD_Menu && menu.submenus?.length > 0 && (
+                                                    menu.submenus.map(sub => (
+                                                        <tr key={sub.iD_SubMenu} className={styles.submenurow}>
+                                                            <td>{sub.opcion}</td>
+                                                            <td><input
+                                                                type="number"
+                                                                defaultValue={sub.posicion}
+                                                                className={styles.inputPos}
+                                                                onBlur={(e) => {
+                                                                    const nueva = Number(e.target.value);
+                                                                    if (nueva !== sub.posicion) {
+                                                                        cambiarPosicionSUB(sub, nueva);
+                                                                    }
+                                                                }}
+                                                            />
+                                                            </td>
+                                                            <td>
+                                                                <button
+                                                                    className={styles.Btnpermisos}
+                                                                    onClick={() => abrirPermisos(sub)}>
+                                                                    {sub.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
                                                                 </button>
-                                                                <button className={styles.Btncancelar}
-                                                                    onClick={() => pedirConfirmacionEliminarSub(sub)}><FaTrash /></button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )
-                                        }
-                                    </React.Fragment>
-                                ))}
-                            </tbody>
-                        </table>
+                                                            </td>
+                                                            <td>
+                                                                <label className={styles.switch}>
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={sub.habilitado === 1}
+                                                                        onChange={() => HabilitarSUB(sub)}
+                                                                    />
+                                                                    <span className={styles.slider}></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <div className={styles.acciones}>
+                                                                    <button className={styles.Btncrear}
+                                                                        onClick={() => {
+                                                                            setSubMenuSeleccionadoEditar(sub);
+                                                                            setFormDataSubMenu({
+                                                                                opcion: sub.opcion,
+                                                                                posicion: sub.posicion
+                                                                            });
+                                                                            setModalSubMenu(true);
+                                                                            setModoSubMenu("editar")
+                                                                        }}>
+                                                                        <FaEdit />
+                                                                    </button>
+                                                                    <button className={styles.Btncancelar}
+                                                                        onClick={() => pedirConfirmacionEliminarSub(sub)}><FaTrash /></button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )
+                                            }
+                                        </React.Fragment>
+                                    ))}
+                                </tbody>
+                            </table>
+                            <Paginacion
+                                totalRegistros={menus.length}
+                                registrosPorPagina={REGISTROS_POR_PAGINA}
+                                paginaActual={paginaActualMenus}
+                                onCambiarPagina={setPaginaActualMenus}
+                            />
+                        </div>
                         {
                             modalMenu && (
                                 <div className={styles.modalOverlay}>
@@ -1081,7 +1102,7 @@ export default function Administracion() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {roles.map(rol => (
+                                {datosPaginadosRoles.map(rol => (
                                     <React.Fragment key={rol.iD_Rol}>
 
                                         <tr key={rol.iD_Rol}>
@@ -1109,6 +1130,12 @@ export default function Administracion() {
                                 ))}
                             </tbody>
                         </table>
+                        <Paginacion
+                            totalRegistros={roles.length}
+                            registrosPorPagina={REGISTROS_POR_PAGINA}
+                            paginaActual={paginaActualRoles}
+                            onCambiarPagina={setPaginaActualRoles}
+                        />
                         {
                             modalCrearRol && (
                                 <div className={styles.modalOverlay}>

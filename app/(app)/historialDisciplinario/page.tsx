@@ -2,7 +2,8 @@
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react"
-import styles from "./page.module.css"
+import styles from "../../styles/tablas.module.css"
+
 
 export default function HistorialDisciplinario() {
     //useAuth();
@@ -15,12 +16,12 @@ export default function HistorialDisciplinario() {
     const fecha = new Date();
 
     return (
-        <div className={styles.contentdisc}>
+        <div className={styles.pageContent}>
             <InformacionEstudiante />
-            <div className={styles.cardsdisc}>
+            <div className={styles.pageCard}>
                 <h2>Historial Disciplinario</h2>
-                <table className={styles.tabledisc}>
-                    <thead>
+                <table className={styles.table}>
+                    <thead className={styles.tableHead}>
                         <tr>
                             <th># Falta</th>
                             <th>Clase</th>
@@ -29,7 +30,7 @@ export default function HistorialDisciplinario() {
                             <th>Acción</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={styles.tableBody}>
                         {
                             data.map((item) => (
                                 <tr key={item.id}>

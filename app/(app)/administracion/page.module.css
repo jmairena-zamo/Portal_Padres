@@ -334,3 +334,79 @@
     padding: 10px 0;
     width: 50px;
 }
+
+.tableContainer {
+    width: 100%;
+}
+
+@media (max-width: 800px) {
+    .header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 0 5px;
+    }
+
+    .card {
+        overflow: hidden;
+    }
+
+    .tableContainer {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .table {
+        display: table;
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .modal {
+        width: calc(100% - 32px);
+        padding: 20px 15px;
+    }
+}
+
+@media (max-width: 420px) {
+    .cards {
+        margin: 8px;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        flex: 1;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .card h2 {
+        font-size: 17px;
+    }
+
+    .Btncrear,
+    .Btncancelar {
+        width: 80px;
+        font-size: 12px;
+        padding: 6px 0;
+    }
+
+    .acciones button {
+        width: 38px;
+        padding: 8px 0;
+    }
+
+    .modal {
+        width: calc(100% - 20px);
+        padding: 15px 10px;
+    }
+
+    .modalBtns {
+        justify-content: center;
+    }
+}

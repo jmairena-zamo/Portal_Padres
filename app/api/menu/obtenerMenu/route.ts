@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ menus: menusfiltrados })
     } catch (error) {
-        console.log("❌ Error exacto:", error);
+        console.log("Error exacto:", error);
         return NextResponse.json({ error: 'Error al obtener menús' }, { status: 500 });
     }
 }

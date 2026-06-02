@@ -9,8 +9,9 @@
     box-shadow: 0 3px 5px rgb(0, 0, 0, 0.4);
     position: fixed;
     top: 0;
-    z-index: 1000;
+    z-index: 98;
     background-color: white;
+    transition: width 0.3s ease, margin-left 0.3s ease;
 }
 .navbar {
     color: black;
@@ -37,4 +38,22 @@
 
 .navicons{
     cursor: pointer;
+}
+
+@media (max-width: 800px) {
+    .header {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 60px; /* espacio para el botón hamburguesa */
+    }
+
+    .navbarright {
+        margin-right: 10px;
+    }
+}
+
+@media (max-width: 420px) {
+    .navbarright span {
+        display: none; /* oculta el nombre en pantallas muy pequeñas */
+    }
 }

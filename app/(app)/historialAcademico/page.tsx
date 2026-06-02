@@ -2,22 +2,38 @@
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react";
-import styles from './page.module.css'
+import index from './page.module.css'
+import styles from "../../styles/tablas.module.css"
+import Paginacion from "@/app/components/paginacion/Paginacion";
 
 export default function HistorialAcademico() {
     //useAuth();
 
+    const [paginaActual, setPaginaActual] = useState(1);
+    const REGISTROS_POR_PAGINA = 1;
+
+
+
     const [data, setData] = useState([
         { id: 1, clase: 'Quimica', seccion: '123', codigo: 'CC05', anio: '2025', periodo: 3, nota: 90.98, estado: 'APB', uv: 4 },
-        { id: 2, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 }
+        { id: 2, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 },
+        { id: 3, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 },
+        { id: 4, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 },
+        { id: 5, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 },
+        { id: 6, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 },
+        { id: 7, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 },
     ])
+
+    const indexInicio = (paginaActual - 1) * REGISTROS_POR_PAGINA;
+    const indexFin = indexInicio + REGISTROS_POR_PAGINA;
+    const datosPaginados = data.slice(indexInicio, indexFin);
     return (
-        <div className={styles.cardshistorial}>
+        <div className={styles.pageContent}>
             <InformacionEstudiante />
-            <div className={styles.cardhistorial}>
+            <div className={styles.pageCard}>
                 <h2>Historial Academico</h2>
-                <table className={styles.tablehistorial}>
-                    <thead>
+                <table className={styles.table}>
+                    <thead className={styles.tableHead}>
                         <tr>
                             <th>ID</th>
                             <th>Año</th>
@@ -30,9 +46,9 @@ export default function HistorialAcademico() {
                             <th>UV</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={styles.tableBody}>
                         {
-                            data.map((item) => (
+                            datosPaginados.map((item) => (
                                 <tr key={item.id}>
                                     <td>{item.id}</td>
                                     <td>{item.anio}</td>
@@ -49,17 +65,16 @@ export default function HistorialAcademico() {
 
                     </tbody>
                 </table>
-                <div className={styles.btnpages}>
-                    <button>
-                        Anterior
-                    </button>
-                    <span>Página 1</span>
-                    <button>
-                        Siguiente
-                    </button>
-                </div>
+
+                <Paginacion
+                    totalRegistros={data.length}
+                    registrosPorPagina={REGISTROS_POR_PAGINA}
+                    paginaActual={paginaActual}
+                    onCambiarPagina={setPaginaActual}
+                />
+
             </div>
-            <div className={styles.cardhistorial}>
+            <div className={index.cardhistorial}>
                 <p><strong>Unidades Valorativas Aprobadas:</strong> 140</p>
                 <p><strong>Índice Académico:</strong> 90</p>
             </div>

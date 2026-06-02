@@ -153,7 +153,55 @@
     font-size: 13px;
 }
 
+@media (max-width: 800px) {
+    .cards {
+        flex-direction: column;
+    }
 
+    .card {
+        flex: 1 1 auto;
+    }
+
+    .graphics {
+        flex: 1 1 auto;
+    }
+
+    .cardsfaltas {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 420px) {
+    .contentresumen {
+        padding: 0.5rem;
+    }
+
+    .cardgraphics {
+        flex: 1 1 100%;
+    }
+
+    .cardgraphicsbody {
+        justify-content: center;
+    }
+
+    .cardsfaltas {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cardsstats {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .spanclinic {
+        font-size: 30px;
+    }
+
+    .cards2 {
+        flex-direction: column;
+    }
+}
 
 
 

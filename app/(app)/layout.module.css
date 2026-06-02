@@ -1,16 +1,31 @@
-.body{
-  min-height: 100vh;
-  background: #F6F6F6;
-  /*background: linear-gradient(90deg, rgba(246, 246, 246, 1) 47%, rgba(148, 255, 193, 1) 100%);*/
+.body {
+    min-height: 100vh;
+    background: #F6F6F6;
 }
 
 .main {
-  display: flex;
-  margin-top: 65px;
+    display: flex;
+    margin-top: 55px;
 }
 
 .content {
-  width: 100%;
-  margin-left: 270px;  
-  margin-right: 20px;
+    width: 100%;
+    margin-left: 250px;
+    margin-right: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 800px) {
+    .content {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 10px 15px;
+    }
+}
+
+@media (max-width: 420px) {
+    .content {
+        padding: 10px;
+    }
 }
