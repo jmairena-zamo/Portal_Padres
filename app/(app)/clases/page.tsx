@@ -4,12 +4,9 @@ import { InformacionEstudiante } from "@/app/components/informacionEstudiante/In
 import { useState } from "react"
 import styles from "../../styles/tablas.module.css"
 import Paginacion from "@/app/components/paginacion/Paginacion";
+import Tabla from "@/app/components/Tabla/Tabla";
 
 export default function Clases() {
-    //useAuth();
-
-    
-
 
     const [data, setData] = useState([
         { id: 1, clase: 'Ecología', seccion: '123', codigo: 'CS69', acumulativo: 50, examenes: 35, faltas: 2 },
@@ -18,47 +15,27 @@ export default function Clases() {
 
     const notaFinal = (a: number, b: number) => {
         return (a + b);
-    }
-
-    
-    
+    }   
 
     return (
         <div className={styles.pageContent}>
             <InformacionEstudiante />
             <div className={styles.pageCard}>
                 <h3>Información academica, Año {new Date().getFullYear()}, Periodo 1</h3>
-                <table className={styles.table}>
-                    <thead className={styles.tableHead}>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre Materia</th>
-                            <th>Sección</th>
-                            <th>Código</th>
-                            <th>Acumulativo</th>
-                            <th>Examenes</th>
-                            <th>Nota</th>
-                            <th>Faltas</th>
-                        </tr>
-                    </thead>
-                    <tbody className={styles.tableBody}>
-                        {
-                            data.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{item.id}</td>
-                                    <td>{item.clase}</td>
-                                    <td>{item.seccion}</td>
-                                    <td>{item.codigo}</td>
-                                    <td>{item.acumulativo}</td>
-                                    <td>{item.examenes}</td>
-                                    <td>{notaFinal(item.acumulativo, item.examenes)}</td>
-                                    <td>{item.faltas}</td>
-                                </tr>
-                            ))
-                        }
-
-                    </tbody>
-                </table>
+                <Tabla
+                    datos={data}
+                    keyExtractor={item => item.id}
+                    columnas={[
+                        {header:'ID', accessor: 'id'},
+                        {header:'Nombre Materia', accessor: 'clase'},
+                        {header:'Sección', accessor: 'seccion'},
+                        {header:'Código', accessor: 'codigo'},
+                        {header:'Acumulativo', accessor: 'acumulativo'},
+                        {header:'Examenes', accessor: 'examenes'},
+                        {header:'Nota', render: item => item.acumulativo + item.examenes},
+                        {header:'Faltas', accessor: 'faltas'},
+                    ]}
+                />
             </div>      
             
         </div>

@@ -12,12 +12,19 @@ import { Menu, Rol, SubMenu } from "@/app/interfaces/menus";
 import ConfirmModal from "@/app/components/confirmModal/confirmModal";
 import IconSelector from "@/app/components/selectorIconos/selectorIconos";
 import Paginacion from "@/app/components/paginacion/Paginacion";
+import ModalFormulario from "@/app/components/ModalFormulario/ModalFormulario";
+import { Content } from "next/font/google";
+import ModalPermisos from "@/app/components/ModalPermisos/ModalPermisos";
+import { BtnV1, BtnV2, BtnV3 } from "@/app/components/Boton/Boton";
+import Tabla from "@/app/components/Tabla/Tabla";
+import ComboBoxFiltro from "@/app/components/ComboBoxFiltro/ComboBoxFiltro";
 
 export default function Administracion() {
 
     const [paginaActualMenus, setPaginaActualMenus] = useState(1);
     const [paginaActualRoles, setPaginaActualRoles] = useState(1);
     const REGISTROS_POR_PAGINA = 10;
+    const [rolFiltro, setRolFiltro] = useState<number | 'todos'>('todos');
 
     const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
 
@@ -48,6 +55,8 @@ export default function Administracion() {
     //constantes para modal crear rol
     const [modalCrearRol, setModalCrearRol] = useState(false);
     const [modalEditarRol, setModalEditarRol] = useState(false);
+    const [modalRol, setModalRol] = useState(false);
+    const [modoRol, setModoRol] = useState<"crear" | "editar">("crear");
     const [rolSeleccionado, setRolSeleccionado] = useState<Rol | null>(null);
     const [formDataRol, setFormDataRol] = useState<rolData>({
         rol: '',
@@ -106,16 +115,29 @@ export default function Administracion() {
     const Habilitar = async (menu: Menu) => {
         const nuevoHabilitado = menu.habilitado === 1 ? 0 : 1;
 
-        const res = await fetch('/api/menu/actualizarMenu', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...menu,
-                habilitado: nuevoHabilitado
+        const promesas: Promise<Response>[] = [
+            fetch('/api/menu/actualizarMenu', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...menu, habilitado: nuevoHabilitado })
             })
-        });
+        ];
 
-        if (res.ok) {
+        if (menu.submenus?.length > 0) {
+            for (const sub of menu.submenus) {
+                promesas.push(
+                    fetch('/api/menu/actualizarSubMenu', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...sub, habilitado: nuevoHabilitado })
+                    })
+                );
+            }
+        }
+
+        const res = await Promise.all(promesas);
+
+        if (res.every(r => r.ok)) {
             mostrarExito(`${menu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
         } else {
             mostrarError(`Error al actualizar ${menu.opcion}`);
@@ -127,16 +149,30 @@ export default function Administracion() {
     const HabilitarSUB = async (submenu: SubMenu) => {
         const nuevoHabilitado = submenu.habilitado === 1 ? 0 : 1;
 
-        const res = await fetch('/api/menu/actualizarSubMenu', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...submenu,
-                habilitado: nuevoHabilitado
+        const promesas: Promise<Response>[] = [
+            fetch('/api/menu/actualizarSubMenu', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...submenu, habilitado: nuevoHabilitado })
             })
-        });
+        ];
 
-        if (res.ok) {
+        if (nuevoHabilitado === 1) {
+            const menuPadre = menus.find(m => m.iD_Menu === submenu.menu_ID);
+            if (menuPadre && menuPadre.habilitado === 0) {
+                promesas.push(
+                    fetch('/api/menu/actualizarMenu', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...menuPadre, habilitado: 1 })
+                    })
+                );
+            }
+        }
+
+        const resultados = await Promise.all(promesas);
+
+        if (resultados.every(r => r.ok)) {
             mostrarExito(`${submenu.opcion} ${nuevoHabilitado === 1 ? 'habilitado' : 'deshabilitado'}`);
         } else {
             mostrarError(`Error al actualizar ${submenu.opcion}`);
@@ -444,9 +480,11 @@ export default function Administracion() {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    ...menu,
+                    iD_Menu: menu?.iD_Menu,
                     opcion: formDataMenu.opcion,
-                    icono: formDataMenu.icono
+                    posicion: menu?.posicion,
+                    habilitado: menu?.habilitado,
+                    icono: formDataMenu.icono,
                 }
                 )
             }
@@ -531,7 +569,7 @@ export default function Administracion() {
     }
 
     const editarSubMenu = async (sub: SubMenu | null) => {
-        if (!formDataMenu.opcion.trim()) return;
+        if (!formDataSubMenu.opcion.trim()) return;
         const res = await fetch('/api/menu/actualizarSubMenu',
             {
                 method: 'PUT',
@@ -607,8 +645,7 @@ export default function Administracion() {
         setFormDataRol({
             rol: ''
         });
-        setModalCrearRol(false);
-        setModalEditarRol(false);
+        setModalRol(false);
     }
 
     //CRUD Rol
@@ -634,7 +671,7 @@ export default function Administracion() {
         setFormDataRol({
             rol: ''
         })
-        setModalCrearRol(false);
+        setModalRol(false);
         cargarDatos();
     }
 
@@ -666,10 +703,11 @@ export default function Administracion() {
     const abrirEditarRol = (rol: Rol) => {
         setRolSeleccionado(rol);
         setFormDataRol({ rol: rol.rol });
-        setModalEditarRol(true);
+        setModalRol(true);
+        setModoRol("editar")
     };
 
-    const actualizarRol = async () => {
+    const editarRol = async () => {
         if (!rolSeleccionado || !formDataRol.rol.trim()) return;
 
         const res = await fetch('/api/roles/actualizarRoles', {
@@ -689,13 +727,20 @@ export default function Administracion() {
 
         setFormDataRol({ rol: '' });
         setRolSeleccionado(null);
-        setModalEditarRol(false);
+        setModalRol(false);
         cargarDatos();
     }
 
+    const menuFiltrados = rolFiltro === 'todos' ? menus : menus.filter(menu =>
+        menu.rolesAsignados.some(r => r.rol_ID === rolFiltro && r.habilitado === 1) ||
+        menu.submenus?.some(sub=>
+            sub.rolesAsignados.some(r => r.rol_ID === rolFiltro && r.habilitado === 1)
+        )
+    );
+
     const indexInicioMenus = (paginaActualMenus - 1) * REGISTROS_POR_PAGINA;
     const indexFinMenus = indexInicioMenus + REGISTROS_POR_PAGINA;
-    const datosPaginadosMenus = menus.slice(indexInicioMenus, indexFinMenus);
+    const datosPaginadosMenus = menuFiltrados.slice(indexInicioMenus, indexFinMenus);
 
     const indexInicioRoles = (paginaActualRoles - 1) * REGISTROS_POR_PAGINA;
     const indexFinRoles = indexInicioRoles + REGISTROS_POR_PAGINA;
@@ -727,163 +772,167 @@ export default function Administracion() {
                 tabActiva === 'menus' && (
                     <div className={styles.card}>
                         <div className={styles.header}>
-                            <h2>Administración de Menú</h2>
+                            <div className={styles.headerTitulo}>
+                                <h2>Administración de Menú</h2>
+                                <div className={styles.comboContainer}>
+                                    <h4>Filtrar Por Rol:</h4>
+                                    <ComboBoxFiltro 
+                                    valor={rolFiltro}
+                                    placeholder="Todos los Roles"
+                                    opciones={roles.map(rol => ({ value: rol.iD_Rol, label: rol.rol }))}
+                                    onChange={value => {
+                                        setRolFiltro(value);
+                                        setPaginaActualMenus(1);
+                                    }}
+                                />
+                                </div>
+                                
+                            </div>
+                            
                             <div className={styles.headerBtn}>
-                                <button onClick={() => { setModalMenu(true); setModoMenu("crear") }} className={styles.Btncrear}>+ Menu</button>
-                                <button onClick={() => setModalSubMenu(true)} className={styles.Btncrear}>+ SubMenu</button>
+                                <BtnV1 onClick={() => { setModalMenu(true); setModoMenu("crear") }}>+ Menu</BtnV1>
+                                <BtnV1 onClick={() => { setModalSubMenu(true); setModoSubMenu("crear") }}>+ SubMenu</BtnV1>
                             </div>
                         </div>
 
                         <div className={styles.tableContainer}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Menú</th>
-                                        <th>Posición</th>
-                                        <th>Roles</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {datosPaginadosMenus.map(menu => (
-                                        <React.Fragment key={menu.iD_Menu}>
-
-                                            <tr key={menu.iD_Menu}>
-
-                                                <td>
-                                                    <button
-                                                        className={styles.menuBtn}
-                                                        onClick={() => gestionSubmenu(menu.iD_Menu)}
-                                                    >
-                                                        {menu.opcion}
-                                                        {menu.submenus?.length > 0 && (
-                                                            menuAbierto === menu.iD_Menu
-                                                                ? <FaChevronDown size={12} />
-                                                                : <FaChevronRight size={12} />
-                                                        )}
-                                                    </button>
-                                                </td>
-
-                                                <td>
+                            <Tabla
+                                datos={datosPaginadosMenus}
+                                keyExtractor={menu => menu.iD_Menu}
+                                estaExpandida={menu => menuAbierto === menu.iD_Menu}
+                                filaExpandida={menu =>
+                                    menu.submenus.map(sub => (
+                                        <tr key={sub.iD_SubMenu} className={styles.submenurow}>
+                                            <td>{sub.opcion}</td>
+                                            <td><input
+                                                type="number"
+                                                defaultValue={sub.posicion}
+                                                className={styles.inputPos}
+                                                onBlur={(e) => {
+                                                    const nueva = Number(e.target.value);
+                                                    if (nueva !== sub.posicion) {
+                                                        cambiarPosicionSUB(sub, nueva);
+                                                    }
+                                                }}
+                                            />
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className={styles.Btnpermisos}
+                                                    onClick={() => abrirPermisos(sub)}>
+                                                    {sub.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <label className={styles.switch}>
                                                     <input
-                                                        type="number"
-                                                        defaultValue={menu.posicion}
-                                                        className={styles.inputPos}
-                                                        onBlur={(e) => {
-                                                            const nueva = Number(e.target.value);
-                                                            if (nueva !== menu.posicion) {
-                                                                cambiarPosicion(menu, nueva);
-                                                            }
-                                                        }}
+                                                        type="checkbox"
+                                                        checked={sub.habilitado === 1}
+                                                        onChange={() => HabilitarSUB(sub)}
                                                     />
-                                                </td>
-
-                                                <td>
-                                                    <button
-                                                        className={styles.Btnpermisos}
-                                                        onClick={() => abrirPermisos(menu)}>
-                                                        {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
-                                                    </button>
-                                                </td>
-
-                                                {/* <td>
-                                                    <button
-                                                        onClick={() => Habilitar(menu)}
-                                                        className={menu.habilitado === 1 ? styles.btnDeshabilitar : styles.btnHabilitar}
-                                                    >
-                                                        {menu.habilitado === 1 ? 'Habilitado' : 'Deshabilitado'}
-                                                    </button>
-                                                </td> */}
-                                                <td>
-                                                    <label className={styles.switch}>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={menu.habilitado === 1}
-                                                            onChange={() => Habilitar(menu)}
-                                                        />
-                                                        <span className={styles.slider}></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div className={styles.acciones}>
-                                                        <button className={styles.Btncrear}
-                                                            onClick={() => {
-                                                                setMenuSeleccionadoEditar(menu);
-                                                                setFormDataMenu({
-                                                                    opcion: menu.opcion,
-                                                                    icono: menu.icono,
-                                                                    posicion: menu.posicion
-                                                                });
-                                                                setModalMenu(true);
-                                                                setModoMenu("editar")
-                                                            }}><FaEdit />
-                                                        </button>
-                                                        <button className={styles.Btncancelar}
-                                                            onClick={() => pedirConfirmacionEliminarMenu(menu)}><FaTrash /></button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            {
-                                                menuAbierto === menu.iD_Menu && menu.submenus?.length > 0 && (
-                                                    menu.submenus.map(sub => (
-                                                        <tr key={sub.iD_SubMenu} className={styles.submenurow}>
-                                                            <td>{sub.opcion}</td>
-                                                            <td><input
-                                                                type="number"
-                                                                defaultValue={sub.posicion}
-                                                                className={styles.inputPos}
-                                                                onBlur={(e) => {
-                                                                    const nueva = Number(e.target.value);
-                                                                    if (nueva !== sub.posicion) {
-                                                                        cambiarPosicionSUB(sub, nueva);
-                                                                    }
-                                                                }}
-                                                            />
-                                                            </td>
-                                                            <td>
-                                                                <button
-                                                                    className={styles.Btnpermisos}
-                                                                    onClick={() => abrirPermisos(sub)}>
-                                                                    {sub.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
-                                                                </button>
-                                                            </td>
-                                                            <td>
-                                                                <label className={styles.switch}>
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        checked={sub.habilitado === 1}
-                                                                        onChange={() => HabilitarSUB(sub)}
-                                                                    />
-                                                                    <span className={styles.slider}></span>
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <div className={styles.acciones}>
-                                                                    <button className={styles.Btncrear}
-                                                                        onClick={() => {
-                                                                            setSubMenuSeleccionadoEditar(sub);
-                                                                            setFormDataSubMenu({
-                                                                                opcion: sub.opcion,
-                                                                                posicion: sub.posicion
-                                                                            });
-                                                                            setModalSubMenu(true);
-                                                                            setModoSubMenu("editar")
-                                                                        }}>
-                                                                        <FaEdit />
-                                                                    </button>
-                                                                    <button className={styles.Btncancelar}
-                                                                        onClick={() => pedirConfirmacionEliminarSub(sub)}><FaTrash /></button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )
-                                            }
-                                        </React.Fragment>
-                                    ))}
-                                </tbody>
-                            </table>
+                                                    <span className={styles.slider}></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div className={styles.acciones}>
+                                                    <BtnV1 onClick={() => {
+                                                        setSubMenuSeleccionadoEditar(sub);
+                                                        setFormDataSubMenu({
+                                                            opcion: sub.opcion,
+                                                            posicion: sub.posicion
+                                                        });
+                                                        setModalSubMenu(true);
+                                                        setModoSubMenu("editar")
+                                                    }}>
+                                                        <FaEdit />
+                                                    </BtnV1>
+                                                    <BtnV2 onClick={() => pedirConfirmacionEliminarSub(sub)}>
+                                                        <FaTrash />
+                                                    </BtnV2>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                }
+                                columnas={[
+                                    {
+                                        header: 'Menú',
+                                        render: menu => (
+                                            <button
+                                                className={styles.menuBtn}
+                                                onClick={() => gestionSubmenu(menu.iD_Menu)}
+                                            >
+                                                {menu.opcion}
+                                                {menu.submenus?.length > 0 && (
+                                                    menuAbierto === menu.iD_Menu
+                                                        ? <FaChevronDown size={12} />
+                                                        : <FaChevronRight size={12} />
+                                                )}
+                                            </button>
+                                        )
+                                    },
+                                    {
+                                        header: 'Posición',
+                                        render: menu => (
+                                            <input
+                                                type="number"
+                                                defaultValue={menu.posicion}
+                                                className={styles.inputPos}
+                                                onBlur={(e) => {
+                                                    const nueva = Number(e.target.value);
+                                                    if (nueva !== menu.posicion) {
+                                                        cambiarPosicion(menu, nueva);
+                                                    }
+                                                }}
+                                            />
+                                        )
+                                    },
+                                    {
+                                        header: 'Roles',
+                                        render: menu => (
+                                            <div className={styles.acciones}>
+                                                <BtnV3 onClick={() => abrirPermisos(menu)}>
+                                                    {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
+                                                </BtnV3>
+                                            </div>                                            
+                                        )
+                                    },
+                                    {
+                                        header: 'Estado',
+                                        render: menu => (
+                                            <label className={styles.switch}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={menu.habilitado === 1}
+                                                    onChange={() => Habilitar(menu)}
+                                                />
+                                                <span className={styles.slider}></span>
+                                            </label>
+                                        )
+                                    },
+                                    {
+                                        header: 'Acciones',
+                                        render: menu => (
+                                            <div className={styles.acciones}>
+                                                <BtnV1 onClick={() => {
+                                                    setMenuSeleccionadoEditar(menu);
+                                                    setFormDataMenu({
+                                                        opcion: menu.opcion,
+                                                        icono: menu.icono,
+                                                        posicion: menu.posicion
+                                                    });
+                                                    setModalMenu(true);
+                                                    setModoMenu("editar")
+                                                }}><FaEdit />
+                                                </BtnV1>
+                                                <BtnV2 onClick={() => pedirConfirmacionEliminarMenu(menu)}>
+                                                    <FaTrash />
+                                                </BtnV2>
+                                            </div>
+                                        )
+                                    }
+                                ]}
+                            />
                             <Paginacion
                                 totalRegistros={menus.length}
                                 registrosPorPagina={REGISTROS_POR_PAGINA}
@@ -893,178 +942,125 @@ export default function Administracion() {
                         </div>
                         {
                             modalMenu && (
-                                <div className={styles.modalOverlay}>
-                                    <div className={styles.modal}>
-                                        <div className={styles.headModal}>
-                                            <h2>{modoMenu === "crear" ? "Nuevo Menú" : "Editar Menú"}</h2>
-                                        </div>
-
-                                        <div className={styles.formGroup}>
-                                            <label>Nombre:</label>
-                                            <input
-                                                type="text"
-                                                name="opcion"
-                                                className={!esValidoOpcion ? styles.inputError : styles.input}
-                                                value={formDataMenu.opcion}
-                                                onChange={handlerOnChangeMenu}
-                                                onBlur={validationOpcion}
-                                                placeholder="Ingrese el nombre de la opción"
-                                            />
-                                            <span className={`${styles.spanError} ${!esValidoOpcion ? styles.err : ""}`}>La Opción no es válida</span>
-                                        </div>
+                                <ModalFormulario
+                                    titulo={modoMenu === "crear" ? "Nuevo Menú" : "Editar Menú"}
+                                    txtConfirmar={modoMenu === "crear" ? "Crear" : "Editar"}
+                                    deshabilitado={!esValidoOpcion || !esValidoPosicion}
+                                    onConfirmar={() => modoMenu === "crear" ? crearMenu() : editarMenu(menuSeleccionadoEditar)}
+                                    onCancelar={cancelarModal}
+                                    campos={[
                                         {
-                                            modoMenu === "crear" && (
-                                                <div className={styles.formGroup}>
-                                                    <label>Posición:</label>
-                                                    <input
-                                                        type="number"
-                                                        name="posicion"
-                                                        className={!esValidoPosicion ? styles.inputError : styles.input}
-                                                        value={formDataMenu.posicion}
-                                                        onChange={handlerOnChangeMenu}
-                                                        onBlur={validationPosicion}
-                                                        placeholder="Ingrese el posicion de la opción"
-                                                    />
-                                                    <span className={`${styles.spanError} ${!esValidoPosicion ? styles.err : ""}`}>La Posicion no es válida</span>
-                                                </div>
-                                            )
+                                            label: "Nombre:",
+                                            content: <>
+                                                <input
+                                                    type="text"
+                                                    name="opcion"
+                                                    className={!esValidoOpcion ? styles.inputError : styles.input}
+                                                    value={formDataMenu.opcion}
+                                                    onChange={handlerOnChangeMenu}
+                                                    onBlur={validationOpcion}
+                                                    placeholder="Ingrese el nombre de la opción"
+                                                />
+                                                <span className={`${styles.spanError} ${!esValidoOpcion ? styles.err : ""}`}>La Opción no es válida</span>
+                                            </>
+                                        },
+                                        ...(modoMenu === "crear" ? [{
+                                            label: "Posición:",
+                                            content: <>
+                                                <input
+                                                    type="number"
+                                                    name="posicion"
+                                                    className={!esValidoPosicion ? styles.inputError : styles.input}
+                                                    value={formDataMenu.posicion}
+                                                    onChange={handlerOnChangeMenu}
+                                                    onBlur={validationPosicion}
+                                                    placeholder="Ingrese el posicion de la opción"
+                                                />
+                                                <span className={`${styles.spanError} ${!esValidoPosicion ? styles.err : ""}`}>La Posicion no es válida</span>
+                                            </>
+                                        }] : []),
+                                        {
+                                            label: "Ícono:",
+                                            content: <>
+                                                <IconSelector
+                                                    selectedIcon={formDataMenu.icono}
+                                                    onSelect={handlerOnChangeIcon}
+                                                />
+                                            </>
                                         }
-
-                                        <div className={styles.formGroup}>
-                                            <label>Ícono:</label>
-                                            <IconSelector
-                                                selectedIcon={formDataMenu.icono}
-                                                onSelect={handlerOnChangeIcon}
-                                            />
-                                        </div>
-                                        <div className={styles.modalBtns}>
-                                            <button className={styles.Btncrear}
-                                                disabled={!esValidoOpcion || !esValidoPosicion}
-                                                onClick={() => {
-                                                    if (modoMenu === "crear") {
-                                                        crearMenu();
-                                                    } else {
-                                                        editarMenu(menuSeleccionadoEditar);
-                                                    }
-                                                }}>
-                                                {modoMenu === "crear" ? "Crear" : "Editar"}
-                                            </button>
-                                            <button onClick={cancelarModal} className={styles.Btncancelar}>Cancelar</button>
-                                        </div>
-                                    </div>
-                                </div>
+                                    ]}
+                                />
                             )
                         }
                         {
                             modalSubMenu && (
-                                <div className={styles.modalOverlay}>
-                                    <div className={styles.modal}>
-                                        <div className={styles.headModal}>
-                                            <h2>{modoSubMenu === "crear" ? "Nuevo SubMenú" : "Editar SubMenú"}</h2>
-                                        </div>
+                                <ModalFormulario
+                                    titulo={modoSubMenu === "crear" ? "Nuevo SubMenú" : "Editar SubMenú"}
+                                    txtConfirmar={modoSubMenu === "crear" ? "Crear" : "Editar"}
+                                    deshabilitado={!esValidoOpcionSub}
+                                    onConfirmar={() => modoSubMenu === "crear" ? crearSubMenu() : editarSubMenu(subMenuSeleccionadoEditar)}
+                                    onCancelar={cancelarModalSub}
+                                    campos={[
+                                        ...(modoSubMenu === "crear" ? [{
+                                            label: "Menú Padre",
+                                            content: <>
+                                                <select
+                                                    value={menuSeleccionado || ''}
+                                                    onChange={e => setMenuSeleccionado(Number(e.target.value))}
+                                                >
+                                                    <option value="">Selecciona un menú</option>
+                                                    {menus.map(m => (
+                                                        <option key={m.iD_Menu} value={m.iD_Menu}>{m.opcion}</option>
+                                                    ))}
+                                                </select>
+                                            </>
+                                        }] : []),
                                         {
-                                            modoSubMenu === "crear" && (
-                                                <div className={styles.formGroup}>
-                                                    <label>Menú padre:</label>
-                                                    <select
-                                                        value={menuSeleccionado || ''}
-                                                        onChange={e => setMenuSeleccionado(Number(e.target.value))}
-                                                    >
-                                                        <option value="">Selecciona un menú</option>
-                                                        {menus.map(m => (
-                                                            <option key={m.iD_Menu} value={m.iD_Menu}>{m.opcion}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                            )
+                                            label: "Nombre",
+                                            content: <>
+                                                <input
+                                                    type="text"
+                                                    name="opcionSub"
+                                                    className={!esValidoOpcionSub ? styles.inputError : styles.input}
+                                                    value={formDataSubMenu.opcion}
+                                                    onChange={handlerOnChangeSubMenu}
+                                                    onBlur={validationOpcionSub}
+                                                    placeholder="Ingrese el nombre del submenu"
+                                                />
+                                                <span className={`${styles.spanError} ${!esValidoOpcionSub ? styles.err : ""}`}>La Opción no es válido</span>
+                                            </>
+                                        },
+                                        {
+                                            label: "Posición",
+                                            content: <>
+                                                <input
+                                                    type="number"
+                                                    name="posicionSub"
+                                                    className={!esValidoPosicionSub ? styles.inputError : styles.input}
+                                                    value={formDataSubMenu.posicion}
+                                                    onChange={handlerOnChangeSubMenu}
+                                                    onBlur={validationPosicionSub}
+                                                    placeholder="Ingrese posicion del submenu"
+                                                />
+                                                <span className={`${styles.spanError} ${!esValidoPosicionSub ? styles.err : ""}`}>La Posicion no es válida</span>
+                                            </>
                                         }
 
-                                        <div className={styles.formGroup}>
-                                            <label>Nombre:</label>
-                                            <input
-                                                type="text"
-                                                name="opcionSub"
-                                                className={!esValidoOpcionSub ? styles.inputError : styles.input}
-                                                value={formDataSubMenu.opcion}
-                                                onChange={handlerOnChangeSubMenu}
-                                                onBlur={validationOpcionSub}
-                                                placeholder="Ingrese el nombre del submenu"
-                                            />
-                                            <span className={`${styles.spanError} ${!esValidoOpcionSub ? styles.err : ""}`}>La Opción no es válido</span>
-                                        </div>
-                                        <div className={styles.formGroup}>
-                                            <label>Posición:</label>
-                                            <input
-                                                type="number"
-                                                name="posicionSub"
-                                                className={!esValidoPosicionSub ? styles.inputError : styles.input}
-                                                value={formDataSubMenu.posicion}
-                                                onChange={handlerOnChangeSubMenu}
-                                                onBlur={validationPosicionSub}
-                                                placeholder="Ingrese posicion del submenu"
-                                            />
-                                            <span className={`${styles.spanError} ${!esValidoPosicionSub ? styles.err : ""}`}>La Posicion no es válida</span>
-                                        </div>
-                                        <div className={styles.modalBtns}>
-                                            <button className={styles.Btncrear}
-                                                disabled={!esValidoOpcionSub}
-                                                onClick={() => {
-                                                    if (modoSubMenu === "crear") {
-                                                        crearSubMenu();
-                                                    } else {
-                                                        editarSubMenu(subMenuSeleccionadoEditar);
-                                                    }
-                                                }}>
-                                                {modoSubMenu === "crear" ? "Crear" : "Editar"}
-                                            </button>
-                                            <button onClick={cancelarModalSub} className={styles.Btncancelar}>Cancelar</button>
-                                        </div>
-                                    </div>
-                                </div>
+                                    ]}
+                                />
                             )
                         }
                         {
                             modalPermisos && itemPermisos && (
-                                <div className={styles.modalOverlay}>
-                                    <div className={styles.modal}>
-                                        <div className={styles.headModal}>
-                                            <h2>Permisos</h2>
-                                            <h2>{itemPermisos.opcion}</h2>
-                                        </div>
-
-                                        <div className={styles.listaRoles}>
-                                            {roles.map(rol => (
-                                                <label key={rol.iD_Rol} className={styles.rolItem}>
-                                                    <span>{rol.rol}</span>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={rolesTemp.includes(rol.iD_Rol)}
-                                                        onChange={() => toggleRolTemp(rol.iD_Rol)}
-                                                    />
-
-                                                </label>
-                                            ))
-                                            }
-                                        </div>
-
-                                        <div className={styles.modalBtns}>
-                                            <button
-                                                className={styles.Btncrear}
-                                                onClick={guardarPermisos}
-                                                disabled={guardandoPermisos}
-                                            >
-                                                {guardandoPermisos ? 'Guardando...' : 'Guardar'}
-                                            </button>
-                                            <button
-                                                className={styles.Btncancelar}
-                                                onClick={() => setModalPermisos(false)}
-                                                disabled={guardandoPermisos}
-                                            >
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <ModalPermisos
+                                    titulo={itemPermisos.opcion}
+                                    roles={roles}
+                                    rolesSeleccionados={rolesTemp}
+                                    onToggle={toggleRolTemp}
+                                    onGuardar={guardarPermisos}
+                                    onCancelar={() => setModalPermisos(false)}
+                                    guardando={guardandoPermisos}
+                                />
                             )}
                         {confirmModalMenu.visible && (
                             <ConfirmModal
@@ -1090,7 +1086,9 @@ export default function Administracion() {
                         <div className={styles.header}>
                             <h2>Administración de Roles</h2>
                             <div className={styles.headerBtn}>
-                                <button className={styles.Btncrear} onClick={() => setModalCrearRol(true)}>+ Rol</button>
+                                <BtnV1 onClick={() => { setModalRol(true); setModoRol("crear") }}>
+                                    + Rol
+                                </BtnV1>
                             </div>
                         </div>
 
@@ -1137,82 +1135,33 @@ export default function Administracion() {
                             onCambiarPagina={setPaginaActualRoles}
                         />
                         {
-                            modalCrearRol && (
-                                <div className={styles.modalOverlay}>
-                                    <div className={styles.modal}>
-                                        <div className={styles.headModal}>
-                                            <h2>Nuevo Rol</h2>
-                                        </div>
-
-                                        <div className={styles.formGroup}>
-                                            <label>Nombre del Rol:</label>
-                                            <input
-                                                type="text"
-                                                name="rol"
-                                                className={!esValidoRol ? styles.inputError : styles.input}
-                                                value={formDataRol.rol}
-                                                onChange={handlerOnChangeRol}
-                                                onBlur={validationRol}
-                                                placeholder="Ingrese el nombre del nuevo Rol"
-                                            />
-                                            <span className={`${styles.spanError} ${!esValidoRol ? styles.err : ""}`}>El Rol no es válido</span>
-                                        </div>
-                                        <div className={styles.modalBtns}>
-                                            <button className={styles.Btncrear}
-                                                disabled={!esValidoRol}
-                                                onClick={crearRol}
-                                            >
-                                                Crear
-                                            </button>
-                                            <button
-                                                onClick={cancelarModalRol}
-                                                className={styles.Btncancelar}>
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                            modalRol && (
+                                <ModalFormulario
+                                    titulo={modoRol === "crear" ? "Crear Rol" : "Editar Rol"}
+                                    txtConfirmar={modoRol === "crear" ? "Crear" : "Editar"}
+                                    deshabilitado={!esValidoRol}
+                                    onConfirmar={() => modoRol === "crear" ? crearRol() : editarRol()}
+                                    onCancelar={cancelarModalRol}
+                                    campos={[
+                                        {
+                                            label: "Nombre del Rol:",
+                                            content: <>
+                                                <input
+                                                    type="text"
+                                                    name="rol"
+                                                    className={!esValidoRol ? styles.inputError : styles.input}
+                                                    value={formDataRol.rol}
+                                                    onChange={handlerOnChangeRol}
+                                                    onBlur={validationRol}
+                                                    placeholder="Ingrese el nombre del nuevo Rol"
+                                                />
+                                                <span className={`${styles.spanError} ${!esValidoRol ? styles.err : ""}`}>El Rol no es válido</span>
+                                            </>
+                                        }
+                                    ]}
+                                />
                             )
                         }
-                        {
-                            modalEditarRol && (
-                                <div className={styles.modalOverlay}>
-                                    <div className={styles.modal}>
-                                        <div className={styles.headModal}>
-                                            <h2>Editar Rol</h2>
-                                        </div>
-
-                                        <div className={styles.formGroup}>
-                                            <label>Nombre del Rol:</label>
-                                            <input
-                                                type="text"
-                                                name="rol"
-                                                className={!esValidoRol ? styles.inputError : styles.input}
-                                                value={formDataRol.rol}
-                                                onChange={handlerOnChangeRol}
-                                                onBlur={validationRol}
-                                                placeholder="Ingrese el nuevo nombre del nuevo Rol"
-                                            />
-                                            <span className={`${styles.spanError} ${!esValidoRol ? styles.err : ""}`}>El Rol no es válido</span>
-                                        </div>
-                                        <div className={styles.modalBtns}>
-                                            <button className={styles.Btncrear}
-                                                disabled={!esValidoRol}
-                                                onClick={actualizarRol}
-                                            >
-                                                <FaEdit />
-                                            </button>
-                                            <button
-                                                onClick={cancelarModalRol}
-                                                className={styles.Btncancelar}>
-                                                <FaTrash />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        }
-
                         {confirmModalRol.visible && (
                             <ConfirmModal
                                 mensaje={`¿Eliminar el rol "${confirmModalRol.rol?.rol}"? Esta acción no se puede deshacer.`}

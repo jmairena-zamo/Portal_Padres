@@ -1,0 +1,45 @@
+.wrapper {
+    width: 100%;
+    margin-top: 25px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid white;
+}
+
+.thead th {
+    border: 1px solid white;
+    text-align: center;
+    background-color: rgb(176, 192, 173);
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.tbody td {
+    border: 1px solid white;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid black;
+}
+
+@media (max-width: 800px) {
+    .wrapper {
+        overflow-x: auto;
+        box-sizing: border-box;
+    }
+
+    .table {
+        white-space: nowrap;
+        min-width: 500px;
+    }
+}
+
+@media (max-width: 420px) {
+    .thead th,
+    .tbody td {
+        padding: 6px 4px;
+        font-size: 12px;
+    }
+}

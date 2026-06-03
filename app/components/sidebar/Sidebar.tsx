@@ -5,29 +5,25 @@ import styles from './Sidebar.module.css'
 import Image from 'next/image';
 import imagen from '../../img/Zamorano1.jpg'
 import { usePathname, useRouter } from 'next/navigation';
-import { FaChevronDown, FaChevronRight, FaSignOutAlt } from "react-icons/fa";
+import { FaChevronDown, FaChevronRight, FaSignOutAlt, FaBars } from "react-icons/fa";
 import { useState } from 'react';
 import { iconos, generarRuta, getSubPath } from '@/app/utils/menu';
 import { useMenu } from '@/app/hooks/useMenu';
 
-export const Sidebar = () => {
+interface Props {
+    colapsado: boolean;
+    onToggle: () => void;
+}
+
+export const Sidebar = ({ colapsado, onToggle }: Props) => {
 
     const pathname = usePathname();
     const route = useRouter();
-    // const [menus, setMenus] = useState<Menu[]>([]);
     const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
     const { menus } = useMenu();
     const [sidebarAbierto, setSidebarAbierto] = useState(false);
 
     const cerrarSidebar = () => setSidebarAbierto(false);
-
-    // useEffect(() => {
-    //     fetch('api/menu/obtenerMenu').then(res => res.json())
-    //     .then(data => {
-    //         if (data.menus) setMenus(data.menus);
-    //     })
-    //     .catch(err => console.log('Error al cargar menús:', err));
-    // }, [])
 
     const linkClass = (path: any) =>
         pathname === path ? styles.active : styles.link;
@@ -67,14 +63,30 @@ export const Sidebar = () => {
                 className={`${styles.overlay} ${sidebarAbierto ? styles.visible : ''}`}
                 onClick={cerrarSidebar}
             />
-            <div className={`${styles.sidebar} ${sidebarAbierto ? styles.open : ''}`}>
-                <div>
+            <div className={`${styles.sidebar} ${sidebarAbierto ? styles.open : ''} ${colapsado ? styles.colapsado : ''}`} >
+                <div className={`${styles.contentToggle} ${colapsado ? styles.contentToggleColapsado : ''}`}>
+                    <button className={styles.toggleBtn} onClick={onToggle} aria-label="Colapsar menú">
+                        <FaBars size={18} />
+                    </button>
+                </div>
+
+                <div className={styles.sidebarInner}>
+                    
                     <div className={styles.tag}>
+                        
                         <div className={styles.contenttag}>
                             <Image src={imagen} alt="Logo Zamorano" />
-                            <h4><strong>usuario</strong></h4>
-                            <p>NombreAlumno</p>
+                            {
+                                !colapsado && (
+                                    <>
+                                        <h4><strong>usuario</strong></h4>
+                                        <p>NombreAlumno</p>
+                                    </>
+                                )
+                            }
+                            
                         </div>
+                        
                     </div>
 
                     <nav className={styles.nav}>
@@ -100,16 +112,14 @@ export const Sidebar = () => {
                                                 <button
                                                     className={`${styles.link} ${styles.menuBtn}`}
                                                     onClick={() => gestionSubmenu(menu.iD_Menu)}
+                                                    title={colapsado ? menu.opcion : ''}
                                                 >
                                                     {Icono && <Icono size={20} />}
-                                                    {menu.opcion}
-                                                    {estaAbierto
-                                                        ? <FaChevronDown size={12} />
-                                                        : <FaChevronRight size={12} />
-                                                    }
+                                                    {!colapsado && menu.opcion}
+                                                    {!colapsado && (estaAbierto ? <FaChevronDown size={12} /> : <FaChevronRight size={12} />)}
                                                 </button>
 
-                                                {estaAbierto && (
+                                                {estaAbierto && !colapsado && (
                                                     <div className={styles.submenus}>
                                                         {menu.submenus
                                                             .sort((a, b) => a.posicion - b.posicion)
@@ -130,9 +140,9 @@ export const Sidebar = () => {
                                                 )}
                                             </>
                                         ) : (
-                                            <Link href={path} onClick={cerrarSidebar} className={linkClass(path)}>
+                                            <Link href={path} onClick={cerrarSidebar} className={linkClass(path)} title={colapsado ? menu.opcion : ''}>
                                                 {Icono && <Icono size={20} />}
-                                                {menu.opcion}
+                                                {!colapsado && menu.opcion}
                                             </Link>
                                         )}
                                     </div>
@@ -145,7 +155,8 @@ export const Sidebar = () => {
                 </div>
 
                 <div className={styles.logout}>
-                    <button className={styles.logoutBTN} onClick={handleLogout}>Cerrar Sesion <FaSignOutAlt size={25} /></button>
+                    <button className={styles.logoutBTN} onClick={handleLogout} title={colapsado ? 'Cerrar Sesión' : ''}>
+                        {!colapsado && 'Cerrar Sesion'} <FaSignOutAlt size={25} /></button>
                 </div>
             </div>
         </>

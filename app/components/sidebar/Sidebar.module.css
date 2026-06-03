@@ -9,8 +9,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px 0px;
+    justify-content: space-between;    
 }
 
 .tag{
@@ -20,6 +19,7 @@
     margin-bottom: 25px;
     padding: 8px 10px;
     border-radius: 5px;
+    position: relative;
 }
 
 .contenttag{
@@ -48,6 +48,9 @@
     border-top: solid 1px white;
     max-height: 57vh;   
     overflow-y: auto;
+
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .nav::-webkit-scrollbar {
@@ -160,14 +163,13 @@
 
 .hamburger span {
     display: block;
-    width: 22px;
+    width: 12px;
     height: 2px;
     background-color: white;
     border-radius: 2px;
     transition: all 0.3s ease;
 }
 
-/* Líneas animadas cuando está abierto */
 .hamburger.open span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
 }
@@ -178,7 +180,6 @@
     transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Overlay oscuro */
 .overlay {
     display: none;
     position: fixed;
@@ -191,6 +192,84 @@
     display: block;
 }
 
+.contentToggle {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: end;
+}
+.toggleBtn {
+    display: flex;
+    align-items: end;
+    justify-content: end;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    align-self: flex-end;
+    top: 5px;
+    z-index: 10;
+    
+    transition: background 0.2s;
+}
+.contentToggleColapsado {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggleBtn:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.sidebarInner {
+    flex: 1;
+    overflow: hidden;
+    width: 95%;
+}
+
+.colapsado {
+    width: 60px;
+}
+
+.colapsado .tag {
+    height: auto;
+    padding: 8px 0;
+}
+
+.colapsado .contenttag img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.colapsado .nav {
+    align-items: center;
+    padding: 10px 0;
+}
+
+.colapsado .nav a,
+.colapsado .menuBtn {
+    justify-content: center;
+    padding: 8px 0;
+    width: 40px;
+    
+}
+
+.colapsado .logout {
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.colapsado .logoutBTN {
+    justify-content: center;
+    padding: 8px 0;
+}
+
 @media (max-width: 800px) {
     .hamburger {
         display: flex;
@@ -200,16 +279,28 @@
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         z-index: 100;
-        width: 280px;
+        width: 300px;
     }
 
     .sidebar.open {
         transform: translateX(0);
     }
+    
+    .toggleBtn {
+        display: none;
+    }
+
+    .sidebarInner {
+        margin-top: 15px;
+    }
+
+    .colapsado {
+        width: 260px; 
+    }
 }
 
 @media (max-width: 420px) {
     .sidebar {
-        width: 80%;
+        width: 70%;
     }
 }

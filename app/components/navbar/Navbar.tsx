@@ -1,18 +1,16 @@
 import styles from './Navbar.module.css'
 import zamorano from '../../img/Logo-Universidad-Zamorano.png'
 import user from '../../img/logo-user.png'
-import { IconContext } from "react-icons";
-import { FaSignOutAlt, FaUser } from "react-icons/fa";
 import Image from 'next/image';
 
-export const Navbar = () => {
+interface Props {
+    colapsado: boolean;
+}
 
-    const prueba = () => {
-        alert("hola");
-    }
+export const Navbar = ({colapsado}: Props) => {
 
     return (
-        <header className={styles.header}>
+        <header className={`${styles.header} ${colapsado ? styles.headerColapsado : ''}`}>
             <div className={styles.navbar}>
                 <div>
                     <Image src={zamorano} alt="Logo Zamorano"

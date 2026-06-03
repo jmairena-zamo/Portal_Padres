@@ -5,22 +5,35 @@
 
 .main {
     display: flex;
+    flex-direction: column; 
     margin-top: 55px;
+    margin-left: 250px;    
+    transition: margin-left 0.3s ease;
+}
+
+.mainColapsado {
+    margin-left: 60px !important;
 }
 
 .content {
     width: 100%;
-    margin-left: 250px;
-    margin-right: 20px;
     padding: 10px;
     box-sizing: border-box;
 }
 
 @media (max-width: 800px) {
+    .main {
+        margin-left: 0; 
+    }
+
     .content {
         margin-left: 0;
         margin-right: 0;
         padding: 10px 15px;
+    }
+
+    .mainColapsado {
+        margin-left: 0 !important;
     }
 }
 

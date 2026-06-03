@@ -12,6 +12,7 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
     
     const [showModal, setShowModal] = useState<boolean>(false);
     const [loading, setLoading] = useState(true); 
+    const [colapsado, setColapsado] = useState(false);
 
     useEffect(() => {
         const cantidadHijos = 1;
@@ -31,9 +32,9 @@ export default function AppLayout({ children }: Readonly<{ children: React.React
 
             {!showModal && (
                 <div className={styles.body}>
-                    <Sidebar />
-                    <div className={styles.main}>
-                        <Navbar />
+                    <Sidebar colapsado={colapsado} onToggle={() => setColapsado(v => !v)}/>
+                    <div className={`${styles.main} ${colapsado ? styles.mainColapsado : ''}`}>
+                        <Navbar colapsado={colapsado} />
                         <div className={styles.content}>
                             {children}
                         </div>

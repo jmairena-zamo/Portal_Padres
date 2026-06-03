@@ -330,13 +330,22 @@
     align-items: center;
 }
 
-.acciones button{
-    padding: 10px 0;
-    width: 50px;
-}
-
 .tableContainer {
     width: 100%;
+}
+
+.headerTitulo {
+    display: flex;
+    align-items: center;
+    gap: 45px;
+    flex-wrap: wrap;
+}
+
+.comboContainer {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
 @media (max-width: 800px) {
