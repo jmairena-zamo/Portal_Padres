@@ -18,6 +18,7 @@ import ModalPermisos from "@/app/components/ModalPermisos/ModalPermisos";
 import { BtnV1, BtnV2, BtnV3 } from "@/app/components/Boton/Boton";
 import Tabla from "@/app/components/Tabla/Tabla";
 import ComboBoxFiltro from "@/app/components/ComboBoxFiltro/ComboBoxFiltro";
+import Buscador from "@/app/components/Buscador/Buscador";
 
 export default function Administracion() {
 
@@ -25,6 +26,9 @@ export default function Administracion() {
     const [paginaActualRoles, setPaginaActualRoles] = useState(1);
     const REGISTROS_POR_PAGINA = 10;
     const [rolFiltro, setRolFiltro] = useState<number | 'todos'>('todos');
+
+    const [menusFiltradosBuscador, setMenusFiltradosBuscador] = useState<Menu[]>([]);
+    const [rolesFiltradosBuscador, setRolesFiltradosBuscador] = useState<Rol[]>([]);
 
     const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
 
@@ -93,6 +97,10 @@ export default function Administracion() {
     const [rolesTemp, setRolesTemp] = useState<number[]>([]);
     const [guardandoPermisos, setGuardandoPermisos] = useState(false);
 
+    const [errorPosicionMenu, setErrorPosicionMenu] = useState('');
+    const [errorPosicionSub, setErrorPosicionSub] = useState('');
+    const [posicionesEditando, setPosicionesEditando] = useState<Record<string, number>>({});
+
     useEffect(() => {
         cargarDatos();
     }, []);
@@ -103,7 +111,10 @@ export default function Administracion() {
             const res = await fetch('/api/menu/adminMenuRol');
             const data = await res.json();
             setRoles(data.roles);
-            setMenus(data.menus)
+            setMenus(data.menus);
+
+            setRolesFiltradosBuscador(data.roles);
+            setMenusFiltradosBuscador(data.menus);
 
         } catch (error) {
             setError('Error de conexión. Intenta de nuevo.');
@@ -181,7 +192,27 @@ export default function Administracion() {
         await cargarMenus();
     }
 
+    const posicionMenuOcupada = (posicion: number, excluirId?: number): boolean => {
+        return menus.some(m =>
+            m.posicion === posicion && m.iD_Menu !== excluirId
+        );
+    };
+
+    const posicionSubMenuOcupada = (posicion: number, menuPadreId: number, excluirId?: number): boolean => {
+        const padre = menus.find(m => m.iD_Menu === menuPadreId);
+        return padre?.submenus?.some(s =>
+            s.posicion === posicion && s.iD_SubMenu !== excluirId
+        ) ?? false;
+    };
+
     const cambiarPosicion = async (menu: Menu, nuevaPosicion: number) => {
+
+        if (posicionMenuOcupada(nuevaPosicion, menu.iD_Menu)) {
+            mostrarError(`La posición ${nuevaPosicion} ya está ocupada por otro menú`);
+            cargarDatos();
+            return;
+        }
+
         const res = await fetch('/api/menu/actualizarMenu',
             {
                 method: 'put',
@@ -202,6 +233,13 @@ export default function Administracion() {
     }
 
     const cambiarPosicionSUB = async (submenu: SubMenu, nuevaPosicion: number) => {
+
+        if (posicionSubMenuOcupada(nuevaPosicion, submenu.menu_ID, submenu.iD_SubMenu)) {
+            mostrarError(`La posición ${nuevaPosicion} ya está ocupada en este menú`);
+            cargarDatos();
+            return;
+        }
+
         const res = await fetch('/api/menu/actualizarSubMenu',
             {
                 method: 'put',
@@ -442,8 +480,16 @@ export default function Administracion() {
         setModalSubMenu(false)
     }
 
+    //CRUD MENU
     const crearMenu = async () => {
         if (!formDataMenu.opcion.trim()) return;
+
+        if (posicionMenuOcupada(Number(formDataMenu.posicion))) {
+            setErrorPosicionMenu(`La posición ${formDataMenu.posicion} ya está en uso`);
+            return;
+        }
+        setErrorPosicionMenu('');
+
         const res = await fetch('/api/menu/crearMenu',
             {
                 method: 'POST',
@@ -542,6 +588,13 @@ export default function Administracion() {
             mostrarError('Seleccione un menú padre');
             return;
         }
+
+        if (posicionSubMenuOcupada(Number(formDataSubMenu.posicion), menuSeleccionado)) {
+            setErrorPosicionSub(`La posición ${formDataSubMenu.posicion} ya está en uso en este menú`);
+            return;
+        }
+        setErrorPosicionSub('');
+
         const res = await fetch('/api/menu/crearSubmenu',
             {
                 method: 'POST',
@@ -731,11 +784,13 @@ export default function Administracion() {
         cargarDatos();
     }
 
-    const menuFiltrados = rolFiltro === 'todos' ? menus : menus.filter(menu =>
-        menu.rolesAsignados.some(r => r.rol_ID === rolFiltro && r.habilitado === 1) ||
-        menu.submenus?.some(sub=>
-            sub.rolesAsignados.some(r => r.rol_ID === rolFiltro && r.habilitado === 1)
-        )
+    //FILTRADOS
+    const menuFiltrados = menusFiltradosBuscador.filter(menu =>
+        rolFiltro === 'todos' ? true :
+            menu.rolesAsignados.some(r => r.rol_ID === rolFiltro && r.habilitado === 1) ||
+            menu.submenus?.some(sub =>
+                sub.rolesAsignados.some(r => r.rol_ID === rolFiltro && r.habilitado === 1)
+            )
     );
 
     const indexInicioMenus = (paginaActualMenus - 1) * REGISTROS_POR_PAGINA;
@@ -774,9 +829,29 @@ export default function Administracion() {
                         <div className={styles.header}>
                             <div className={styles.headerTitulo}>
                                 <h2>Administración de Menú</h2>
-                                <div className={styles.comboContainer}>
-                                    <h4>Filtrar Por Rol:</h4>
-                                    <ComboBoxFiltro 
+                            </div>
+
+                            <div className={styles.headerBtn}>
+                                <BtnV1 onClick={() => { setModalMenu(true); setModoMenu("crear") }}>+ Menu</BtnV1>
+                                <BtnV1 onClick={() => { setModalSubMenu(true); setModoSubMenu("crear") }}>+ SubMenu</BtnV1>
+                            </div>
+                        </div>
+                        <div className={styles.Filtros}>
+                            <div className={styles.Buscador}>
+                                <Buscador
+                                    datos={menus}
+                                    campos={["opcion"]}
+                                    placeholder="Buscar Menu..."
+                                    onResultado={resultados => {
+                                        setMenusFiltradosBuscador(resultados);
+                                        setPaginaActualMenus(1);
+                                    }
+                                    }
+                                />
+                            </div>
+                            <div className={styles.comboContainer}>
+                                <h4>Rol:</h4>
+                                <ComboBoxFiltro
                                     valor={rolFiltro}
                                     placeholder="Todos los Roles"
                                     opciones={roles.map(rol => ({ value: rol.iD_Rol, label: rol.rol }))}
@@ -785,13 +860,6 @@ export default function Administracion() {
                                         setPaginaActualMenus(1);
                                     }}
                                 />
-                                </div>
-                                
-                            </div>
-                            
-                            <div className={styles.headerBtn}>
-                                <BtnV1 onClick={() => { setModalMenu(true); setModoMenu("crear") }}>+ Menu</BtnV1>
-                                <BtnV1 onClick={() => { setModalSubMenu(true); setModoSubMenu("crear") }}>+ SubMenu</BtnV1>
                             </div>
                         </div>
 
@@ -804,17 +872,38 @@ export default function Administracion() {
                                     menu.submenus.map(sub => (
                                         <tr key={sub.iD_SubMenu} className={styles.submenurow}>
                                             <td>{sub.opcion}</td>
-                                            <td><input
-                                                type="number"
-                                                defaultValue={sub.posicion}
-                                                className={styles.inputPos}
-                                                onBlur={(e) => {
-                                                    const nueva = Number(e.target.value);
-                                                    if (nueva !== sub.posicion) {
-                                                        cambiarPosicionSUB(sub, nueva);
-                                                    }
-                                                }}
-                                            />
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    className={styles.inputPos}
+                                                    value={posicionesEditando[`sub-${sub.iD_SubMenu}`] ?? sub.posicion}
+                                                    onChange={(e) => {
+                                                        setPosicionesEditando(prev => ({
+                                                            ...prev,
+                                                            [`sub-${sub.iD_SubMenu}`]: Number(e.target.value)
+                                                        }));
+                                                    }}
+                                                    onBlur={async (e) => {
+                                                        const nueva = Number(e.target.value);
+                                                        if (nueva !== sub.posicion) {
+                                                            if (posicionSubMenuOcupada(nueva, sub.menu_ID, sub.iD_SubMenu)) {
+                                                                mostrarError(`La posición ${nueva} ya está ocupada en este menú`);
+                                                                // Revertir visualmente
+                                                                setPosicionesEditando(prev => ({
+                                                                    ...prev,
+                                                                    [`sub-${sub.iD_SubMenu}`]: sub.posicion
+                                                                }));
+                                                                return;
+                                                            }
+                                                            await cambiarPosicionSUB(sub, nueva);
+                                                        }
+                                                        setPosicionesEditando(prev => {
+                                                            const nuevo = { ...prev };
+                                                            delete nuevo[`sub-${sub.iD_SubMenu}`];
+                                                            return nuevo;
+                                                        });
+                                                    }}
+                                                />
                                             </td>
                                             <td>
                                                 <button
@@ -876,13 +965,32 @@ export default function Administracion() {
                                         render: menu => (
                                             <input
                                                 type="number"
-                                                defaultValue={menu.posicion}
                                                 className={styles.inputPos}
-                                                onBlur={(e) => {
+                                                value={posicionesEditando[`menu-${menu.iD_Menu}`] ?? menu.posicion}
+                                                onChange={(e) => {
+                                                    setPosicionesEditando(prev => ({
+                                                        ...prev,
+                                                        [`menu-${menu.iD_Menu}`]: Number(e.target.value)
+                                                    }));
+                                                }}
+                                                onBlur={async (e) => {
                                                     const nueva = Number(e.target.value);
                                                     if (nueva !== menu.posicion) {
-                                                        cambiarPosicion(menu, nueva);
+                                                        if (posicionMenuOcupada(nueva, menu.iD_Menu)) {
+                                                            mostrarError(`La posición ${nueva} ya está ocupada por otro menú`);
+                                                            setPosicionesEditando(prev => ({
+                                                                ...prev,
+                                                                [`menu-${menu.iD_Menu}`]: menu.posicion
+                                                            }));
+                                                            return;
+                                                        }
+                                                        await cambiarPosicion(menu, nueva);
                                                     }
+                                                    setPosicionesEditando(prev => {
+                                                        const nuevo = { ...prev };
+                                                        delete nuevo[`menu-${menu.iD_Menu}`];
+                                                        return nuevo;
+                                                    });
                                                 }}
                                             />
                                         )
@@ -894,7 +1002,7 @@ export default function Administracion() {
                                                 <BtnV3 onClick={() => abrirPermisos(menu)}>
                                                     {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
                                                 </BtnV3>
-                                            </div>                                            
+                                            </div>
                                         )
                                     },
                                     {
@@ -972,11 +1080,17 @@ export default function Administracion() {
                                                     name="posicion"
                                                     className={!esValidoPosicion ? styles.inputError : styles.input}
                                                     value={formDataMenu.posicion}
-                                                    onChange={handlerOnChangeMenu}
+                                                    onChange={(e) => {
+                                                        handlerOnChangeMenu(e);
+                                                        setErrorPosicionMenu('');
+                                                    }}
                                                     onBlur={validationPosicion}
                                                     placeholder="Ingrese el posicion de la opción"
                                                 />
-                                                <span className={`${styles.spanError} ${!esValidoPosicion ? styles.err : ""}`}>La Posicion no es válida</span>
+                                                <span className={`${styles.spanError} ${(!esValidoPosicion || !!errorPosicionMenu) ? styles.err : ""}`}>
+                                                    {errorPosicionMenu || "La Posición no es válida"}
+                                                </span>
+
                                             </>
                                         }] : []),
                                         {
@@ -1038,11 +1152,16 @@ export default function Administracion() {
                                                     name="posicionSub"
                                                     className={!esValidoPosicionSub ? styles.inputError : styles.input}
                                                     value={formDataSubMenu.posicion}
-                                                    onChange={handlerOnChangeSubMenu}
+                                                    onChange={(e) => {
+                                                        handlerOnChangeSubMenu(e);
+                                                        setErrorPosicionSub('');
+                                                    }}
                                                     onBlur={validationPosicionSub}
                                                     placeholder="Ingrese posicion del submenu"
                                                 />
-                                                <span className={`${styles.spanError} ${!esValidoPosicionSub ? styles.err : ""}`}>La Posicion no es válida</span>
+                                                <span className={`${styles.spanError} ${(!esValidoPosicionSub || !!errorPosicionSub) ? styles.err : ""}`}>
+                                                    {errorPosicionSub || "La Posición no es válida"}
+                                                </span>
                                             </>
                                         }
 
@@ -1092,42 +1211,25 @@ export default function Administracion() {
                             </div>
                         </div>
 
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>Rol</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {datosPaginadosRoles.map(rol => (
-                                    <React.Fragment key={rol.iD_Rol}>
-
-                                        <tr key={rol.iD_Rol}>
-
-                                            <td className={styles.rol}>
-                                                {rol.rol}
-                                            </td>
-
-                                            <td>
-                                                <div className={styles.acciones}>
-                                                    <button className={styles.Btncrear}
-                                                        onClick={() => abrirEditarRol(rol)}>
-                                                        <FaEdit />
-                                                    </button>
-                                                    <button className={styles.Btncancelar}
-                                                        onClick={() => pedirConfirmacionEliminar(rol)}>
-                                                        <FaTrash size={15} />
-                                                    </button>
-
-                                                </div>
-
-                                            </td>
-                                        </tr>
-                                    </React.Fragment>
-                                ))}
-                            </tbody>
-                        </table>
+                        <Tabla
+                            datos={datosPaginadosRoles}
+                            keyExtractor={rol => rol.iD_Rol}
+                            columnas={[
+                                {
+                                    header: 'Rol',
+                                    accessor: 'rol'
+                                },
+                                {
+                                    header: 'Acciones',
+                                    render: rol => (
+                                        <div className={styles.acciones}>
+                                            <BtnV1 onClick={() => abrirEditarRol(rol)}><FaEdit /></BtnV1>
+                                            <BtnV2 onClick={() => pedirConfirmacionEliminar(rol)}><FaTrash /></BtnV2>
+                                        </div>
+                                    )
+                                }
+                            ]}
+                        />
                         <Paginacion
                             totalRegistros={roles.length}
                             registrosPorPagina={REGISTROS_POR_PAGINA}

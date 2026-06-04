@@ -10,7 +10,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: width 0.3s ease, margin-left 0.3s ease;
+    transition: left 0.3s ease;
 }
 .navbar {
     color: black;
@@ -45,24 +45,26 @@
 }
 
 @media (max-width: 800px) {
-    .header {
+    .header, .headerColapsado {
+        left: 0 !important;
         width: 100%;
-        margin-left: 0;
-        padding-left: 60px; /* espacio para el botón hamburguesa */
+        height: 60px;
+        padding-left: 60px;   
+        box-sizing: border-box;
+    }
+
+    .navbar {
+        padding: 0 15px 0 0;  
     }
 
     .navbarright {
         margin-right: 10px;
     }
 
-    .headerColapsado {
-        width: 100%;
-        margin-left: 0;
-    }
 }
 
 @media (max-width: 420px) {
     .navbarright span {
-        display: none; /* oculta el nombre en pantallas muy pequeñas */
+        display: none; 
     }
 }

@@ -1,12 +1,12 @@
 .combo {
-    padding: 5px 10px;
-    border: 1px solid #008237;
+    padding: 9px 32px 9px 5px;
+    border: 1px solid black;
     border-radius: 5px;
-    font-size: 13px;
+    font-size: 14px;
     color: #333;
     cursor: pointer;
     background-color: white;
-    min-width: 160px;
+    width: 100%;
 }
 
 .combo:focus {

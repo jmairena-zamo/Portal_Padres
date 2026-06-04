@@ -154,7 +154,6 @@
     background-color: #005221;
 }
 
-/* interruptor cambiar estado habilitado */
 .switch {
     position: relative;
     display: inline-block;
@@ -341,11 +340,24 @@
     flex-wrap: wrap;
 }
 
+.Filtros{
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    gap: 15px;
+}
+
 .comboContainer {
     display: flex;
     align-items: center;
     gap: 15px;
-    flex-wrap: wrap;
+}
+
+.Buscador{
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 @media (max-width: 800px) {
@@ -377,9 +389,33 @@
         width: calc(100% - 32px);
         padding: 20px 15px;
     }
+
+    .headerTitulo {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
 }
 
 @media (max-width: 420px) {
+
+    .headerTitulo {
+        width: 100%;
+        gap: 15px;
+    }
+
+    .Filtros{
+        flex-direction: column;
+    }
+
+    .comboContainer{
+        gap: 5px;
+    }
+
+    .Buscador{
+        width: 100%;
+    }
+
     .cards {
         margin: 8px;
     }
