@@ -35,10 +35,17 @@ export async function middleware(request: NextRequest) {
     const rutaactual = rutasProtegidas.find((ruta) => path.startsWith(ruta));
     if (!rutaactual) return NextResponse.next();
 
-    const usuario = JSON.parse(session.value);
-    const ID_rol = 2;
+    if(!session){
+        return NextResponse.json(
+            { error: 'No hay sesion'},
+            { status: 400 }
+        )
+    }
 
-    const rutaspermitidas = await getRutasPermitidas(ID_rol);
+    const usuarioData = JSON.parse(session.value);
+    const idrol = usuarioData.iD_Rol;
+
+    const rutaspermitidas = await getRutasPermitidas(idrol);
 
     const permiso = rutaspermitidas.includes(path);
 

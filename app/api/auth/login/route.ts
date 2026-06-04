@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-    const limitResult = rateLimit(request, 5, 15 * 60 * 1000);
+    const limitResult = rateLimit(request, 10, 15 * 60 * 1000);
     if (limitResult) return limitResult;
 
     const body = await request.json();
@@ -46,7 +46,8 @@ export async function POST(request: NextRequest) {
 
         const saveData = {
             id: data.response.iD_UserEmail,
-            email: data.response.correoElectronico
+            email: data.response.correoElectronico,
+            iD_Rol: data.response.iD_Rol
         }
 
         const response = NextResponse.json({ ok: true });

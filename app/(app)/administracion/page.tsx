@@ -19,6 +19,8 @@ import { BtnV1, BtnV2, BtnV3 } from "@/app/components/Boton/Boton";
 import Tabla from "@/app/components/Tabla/Tabla";
 import ComboBoxFiltro from "@/app/components/ComboBoxFiltro/ComboBoxFiltro";
 import Buscador from "@/app/components/Buscador/Buscador";
+import Loading from "@/app/components/Loading/Loading";
+import Vacio from "@/app/components/Vacio/Vacio";
 
 export default function Administracion() {
 
@@ -797,9 +799,15 @@ export default function Administracion() {
     const indexFinMenus = indexInicioMenus + REGISTROS_POR_PAGINA;
     const datosPaginadosMenus = menuFiltrados.slice(indexInicioMenus, indexFinMenus);
 
+    const tieneMenus = datosPaginadosMenus && datosPaginadosMenus.length > 0;
+
     const indexInicioRoles = (paginaActualRoles - 1) * REGISTROS_POR_PAGINA;
     const indexFinRoles = indexInicioRoles + REGISTROS_POR_PAGINA;
     const datosPaginadosRoles = roles.slice(indexInicioRoles, indexFinRoles);
+
+    const tieneRoles = datosPaginadosRoles && datosPaginadosRoles.length > 0;
+
+    if (cargando) return <Loading />;
 
     return (
         <div className={styles.cards}>
@@ -864,183 +872,192 @@ export default function Administracion() {
                         </div>
 
                         <div className={styles.tableContainer}>
-                            <Tabla
-                                datos={datosPaginadosMenus}
-                                keyExtractor={menu => menu.iD_Menu}
-                                estaExpandida={menu => menuAbierto === menu.iD_Menu}
-                                filaExpandida={menu =>
-                                    menu.submenus.map(sub => (
-                                        <tr key={sub.iD_SubMenu} className={styles.submenurow}>
-                                            <td>{sub.opcion}</td>
-                                            <td>
-                                                <input
-                                                    type="number"
-                                                    className={styles.inputPos}
-                                                    value={posicionesEditando[`sub-${sub.iD_SubMenu}`] ?? sub.posicion}
-                                                    onChange={(e) => {
-                                                        setPosicionesEditando(prev => ({
-                                                            ...prev,
-                                                            [`sub-${sub.iD_SubMenu}`]: Number(e.target.value)
-                                                        }));
-                                                    }}
-                                                    onBlur={async (e) => {
-                                                        const nueva = Number(e.target.value);
-                                                        if (nueva !== sub.posicion) {
-                                                            if (posicionSubMenuOcupada(nueva, sub.menu_ID, sub.iD_SubMenu)) {
-                                                                mostrarError(`La posición ${nueva} ya está ocupada en este menú`);
-                                                                // Revertir visualmente
+                            {
+                                !tieneMenus ? (
+                                    <Vacio
+                                        titulo="No hay Menus"
+                                        descripcion="No se encontraron menus con ese nombre"
+                                    />
+                                ) : (
+                                    <Tabla
+                                        datos={datosPaginadosMenus}
+                                        keyExtractor={menu => menu.iD_Menu}
+                                        estaExpandida={menu => menuAbierto === menu.iD_Menu}
+                                        filaExpandida={menu =>
+                                            menu.submenus.map(sub => (
+                                                <tr key={sub.iD_SubMenu} className={styles.submenurow}>
+                                                    <td>{sub.opcion}</td>
+                                                    <td>
+                                                        <input
+                                                            type="number"
+                                                            className={styles.inputPos}
+                                                            value={posicionesEditando[`sub-${sub.iD_SubMenu}`] ?? sub.posicion}
+                                                            onChange={(e) => {
                                                                 setPosicionesEditando(prev => ({
                                                                     ...prev,
-                                                                    [`sub-${sub.iD_SubMenu}`]: sub.posicion
+                                                                    [`sub-${sub.iD_SubMenu}`]: Number(e.target.value)
                                                                 }));
-                                                                return;
-                                                            }
-                                                            await cambiarPosicionSUB(sub, nueva);
-                                                        }
-                                                        setPosicionesEditando(prev => {
-                                                            const nuevo = { ...prev };
-                                                            delete nuevo[`sub-${sub.iD_SubMenu}`];
-                                                            return nuevo;
-                                                        });
-                                                    }}
-                                                />
-                                            </td>
-                                            <td>
-                                                <button
-                                                    className={styles.Btnpermisos}
-                                                    onClick={() => abrirPermisos(sub)}>
-                                                    {sub.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <label className={styles.switch}>
+                                                            }}
+                                                            onBlur={async (e) => {
+                                                                const nueva = Number(e.target.value);
+                                                                if (nueva !== sub.posicion) {
+                                                                    if (posicionSubMenuOcupada(nueva, sub.menu_ID, sub.iD_SubMenu)) {
+                                                                        mostrarError(`La posición ${nueva} ya está ocupada en este menú`);
+                                                                        setPosicionesEditando(prev => ({
+                                                                            ...prev,
+                                                                            [`sub-${sub.iD_SubMenu}`]: sub.posicion
+                                                                        }));
+                                                                        return;
+                                                                    }
+                                                                    await cambiarPosicionSUB(sub, nueva);
+                                                                }
+                                                                setPosicionesEditando(prev => {
+                                                                    const nuevo = { ...prev };
+                                                                    delete nuevo[`sub-${sub.iD_SubMenu}`];
+                                                                    return nuevo;
+                                                                });
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            className={styles.Btnpermisos}
+                                                            onClick={() => abrirPermisos(sub)}>
+                                                            {sub.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
+                                                        </button>
+                                                    </td>
+                                                    <td>
+                                                        <label className={styles.switch}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={sub.habilitado === 1}
+                                                                onChange={() => HabilitarSUB(sub)}
+                                                            />
+                                                            <span className={styles.slider}></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <div className={styles.acciones}>
+                                                            <BtnV1 onClick={() => {
+                                                                setSubMenuSeleccionadoEditar(sub);
+                                                                setFormDataSubMenu({
+                                                                    opcion: sub.opcion,
+                                                                    posicion: sub.posicion
+                                                                });
+                                                                setModalSubMenu(true);
+                                                                setModoSubMenu("editar")
+                                                            }}>
+                                                                <FaEdit />
+                                                            </BtnV1>
+                                                            <BtnV2 onClick={() => pedirConfirmacionEliminarSub(sub)}>
+                                                                <FaTrash />
+                                                            </BtnV2>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        }
+                                        columnas={[
+                                            {
+                                                header: 'Menú',
+                                                render: menu => (
+                                                    <button
+                                                        className={styles.menuBtn}
+                                                        onClick={() => gestionSubmenu(menu.iD_Menu)}
+                                                    >
+                                                        {menu.opcion}
+                                                        {menu.submenus?.length > 0 && (
+                                                            menuAbierto === menu.iD_Menu
+                                                                ? <FaChevronDown size={12} />
+                                                                : <FaChevronRight size={12} />
+                                                        )}
+                                                    </button>
+                                                )
+                                            },
+                                            {
+                                                header: 'Posición',
+                                                render: menu => (
                                                     <input
-                                                        type="checkbox"
-                                                        checked={sub.habilitado === 1}
-                                                        onChange={() => HabilitarSUB(sub)}
-                                                    />
-                                                    <span className={styles.slider}></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <div className={styles.acciones}>
-                                                    <BtnV1 onClick={() => {
-                                                        setSubMenuSeleccionadoEditar(sub);
-                                                        setFormDataSubMenu({
-                                                            opcion: sub.opcion,
-                                                            posicion: sub.posicion
-                                                        });
-                                                        setModalSubMenu(true);
-                                                        setModoSubMenu("editar")
-                                                    }}>
-                                                        <FaEdit />
-                                                    </BtnV1>
-                                                    <BtnV2 onClick={() => pedirConfirmacionEliminarSub(sub)}>
-                                                        <FaTrash />
-                                                    </BtnV2>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                }
-                                columnas={[
-                                    {
-                                        header: 'Menú',
-                                        render: menu => (
-                                            <button
-                                                className={styles.menuBtn}
-                                                onClick={() => gestionSubmenu(menu.iD_Menu)}
-                                            >
-                                                {menu.opcion}
-                                                {menu.submenus?.length > 0 && (
-                                                    menuAbierto === menu.iD_Menu
-                                                        ? <FaChevronDown size={12} />
-                                                        : <FaChevronRight size={12} />
-                                                )}
-                                            </button>
-                                        )
-                                    },
-                                    {
-                                        header: 'Posición',
-                                        render: menu => (
-                                            <input
-                                                type="number"
-                                                className={styles.inputPos}
-                                                value={posicionesEditando[`menu-${menu.iD_Menu}`] ?? menu.posicion}
-                                                onChange={(e) => {
-                                                    setPosicionesEditando(prev => ({
-                                                        ...prev,
-                                                        [`menu-${menu.iD_Menu}`]: Number(e.target.value)
-                                                    }));
-                                                }}
-                                                onBlur={async (e) => {
-                                                    const nueva = Number(e.target.value);
-                                                    if (nueva !== menu.posicion) {
-                                                        if (posicionMenuOcupada(nueva, menu.iD_Menu)) {
-                                                            mostrarError(`La posición ${nueva} ya está ocupada por otro menú`);
+                                                        type="number"
+                                                        className={styles.inputPos}
+                                                        value={posicionesEditando[`menu-${menu.iD_Menu}`] ?? menu.posicion}
+                                                        onChange={(e) => {
                                                             setPosicionesEditando(prev => ({
                                                                 ...prev,
-                                                                [`menu-${menu.iD_Menu}`]: menu.posicion
+                                                                [`menu-${menu.iD_Menu}`]: Number(e.target.value)
                                                             }));
-                                                            return;
-                                                        }
-                                                        await cambiarPosicion(menu, nueva);
-                                                    }
-                                                    setPosicionesEditando(prev => {
-                                                        const nuevo = { ...prev };
-                                                        delete nuevo[`menu-${menu.iD_Menu}`];
-                                                        return nuevo;
-                                                    });
-                                                }}
-                                            />
-                                        )
-                                    },
-                                    {
-                                        header: 'Roles',
-                                        render: menu => (
-                                            <div className={styles.acciones}>
-                                                <BtnV3 onClick={() => abrirPermisos(menu)}>
-                                                    {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
-                                                </BtnV3>
-                                            </div>
-                                        )
-                                    },
-                                    {
-                                        header: 'Estado',
-                                        render: menu => (
-                                            <label className={styles.switch}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={menu.habilitado === 1}
-                                                    onChange={() => Habilitar(menu)}
-                                                />
-                                                <span className={styles.slider}></span>
-                                            </label>
-                                        )
-                                    },
-                                    {
-                                        header: 'Acciones',
-                                        render: menu => (
-                                            <div className={styles.acciones}>
-                                                <BtnV1 onClick={() => {
-                                                    setMenuSeleccionadoEditar(menu);
-                                                    setFormDataMenu({
-                                                        opcion: menu.opcion,
-                                                        icono: menu.icono,
-                                                        posicion: menu.posicion
-                                                    });
-                                                    setModalMenu(true);
-                                                    setModoMenu("editar")
-                                                }}><FaEdit />
-                                                </BtnV1>
-                                                <BtnV2 onClick={() => pedirConfirmacionEliminarMenu(menu)}>
-                                                    <FaTrash />
-                                                </BtnV2>
-                                            </div>
-                                        )
-                                    }
-                                ]}
-                            />
+                                                        }}
+                                                        onBlur={async (e) => {
+                                                            const nueva = Number(e.target.value);
+                                                            if (nueva !== menu.posicion) {
+                                                                if (posicionMenuOcupada(nueva, menu.iD_Menu)) {
+                                                                    mostrarError(`La posición ${nueva} ya está ocupada por otro menú`);
+                                                                    setPosicionesEditando(prev => ({
+                                                                        ...prev,
+                                                                        [`menu-${menu.iD_Menu}`]: menu.posicion
+                                                                    }));
+                                                                    return;
+                                                                }
+                                                                await cambiarPosicion(menu, nueva);
+                                                            }
+                                                            setPosicionesEditando(prev => {
+                                                                const nuevo = { ...prev };
+                                                                delete nuevo[`menu-${menu.iD_Menu}`];
+                                                                return nuevo;
+                                                            });
+                                                        }}
+                                                    />
+                                                )
+                                            },
+                                            {
+                                                header: 'Roles',
+                                                render: menu => (
+                                                    <div className={styles.acciones}>
+                                                        <BtnV3 onClick={() => abrirPermisos(menu)}>
+                                                            {menu.rolesAsignados.filter(r => r.habilitado === 1).length} de {roles.length}
+                                                        </BtnV3>
+                                                    </div>
+                                                )
+                                            },
+                                            {
+                                                header: 'Estado',
+                                                render: menu => (
+                                                    <label className={styles.switch}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={menu.habilitado === 1}
+                                                            onChange={() => Habilitar(menu)}
+                                                        />
+                                                        <span className={styles.slider}></span>
+                                                    </label>
+                                                )
+                                            },
+                                            {
+                                                header: 'Acciones',
+                                                render: menu => (
+                                                    <div className={styles.acciones}>
+                                                        <BtnV1 onClick={() => {
+                                                            setMenuSeleccionadoEditar(menu);
+                                                            setFormDataMenu({
+                                                                opcion: menu.opcion,
+                                                                icono: menu.icono,
+                                                                posicion: menu.posicion
+                                                            });
+                                                            setModalMenu(true);
+                                                            setModoMenu("editar")
+                                                        }}><FaEdit />
+                                                        </BtnV1>
+                                                        <BtnV2 onClick={() => pedirConfirmacionEliminarMenu(menu)}>
+                                                            <FaTrash />
+                                                        </BtnV2>
+                                                    </div>
+                                                )
+                                            }
+                                        ]}
+                                    />
+                                )
+                            }
+
                             <Paginacion
                                 totalRegistros={menus.length}
                                 registrosPorPagina={REGISTROS_POR_PAGINA}
@@ -1210,26 +1227,37 @@ export default function Administracion() {
                                 </BtnV1>
                             </div>
                         </div>
+                        {
 
-                        <Tabla
-                            datos={datosPaginadosRoles}
-                            keyExtractor={rol => rol.iD_Rol}
-                            columnas={[
-                                {
-                                    header: 'Rol',
-                                    accessor: 'rol'
-                                },
-                                {
-                                    header: 'Acciones',
-                                    render: rol => (
-                                        <div className={styles.acciones}>
-                                            <BtnV1 onClick={() => abrirEditarRol(rol)}><FaEdit /></BtnV1>
-                                            <BtnV2 onClick={() => pedirConfirmacionEliminar(rol)}><FaTrash /></BtnV2>
-                                        </div>
-                                    )
-                                }
-                            ]}
-                        />
+                            !tieneRoles ? (
+                                <Vacio
+                                    titulo="No hay Roles"
+                                    descripcion="No se encontraron roles"
+                                />
+                            ) : (
+                                <Tabla
+                                    datos={datosPaginadosRoles}
+                                    keyExtractor={rol => rol.iD_Rol}
+                                    columnas={[
+                                        {
+                                            header: 'Rol',
+                                            accessor: 'rol'
+                                        },
+                                        {
+                                            header: 'Acciones',
+                                            render: rol => (
+                                                <div className={styles.acciones}>
+                                                    <BtnV1 onClick={() => abrirEditarRol(rol)}><FaEdit /></BtnV1>
+                                                    <BtnV2 onClick={() => pedirConfirmacionEliminar(rol)}><FaTrash /></BtnV2>
+                                                </div>
+                                            )
+                                        }
+                                    ]}
+                                />
+                            )
+
+                        }
+
                         <Paginacion
                             totalRegistros={roles.length}
                             registrosPorPagina={REGISTROS_POR_PAGINA}

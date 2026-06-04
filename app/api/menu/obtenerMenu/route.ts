@@ -2,7 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
 
-    const idrol = 2;
+    const session = request.cookies.get('session');
+
+    if(!session){
+        return NextResponse.json(
+            { error: 'No hay sesion'},
+            { status: 400 }
+        )
+    }
+
+    const usuarioData = JSON.parse(session.value);
+    const idrol = usuarioData.iD_Rol;
 
     try {
         const resRol = await fetch(`https://localhost:7233/portalpadres/v1/menurol/ListarPorRol/${idrol}`);
