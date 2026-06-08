@@ -1,9 +1,27 @@
 import { subMenuSchema } from "@/app/utils/validations";
 import { NextResponse, NextRequest } from "next/server";
 
+//POST /api/menu/crearSubMenu
+//Crear una opcion de submenu
 export async function POST(request: NextRequest) {
+
+    //Requiere sesion activa; Se obtiene la sesion activa
+    const session = request.cookies.get('session');
+
+    if(!session){
+        return NextResponse.json(
+            { error: 'No hay sesion'},
+            { status: 400 }
+        )
+    }
+
+    const usuarioData = JSON.parse(session.value);
+    const usuario = usuarioData.email;
+
     const body = await request.json();
 
+    //validar el body con Zod
+    // Zod espera number; el form envía string
     const datosParseados = {
         ...body,
         posicion: Number(body.posicion)
@@ -30,9 +48,9 @@ export async function POST(request: NextRequest) {
                 posicion: posicion,
                 menu_ID: datosParseados.menu_ID,
                 icono: 'string',
-                habilitado: 0,
-                estado: 1,
-                usuario: 'DIEGO',
+                habilitado: 0,  //deshabilitado por defecto al crear
+                estado: 1,      //Activado por defecto
+                usuario: usuario,
             })
         }
     )

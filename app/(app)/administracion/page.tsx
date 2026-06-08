@@ -1,3 +1,14 @@
+//Creado por Diego Castro
+
+//  * Página de administración de menús y roles.
+//  *
+//  * Permite:
+//  * - Crear, editar y eliminar menús y submenús.
+//  * - Habilitar/deshabilitar menús y submenús (con lógica de cascada).
+//  * - Asignar roles a menús y submenús (con propagación al padre o hijos).
+//  * - Crear, editar y eliminar roles.
+ 
+
 "use client"
 
 import { useEffect, useState } from "react";
@@ -24,25 +35,31 @@ import Vacio from "@/app/components/Vacio/Vacio";
 
 export default function Administracion() {
 
+    //----PAGINACIÓN-----------------------------------------------------------
     const [paginaActualMenus, setPaginaActualMenus] = useState(1);
     const [paginaActualRoles, setPaginaActualRoles] = useState(1);
     const REGISTROS_POR_PAGINA = 10;
-    const [rolFiltro, setRolFiltro] = useState<number | 'todos'>('todos');
 
+    //----FILTROS--------------------------------------------------------------
+    const [rolFiltro, setRolFiltro] = useState<number | 'todos'>('todos');
     const [menusFiltradosBuscador, setMenusFiltradosBuscador] = useState<Menu[]>([]);
     const [rolesFiltradosBuscador, setRolesFiltradosBuscador] = useState<Rol[]>([]);
 
+    //----TOAST Y TAB----------------------------------------------------------
     const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
-
     const [tabActiva, setTabActiva] = useState<'menus' | 'roles'>('menus');
 
+    //----DATOS PRINCIPALES----------------------------------------------------
     const [menus, setMenus] = useState<Menu[]>([]);
     const { cargarMenus } = useMenu();
     const [roles, setRoles] = useState<Rol[]>([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState('');
+
+    // Controla qué menú tiene sus submenús expandidos en la tabla
     const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
 
+    //----MODALES DE CONFIRMACIÓN----------------------------------------------
     const [confirmModalMenu, setConfirmModalMenu] = useState<{ visible: boolean; menu: Menu | null }>({
         visible: false,
         menu: null
@@ -58,9 +75,7 @@ export default function Administracion() {
         rol: null
     });
 
-    //constantes para modal crear rol
-    const [modalCrearRol, setModalCrearRol] = useState(false);
-    const [modalEditarRol, setModalEditarRol] = useState(false);
+    //----MODAL Y FORMULARIO DE ROL--------------------------------------------
     const [modalRol, setModalRol] = useState(false);
     const [modoRol, setModoRol] = useState<"crear" | "editar">("crear");
     const [rolSeleccionado, setRolSeleccionado] = useState<Rol | null>(null);
@@ -69,7 +84,7 @@ export default function Administracion() {
     });
     const [esValidoRol, setEsValidoRol] = useState(true);
 
-    //constantes para modal menu
+    //----MODAL Y FOMULARIO DE MENU--------------------------------------------
     const [modalMenu, setModalMenu] = useState(false);
     const [modoMenu, setModoMenu] = useState<"crear" | "editar">("crear");
     const [formDataMenu, setFormDataMenu] = useState<menuData>({
@@ -80,8 +95,9 @@ export default function Administracion() {
     const [esValidoOpcion, setEsValidoOpcion] = useState(true);
     const [esValidoPosicion, setEsValidoPosicion] = useState(true);
     const [menuSeleccionadoEditar, setMenuSeleccionadoEditar] = useState<Menu | null>(null);
+    const [errorPosicionMenu, setErrorPosicionMenu] = useState('');
 
-    //constantes para modal Submenu
+    //----MODAL Y FORMULARIO DE SUBMENU
     const [modalSubMenu, setModalSubMenu] = useState(false);
     const [modoSubMenu, setModoSubMenu] = useState<"crear" | "editar">("crear");
     const [formDataSubMenu, setFormDataSubMenu] = useState<subMenuData>({
@@ -92,21 +108,23 @@ export default function Administracion() {
     const [esValidoPosicionSub, setEsValidoPosicionSub] = useState(true);
     const [menuSeleccionado, setMenuSeleccionado] = useState<number | null>(null);
     const [subMenuSeleccionadoEditar, setSubMenuSeleccionadoEditar] = useState<SubMenu | null>(null);
+    const [errorPosicionSub, setErrorPosicionSub] = useState('');
 
-    //constantes para gestionar roles
+    //----MODAL DE PERMISOS (roles por menu y submenu)
     const [modalPermisos, setModalPermisos] = useState(false);
     const [itemPermisos, setItemPermisos] = useState<Menu | SubMenu | null>(null);
     const [rolesTemp, setRolesTemp] = useState<number[]>([]);
     const [guardandoPermisos, setGuardandoPermisos] = useState(false);
 
-    const [errorPosicionMenu, setErrorPosicionMenu] = useState('');
-    const [errorPosicionSub, setErrorPosicionSub] = useState('');
+    // Posiciones editadas en los inputs inline de la tabla (clave: "menu-{id}" o "sub-{id}")
     const [posicionesEditando, setPosicionesEditando] = useState<Record<string, number>>({});
 
+    //----Carga inicial de los datos
     useEffect(() => {
         cargarDatos();
     }, []);
 
+    /** Carga menús y roles desde la API y sincroniza los estados del buscador. */
     const cargarDatos = async () => {
         setCargando(true);
         try {
@@ -125,6 +143,11 @@ export default function Administracion() {
         }
     }
 
+    //----HABILITAR Y DESHABILITAR---------------------------------------------
+    /**
+     * Alterna el estado habilitado de un menú.
+     * Si se deshabilita, también deshabilita todos sus submenús en paralelo.
+     */
     const Habilitar = async (menu: Menu) => {
         const nuevoHabilitado = menu.habilitado === 1 ? 0 : 1;
 
@@ -136,6 +159,7 @@ export default function Administracion() {
             })
         ];
 
+        // Cascada: deshabilitar/habilitar todos los submenús junto con el menú padre
         if (menu.submenus?.length > 0) {
             for (const sub of menu.submenus) {
                 promesas.push(
@@ -159,6 +183,10 @@ export default function Administracion() {
         await cargarMenus();
     }
 
+    /**
+     * Alterna el estado habilitado de un submenú.
+     * Si se habilita y su menú padre está deshabilitado, habilita el padre también.
+     */
     const HabilitarSUB = async (submenu: SubMenu) => {
         const nuevoHabilitado = submenu.habilitado === 1 ? 0 : 1;
 
@@ -170,6 +198,7 @@ export default function Administracion() {
             })
         ];
 
+        // Si se habilita el submenú y el padre está deshabilitado, habilitar el padre
         if (nuevoHabilitado === 1) {
             const menuPadre = menus.find(m => m.iD_Menu === submenu.menu_ID);
             if (menuPadre && menuPadre.habilitado === 0) {
@@ -194,12 +223,15 @@ export default function Administracion() {
         await cargarMenus();
     }
 
+    //----Validación de posiciones duplicadas------------------------
+    /** Retorna true si la posición ya está ocupada por otro menú (excluye el menú que se está editando). */
     const posicionMenuOcupada = (posicion: number, excluirId?: number): boolean => {
         return menus.some(m =>
             m.posicion === posicion && m.iD_Menu !== excluirId
         );
     };
 
+    /** Retorna true si la posición ya está ocupada dentro del mismo menú padre. */
     const posicionSubMenuOcupada = (posicion: number, menuPadreId: number, excluirId?: number): boolean => {
         const padre = menus.find(m => m.iD_Menu === menuPadreId);
         return padre?.submenus?.some(s =>
@@ -207,6 +239,8 @@ export default function Administracion() {
         ) ?? false;
     };
 
+    //----Cambio de posición-------------------------------------------------------
+    /** Guarda la nueva posición de un menú si no está ocupada; de lo contrario muestra un error. */
     const cambiarPosicion = async (menu: Menu, nuevaPosicion: number) => {
 
         if (posicionMenuOcupada(nuevaPosicion, menu.iD_Menu)) {
@@ -234,6 +268,7 @@ export default function Administracion() {
         await cargarMenus();
     }
 
+    /** Guarda la nueva posición de un submenú si no está ocupada dentro del mismo padre. */
     const cambiarPosicionSUB = async (submenu: SubMenu, nuevaPosicion: number) => {
 
         if (posicionSubMenuOcupada(nuevaPosicion, submenu.menu_ID, submenu.iD_SubMenu)) {
@@ -261,21 +296,33 @@ export default function Administracion() {
         await cargarMenus();
     }
 
+    /** Abre o cierra la fila expandida de submenús para el menú dado. */
     const gestionSubmenu = (idMenu: number) => {
         setMenuAbierto(e => e === idMenu ? null : idMenu);
     }
 
-    //Gestion de roles
+    //----Gestion de roles------------------------------------------------
     const abrirPermisos = (item: Menu | SubMenu) => {
         setItemPermisos(item);
         setRolesTemp(item.rolesAsignados.filter(r => r.habilitado === 1).map(r => r.rol_ID));
         setModalPermisos(true);
     };
 
+    /** Agrega o quita un rol del estado temporal (antes de guardar). */
     const toggleRolTemp = (idRol: number) => {
         setRolesTemp(prev => prev.includes(idRol) ? prev.filter(id => id !== idRol) : [...prev, idRol]);
     };
 
+    /**
+     * Guarda los permisos del modal aplicando un diff entre el estado original y el temporal:
+     * - POST: roles nuevos que no tenían registro previo.
+     * - PUT habilitado=1: roles que existían pero estaban desactivados.
+     * - PUT habilitado=0: roles que se desactivaron.
+     *
+     * Lógica de cascada:
+     * - Submenú activado → habilita el rol en el menú padre si no estaba.
+     * - Menú desactivado → deshabilita el rol en todos sus submenús hijos.
+     */
     const guardarPermisos = async () => {
         if (!itemPermisos) return;
         setGuardandoPermisos(true);
@@ -283,6 +330,7 @@ export default function Administracion() {
         const esMenu = 'iD_Menu' in itemPermisos;
         const rolesConRegistro = itemPermisos.rolesAsignados;
 
+        // Diff: qué roles se activaron, desactivaron, son completamente nuevos o se reactivan
         const activar = rolesTemp.filter(idRol => {
             const registro = rolesConRegistro.find(r => r.rol_ID === idRol);
             return !registro || registro.habilitado === 0;
@@ -300,6 +348,7 @@ export default function Administracion() {
             rolesConRegistro.find(r => r.rol_ID === idRol && r.habilitado === 0)
         );
 
+        // Cascada hacia arriba: al activar un rol en un submenú, asegurar que el padre también lo tenga
         const activarPadre: Promise<Response>[] = [];
 
         if (!esMenu) {
@@ -311,6 +360,7 @@ export default function Administracion() {
                     const rolenPadre = menuPadre.rolesAsignados.find(r => r.rol_ID === idRol);
 
                     if (!rolenPadre) {
+                        // El padre no tiene registro: crear
                         activarPadre.push(
                             fetch('/api/menu/asignarMenuRol',
                                 {
@@ -324,6 +374,7 @@ export default function Administracion() {
                             )
                         )
                     } else if (rolenPadre.habilitado === 0) {
+                        // El padre tiene el registro desactivado: reactivar
                         activarPadre.push(
                             fetch('/api/menu/asignarMenuRol',
                                 {
@@ -341,6 +392,7 @@ export default function Administracion() {
             }
         }
 
+        // Cascada hacia abajo: al desactivar un rol en un menú, desactivarlo en sus submenús hijos
         const desactivarHijos: Promise<Response>[] = [];
 
         if (esMenu) {
@@ -368,8 +420,10 @@ export default function Administracion() {
             }
         }
 
+        const endpoint = `/api/menu/${esMenu ? 'asignarMenuRol' : 'asignarSubMenuRol'}`;
+
         const promesasAgregar = nuevos.map(idRol =>
-            fetch(`/api/menu/${esMenu ? 'asignarMenuRol' : 'asignarSubMenuRol'}`, {
+            fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(
@@ -407,7 +461,7 @@ export default function Administracion() {
         await cargarMenus();
     };
 
-    //Validacion modal menu
+    //----Validación y handlers del formulario menu---------------------------------------
     const handlerOnChangeMenu = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
@@ -439,6 +493,7 @@ export default function Administracion() {
         setEsValidoPosicion(result.success)
     }
 
+    /** Limpia el formulario y cierra el modal de menú. */
     const cancelarModal = () => {
         setFormDataMenu({
             opcion: '',
@@ -448,7 +503,7 @@ export default function Administracion() {
         setModalMenu(false)
     }
 
-    //Validacion modal Submenu
+    //----Validación y handlers del formulario submenu
     const handlerOnChangeSubMenu = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
@@ -463,7 +518,6 @@ export default function Administracion() {
         }
     }
 
-
     const validationOpcionSub = () => {
         const result = menuSchema.shape.opcion.safeParse(formDataSubMenu.opcion);
         setEsValidoOpcionSub(result.success);
@@ -474,6 +528,7 @@ export default function Administracion() {
         setEsValidoPosicionSub(result.success);
     }
 
+    /** Limpia el formulario y cierra el modal de submenú. */
     const cancelarModalSub = () => {
         setFormDataSubMenu({
             opcion: '',
@@ -482,7 +537,7 @@ export default function Administracion() {
         setModalSubMenu(false)
     }
 
-    //CRUD MENU
+    //----CRUD MENU----------------------------------------------------------
     const crearMenu = async () => {
         if (!formDataMenu.opcion.trim()) return;
 
@@ -579,7 +634,7 @@ export default function Administracion() {
         await cargarMenus();
     }
 
-    //CRUD SUBMENU
+    //----CRUD SUBMENU-------------------------------------------------------
     const crearSubMenu = async () => {
         if (!formDataSubMenu.opcion.trim()) {
             mostrarError('Ingrese un nombre para el submenu');
@@ -677,7 +732,7 @@ export default function Administracion() {
         await cargarMenus();
     }
 
-    //validar Rol
+    //----Validación y handlers formulario rol
     const handlerOnChangeRol = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
@@ -696,6 +751,7 @@ export default function Administracion() {
         setEsValidoRol(result.success)
     }
 
+    /** Limpia el formulario y cierra el modal de rol. */
     const cancelarModalRol = () => {
         setFormDataRol({
             rol: ''
@@ -703,7 +759,7 @@ export default function Administracion() {
         setModalRol(false);
     }
 
-    //CRUD Rol
+    //----CRUD Rol--------------------------------------------
     const crearRol = async () => {
         if (!formDataRol.rol.trim()) return;
 
@@ -755,6 +811,7 @@ export default function Administracion() {
         await cargarMenus();
     };
 
+    /** Precarga el formulario con los datos del rol y abre el modal en modo editar. */
     const abrirEditarRol = (rol: Rol) => {
         setRolSeleccionado(rol);
         setFormDataRol({ rol: rol.rol });
@@ -786,7 +843,7 @@ export default function Administracion() {
         cargarDatos();
     }
 
-    //FILTRADOS
+    //----Filtros y paginación-------------------------------------
     const menuFiltrados = menusFiltradosBuscador.filter(menu =>
         rolFiltro === 'todos' ? true :
             menu.rolesAsignados.some(r => r.rol_ID === rolFiltro && r.habilitado === 1) ||
@@ -809,6 +866,7 @@ export default function Administracion() {
 
     if (cargando) return <Loading />;
 
+    //----RENDER----------------------------------------------------------
     return (
         <div className={styles.cards}>
 
@@ -831,6 +889,7 @@ export default function Administracion() {
                 </button>
             </div>
 
+            {/* ── Tab: Menús ── */}
             {
                 tabActiva === 'menus' && (
                     <div className={styles.card}>
@@ -888,6 +947,7 @@ export default function Administracion() {
                                                 <tr key={sub.iD_SubMenu} className={styles.submenurow}>
                                                     <td>{sub.opcion}</td>
                                                     <td>
+                                                        {/* Input inline para editar posición; valida al perder foco */}
                                                         <input
                                                             type="number"
                                                             className={styles.inputPos}
@@ -961,6 +1021,7 @@ export default function Administracion() {
                                             {
                                                 header: 'Menú',
                                                 render: menu => (
+                                                    // Chevron indica si el menú tiene submenús y si están expandidos
                                                     <button
                                                         className={styles.menuBtn}
                                                         onClick={() => gestionSubmenu(menu.iD_Menu)}
@@ -1065,6 +1126,7 @@ export default function Administracion() {
                                 onCambiarPagina={setPaginaActualMenus}
                             />
                         </div>
+                        {/* Modal crear/editar menú: campo posición solo aparece al crear */}
                         {
                             modalMenu && (
                                 <ModalFormulario
@@ -1123,6 +1185,7 @@ export default function Administracion() {
                                 />
                             )
                         }
+                        {/* Modal crear/editar submenú: selector de menú padre solo al crear */}
                         {
                             modalSubMenu && (
                                 <ModalFormulario
@@ -1215,7 +1278,7 @@ export default function Administracion() {
                     </div>
                 )
             }
-
+            {/* ── Tab: Roles ── */}
             {
                 tabActiva === 'roles' && (
                     <div className={styles.card}>

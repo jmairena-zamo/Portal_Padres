@@ -1,11 +1,14 @@
+//Componente creado por Diego Castro
+
 import styles from './confirmModal.module.css';
 
 interface Props {
-    mensaje: string;
-    onConfirmar: () => void;
-    onCancelar: () => void;
+    mensaje: string; //Mnesaje que se le muestra al usuario antes de confirmar
+    onConfirmar: () => void; //Se ejecuta al presionar aceptar
+    onCancelar: () => void; //Se ejecuta al presionar cancelar
 }
 
+//Modal de confirmación
 export default function ConfirmModal({ mensaje, onConfirmar, onCancelar }: Props) {
     return (
         <div className={styles.modalOverlay}>

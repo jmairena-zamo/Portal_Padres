@@ -1,8 +1,13 @@
+//Creado por Diego Castro
+
 import { menuSchema } from "@/app/utils/validations";
 import { NextRequest, NextResponse } from "next/server";
 
+//POST /api/menu/crearMenu
+//Crear una opcion de menu
 export async function POST(request: NextRequest) {
 
+    //Requiere sesion activa; Se obtiene la sesion activa
     const session = request.cookies.get('session');
 
     if(!session){
@@ -17,6 +22,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    //validar el body con Zod
+    // Zod espera number; el form envía string
     const datosParseados = {
         ...body,
         posicion: Number(body.posicion)
@@ -43,8 +50,8 @@ export async function POST(request: NextRequest) {
                     opcion: opcion,
                     posicion: posicion,
                     icono: icono,
-                    habilitado: 0,
-                    estado: 1,
+                    habilitado: 0, //deshabilitado por defecto al crear
+                    estado: 1,     //activado por defecto
                     usuario: usuario,
                 }
             ),

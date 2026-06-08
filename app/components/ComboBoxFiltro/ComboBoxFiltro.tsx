@@ -1,13 +1,18 @@
+//Componente creado por Diego Castro
+//Componente para filtrar por medio de un ComboBox
+
 import styles from "./ComboBoxFiltro.module.css"
 
+//Modelo para opciones que se veran en el ComboBox
 interface Opcion {
     value: number | string
     label: string
 }
 
+//Propiedades que recibe el componente
 interface Props {
-    opciones: Opcion[]
-    valor: number | string
+    opciones: Opcion[] 
+    valor: number | string 
     onChange: (value: number | 'todos') => void
     placeholder?: string
 }

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
+//POST /api/menu/asignarSubMenuRol
+//Asigna un rol a un submenu
+//Crea el registro en la tabla Tbl_SubMenu_Rol
 export async function POST(request: NextRequest){
 
+    //Requiere sesion activa; Se obtiene la sesion activa
     const session = request.cookies.get('session');
 
     if(!session){
@@ -33,8 +37,11 @@ export async function POST(request: NextRequest){
     return NextResponse.json({ok: true})
 }
 
+//PUT /api/menu/asignarSubMenuRol
+//Activa o desactiva un rol en un submenu
 export async function PUT(request: NextRequest){
 
+    //Requiere sesion activa; Se obtiene la sesion activa
     const session = request.cookies.get('session');
 
     if(!session){

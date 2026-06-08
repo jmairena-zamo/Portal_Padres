@@ -1,3 +1,6 @@
+//Componente creado por Dieg Castro
+//Componente de Loading
+
 import styles from './Loading.module.css';
 
 interface LoadingProps {

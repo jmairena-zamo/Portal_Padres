@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+//GET /api/menu/obtenerMenu
+//Retorna los menús y submenús habilitados para el rol del usuario en sesión.
+//Se utiliza para crear el sidebar dinamico
 export async function GET(request: NextRequest) {
 
     const session = request.cookies.get('session');
@@ -15,16 +18,25 @@ export async function GET(request: NextRequest) {
     const idrol = usuarioData.iD_Rol;
 
     try {
-        const resRol = await fetch(`https://localhost:7233/portalpadres/v1/menurol/ListarPorRol/${idrol}`);
+        // Obtener los menús y submenús habilitados para el rol, en paralelo
+        const [resMenuRol, resSubMenuRol] = await Promise.all([
+            fetch(`https://localhost:7233/portalpadres/v1/menurol/ListarPorRol/${idrol}`),
+            fetch(`https://localhost:7233/portalpadres/v1/submenurol/ListarPorRol/${idrol}`)
+        ]);
 
-        const datarol = await resRol.json();
-        const menuIDs: number[] = datarol.response.filter((item: any) => item.habilitado === 1).map((item: any) => item.menu_ID);
+        const dataMenuRol    = await resMenuRol.json();
+        const dataSubMenuRol = await resSubMenuRol.json();
 
-        const resSubRol = await fetch(`https://localhost:7233/portalpadres/v1/submenurol/ListarPorRol/${idrol}`);
+        // Extraer solo los IDs que estén habilitados
+        const menuIDs: number[]    = dataMenuRol.response
+            .filter((item: any) => item.habilitado === 1)
+            .map((item: any) => item.menu_ID);
 
-        const datasubrol = await resSubRol.json();
-        const submenuIDs: number[] = (datasubrol.response || []).filter((item: any) => item.habilitado === 1).map((item: any) => item.subMenu_ID);
+        const submenuIDs: number[] = (dataSubMenuRol.response || [])
+            .filter((item: any) => item.habilitado === 1)
+            .map((item: any) => item.subMenu_ID);
 
+        // Por cada menú habilitado, obtener su detalle y filtrar sus submenús
         const menus = await Promise.all(
             menuIDs.map(async (id) => {
                 const res = await fetch(`https://localhost:7233/portalpadres/v1/menu/Listar/${id}`);
@@ -38,6 +50,7 @@ export async function GET(request: NextRequest) {
                 };
                 const dataSub = await resSub.json();
 
+                // Solo submenús que estén en la lista de habilitados para el rol
                 const submenus = (dataSub.response || []).filter((sub: any) =>
                     submenuIDs.includes(sub.iD_SubMenu) && sub.habilitado === 1
                 );
@@ -46,6 +59,7 @@ export async function GET(request: NextRequest) {
             })
         )
 
+        // Descartar nulos (menús que fallaron) y menús deshabilitados; ordenar por posición
         const menusfiltrados = menus.filter(m => m !== null && m.habilitado === 1)
             .sort((a, b) => a.posicion - b.posicion);
 

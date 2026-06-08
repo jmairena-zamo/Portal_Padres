@@ -2,21 +2,22 @@ import React from "react"
 import styles from "./Tabla.module.css"
 
 interface Columna<Table> {
-    header: string
-    accessor?: keyof Table
-    render?: (item: Table) => React.ReactNode
-    width?: string
+    header: string //texto del encabezado de la columna
+    accessor?: keyof Table //Clave del objeto
+    render?: (item: Table) => React.ReactNode //Renderizado personalizado
+    width?: string  //Ancho de la columna
 }
 
 interface Props<Table> {
-    columnas: Columna<Table>[]
-    datos: Table[]
-    keyExtractor: (item: Table) => string | number
-    filaExpandida?: (item: Table) => React.ReactNode
-    estaExpandida?: (item: Table) => boolean
-    claseFilaExtra?: (item: Table) => string
+    columnas: Columna<Table>[] //Se define la columna y como renderizar cada una
+    datos: Table[]  //El arreglo de objetos que se mostraran en la tabla
+    keyExtractor: (item: Table) => string | number  //Identificador unico por columna
+    filaExpandida?: (item: Table) => React.ReactNode //Contenido de fila extendida, en este proyecto para los submenus
+    estaExpandida?: (item: Table) => boolean  //Determinar si la fila esta expandida
+    claseFilaExtra?: (item: Table) => string  //Mostrar ccs para fila expandida
 }
 
+//Tabla generica que soporta renderizado personalizado en sus columnas
 export default function Tabla<Table>({ columnas, datos, keyExtractor, filaExpandida, estaExpandida, claseFilaExtra }: Props<Table>) {
     return (
         <div className={styles.wrapper}>
@@ -36,6 +37,7 @@ export default function Tabla<Table>({ columnas, datos, keyExtractor, filaExpand
                             <tr key={keyExtractor(item)} className={claseFilaExtra?.(item) ?? ''}>
                                 {columnas.map((col, i) => (
                                     <td key={i}>
+                                        {/* render tiene prioridad; si no hay, usa accessor; si no, vacío */}
                                         {col.render
                                             ? col.render(item)
                                             : col.accessor
@@ -44,6 +46,7 @@ export default function Tabla<Table>({ columnas, datos, keyExtractor, filaExpand
                                     </td>
                                 ))}
                             </tr>
+                            {/* Fila extra que se muestra solo si la fila está marcada como expandida */}
                             {estaExpandida?.(item) && filaExpandida?.(item)}
                         </React.Fragment>
                     ))}

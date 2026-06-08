@@ -1,3 +1,6 @@
+//Componete creado por Diego Castro
+//Componente para mostrar cuando no hay datos en alguna peticion
+
 import styles from "./Vacio.module.css"
 
 interface DataVacia {

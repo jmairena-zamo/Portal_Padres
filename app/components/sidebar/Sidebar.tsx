@@ -66,7 +66,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
             <div className={`${styles.sidebar} ${sidebarAbierto ? styles.open : ''} ${colapsado ? styles.colapsado : ''}`} >
                 <div className={`${styles.contentToggle} ${colapsado ? styles.contentToggleColapsado : ''}`}>
                     <button className={styles.toggleBtn} onClick={onToggle} aria-label="Colapsar menú">
-                        <FaBars size={18} />
+                        <FaBars size={25} />
                     </button>
                 </div>
 

@@ -1,7 +1,12 @@
+//Creado pr Diego Castro
+
 import { NextResponse, NextRequest } from "next/server";
 
+//DELETE /api/menu/eliminarSubMenu
+//Eliminar submenu por su ID
 export async function DELETE(request: NextRequest) {
 
+    //Requiere sesion activa; Se obtiene la sesion activa
     const session = request.cookies.get('session');
 
     if (!session) {

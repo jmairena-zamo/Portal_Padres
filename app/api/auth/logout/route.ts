@@ -1,5 +1,9 @@
+//Creado por Diego Castro
+
 import { NextResponse } from "next/server";
 
+//POST /api/auth/logout
+//Eliminar la sesion 
 export async function POST() {
 
     const response = NextResponse.json({ ok: true });

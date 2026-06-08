@@ -1,3 +1,6 @@
+//Componente creado por Diego Castro
+//
+
 "use client"
 
 import { useEffect } from 'react';
@@ -5,13 +8,15 @@ import styles from './Toast.module.css';
 import { FaCheckCircle, FaTimesCircle, FaTimes } from 'react-icons/fa';
 
 interface ToastProps {
-    mensaje: string;
-    tipo: 'exito' | 'error';
-    onClose: () => void;
+    mensaje: string; //texto que muestra la notificación
+    tipo: 'exito' | 'error';  //Controla el color e icono, verde exito y rojo error
+    onClose: () => void;  //Cierra el toast
 }
 
+//Notificacón temporal que se cierra automaticamente en 2 segundos
 export default function Toast({ mensaje, tipo, onClose }: ToastProps) {
 
+    //Cierra la notificación luego de 2 segundos
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();
@@ -29,6 +34,8 @@ export default function Toast({ mensaje, tipo, onClose }: ToastProps) {
                 }
             </div>
             <p className={styles.mensaje}>{mensaje}</p>
+
+            {/* boton para cerrar manualmente */}
             <button onClick={onClose} className={styles.cerrar}>
                 <FaTimes size={14} />
             </button>
