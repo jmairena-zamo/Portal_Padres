@@ -23,7 +23,7 @@
 }
 
 .contenttag{
-    margin-top: 5px;
+    /* margin-top: 5px; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -266,6 +266,10 @@
 .colapsado .logoutBTN {
     justify-content: center;
     padding: 8px 0;
+}
+
+.contenttag p{
+    font-size: 10px;
 }
 
 @media (max-width: 800px) {

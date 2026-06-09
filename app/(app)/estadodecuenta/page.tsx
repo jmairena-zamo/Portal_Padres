@@ -1,10 +1,12 @@
+//Creado por Diego Castro
+//Pagina donde se mostrara la información del estado de cuenta del estudiante 
+
 'use client'
 
 import { InformacionEstudiante } from '@/app/components/informacionEstudiante/InformacionEstudiante'
 import styles from "../../styles/tablas.module.css"
 
 export default function EstadoCuenta(){
-    //useAuth();
 
     return(
         <div className={styles.pageContent}>

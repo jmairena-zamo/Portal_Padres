@@ -1,3 +1,7 @@
+//Creado por Diego Castro
+// Página de inicio de sesión del portal de padres.
+// Valida el formulario localmente con Zod antes de enviar al endpoint /api/auth/login.
+
 "use client"
 
 import styles from "./page.module.css"
@@ -23,6 +27,7 @@ export default function Login() {
         contrasena: ''
     });
 
+    // Limpia el error del campo que el usuario está editando para no bloquear el botón prematuramente.
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setForm((values) => ({
@@ -38,6 +43,7 @@ export default function Login() {
         }
     }
 
+    //Validación onBlur para el correo y contraseña
     const validationCorreo = () => {
         const result = loginSchema.shape.correo.safeParse(form.correo);
         setEsValidoCorreo(result.success);
@@ -54,7 +60,7 @@ export default function Login() {
         }
     }
 
-
+    // Valida todo el form antes de llamar a la API; el backend devuelve { error } en caso de fallo.
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setErrorServidor("");
@@ -86,7 +92,6 @@ export default function Login() {
         } catch (error) {
             setErrorServidor('Error de conexión. Intenta de nuevo.');
             console.log("Error: ", error);
-            alert("Error al enviar datos");
         } finally {
             setCargando(false);
         }
@@ -106,6 +111,7 @@ export default function Login() {
                     <div className={styles.inputlogin}>
                         <label>Correo Electrónico:
                         </label>
+                        {/* inputError resalta el borde en rojo; spanError/err muestra el mensaje */}
                         <input id="correo" type="text" name="correo" placeholder="Ingrese Correo"
                             value={form.correo} onChange={handleOnChange} onBlur={validationCorreo}
                             className={!esValidoCorreo ? styles.inputError : ""} />
@@ -119,6 +125,7 @@ export default function Login() {
                             className={!esValidoPass ? styles.inputError : ""} />
                         <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>{errorContra}</span>
                     </div>
+                    {/* Deshabilitado mientras haya errores de validación o la petición esté en vuelo */}
                     <button type="submit" disabled={!esValidoPass || !esValidoCorreo || cargando}>Ingresar</button>
                     <a href="/recuperarContrasena">¿Has olvidado tu contraseña?</a>
                     <span className={`${styles.spanError} ${errorServidor ? styles.err : ""}`}>

@@ -10,7 +10,7 @@ export default function HistorialAcademico() {
     //useAuth();
 
     const [paginaActual, setPaginaActual] = useState(1);
-    const REGISTROS_POR_PAGINA = 1;
+    const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
 
 
 
@@ -24,8 +24,13 @@ export default function HistorialAcademico() {
         { id: 7, clase: 'Biologia', seccion: '124', codigo: 'CC06', anio: '2026', periodo: 1, nota: 76.98, estado: 'APB', uv: 4 },
     ])
 
-    const indexInicio = (paginaActual - 1) * REGISTROS_POR_PAGINA;
-    const indexFin = indexInicio + REGISTROS_POR_PAGINA;
+    const handleCambiarRegistros = (cantidad: number) => {
+        setRegistrosPorPagina(cantidad);
+        setPaginaActual(1);
+    };
+
+    const indexInicio = (paginaActual - 1) * registrosPorPagina;
+    const indexFin = indexInicio + registrosPorPagina;
     const datosPaginados = data.slice(indexInicio, indexFin);
     return (
         <div className={styles.pageContent}>
@@ -68,9 +73,10 @@ export default function HistorialAcademico() {
 
                 <Paginacion
                     totalRegistros={data.length}
-                    registrosPorPagina={REGISTROS_POR_PAGINA}
+                    registrosPorPagina={registrosPorPagina}
                     paginaActual={paginaActual}
                     onCambiarPagina={setPaginaActual}
+                    onCambiarRegistrosPorPagina={handleCambiarRegistros}
                 />
 
             </div>

@@ -1,3 +1,7 @@
+//Creado por Diego Castro
+//Componente para mostrar la información genreal de los estudiantes
+//Sera utilizado en varias paginas como encabezado
+
 "use client"
 
 import styles from './InformacionEstudiante.module.css'

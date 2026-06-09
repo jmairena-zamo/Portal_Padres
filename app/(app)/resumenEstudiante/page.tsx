@@ -1,3 +1,7 @@
+//Creado por Diego Castro
+//Pagina tipo dashboard para mostrar la información general de estidiante
+//
+
 "use client"
 import Image from 'next/image';
 import user from '../../img/logo-user.png';
@@ -7,8 +11,8 @@ import { RadialBarChart, RadialBar, PolarAngleAxis, Legend } from 'recharts';
 import styles from './page.module.css'
 
 export default function ResumenEstudiante() {
-    //useAuth();
 
+    //Datos de prueba para mostrar en el dashboard
     const [estudiante, setEstudiante] = useState({
         Nombre: 'xxxxxx',
         Apellido: 'xxxxx',
@@ -52,6 +56,7 @@ export default function ResumenEstudiante() {
                         <h3>PORCENTAJE CARRERA</h3>
                         <hr />
                         <div className={styles.progresscontainer}>
+                            {/* Barra de prcentaje dinamica */}
                             <div className={styles.progressbar} style={{ width: `${porcentaje}%` }}></div>
                         </div>
                         <span className={styles.progresstext}>{porcentaje}%</span>

@@ -9,10 +9,13 @@ import rateLimit from "@/app/utils/rateLimits";
 //Crean una cookie si las credenciales son validas
 //Aplica un rate limits de 10 intentos en 15 min
 //valida a traves de zod antes de prcesar
-export async function POST(request: NextRequest) {
 
-    // Deshabilita la verificación TLS para el entorno de desarrollo local
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+// Deshabilita la verificación TLS para el entorno de desarrollo local
+if (process.env.NODE_ENV === 'development') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
+export async function POST(request: NextRequest) {
 
     // Bloquea la petición si el IP superó el límite de intentos
     const limitResult = rateLimit(request, 10, 15 * 60 * 1000);

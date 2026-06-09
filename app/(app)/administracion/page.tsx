@@ -38,7 +38,7 @@ export default function Administracion() {
     //----PAGINACIÓN-----------------------------------------------------------
     const [paginaActualMenus, setPaginaActualMenus] = useState(1);
     const [paginaActualRoles, setPaginaActualRoles] = useState(1);
-    const REGISTROS_POR_PAGINA = 10;
+    const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
 
     //----FILTROS--------------------------------------------------------------
     const [rolFiltro, setRolFiltro] = useState<number | 'todos'>('todos');
@@ -852,14 +852,20 @@ export default function Administracion() {
             )
     );
 
-    const indexInicioMenus = (paginaActualMenus - 1) * REGISTROS_POR_PAGINA;
-    const indexFinMenus = indexInicioMenus + REGISTROS_POR_PAGINA;
+    const handleCambiarRegistros = (cantidad: number) => {
+        setRegistrosPorPagina(cantidad);
+        setPaginaActualMenus(1);
+        setPaginaActualRoles(1);
+    };
+
+    const indexInicioMenus = (paginaActualMenus - 1) * registrosPorPagina;
+    const indexFinMenus = indexInicioMenus + registrosPorPagina;
     const datosPaginadosMenus = menuFiltrados.slice(indexInicioMenus, indexFinMenus);
 
     const tieneMenus = datosPaginadosMenus && datosPaginadosMenus.length > 0;
 
-    const indexInicioRoles = (paginaActualRoles - 1) * REGISTROS_POR_PAGINA;
-    const indexFinRoles = indexInicioRoles + REGISTROS_POR_PAGINA;
+    const indexInicioRoles = (paginaActualRoles - 1) * registrosPorPagina;
+    const indexFinRoles = indexInicioRoles + registrosPorPagina;
     const datosPaginadosRoles = roles.slice(indexInicioRoles, indexFinRoles);
 
     const tieneRoles = datosPaginadosRoles && datosPaginadosRoles.length > 0;
@@ -1121,9 +1127,10 @@ export default function Administracion() {
 
                             <Paginacion
                                 totalRegistros={menus.length}
-                                registrosPorPagina={REGISTROS_POR_PAGINA}
+                                registrosPorPagina={registrosPorPagina}
                                 paginaActual={paginaActualMenus}
                                 onCambiarPagina={setPaginaActualMenus}
+                                onCambiarRegistrosPorPagina={handleCambiarRegistros}
                             />
                         </div>
                         {/* Modal crear/editar menú: campo posición solo aparece al crear */}
@@ -1323,9 +1330,10 @@ export default function Administracion() {
 
                         <Paginacion
                             totalRegistros={roles.length}
-                            registrosPorPagina={REGISTROS_POR_PAGINA}
+                            registrosPorPagina={registrosPorPagina}
                             paginaActual={paginaActualRoles}
                             onCambiarPagina={setPaginaActualRoles}
+                            onCambiarRegistrosPorPagina={handleCambiarRegistros}
                         />
                         {
                             modalRol && (

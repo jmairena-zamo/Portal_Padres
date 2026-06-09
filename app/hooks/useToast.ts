@@ -1,3 +1,6 @@
+//Creado por Diego Castro
+//Muestra mensaje de confirmación o error
+
 import { useState } from 'react';
 
 interface Toast {

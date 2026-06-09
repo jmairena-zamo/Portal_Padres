@@ -6,7 +6,7 @@ import Image from 'next/image';
 import imagen from '../../img/Zamorano1.jpg'
 import { usePathname, useRouter } from 'next/navigation';
 import { FaChevronDown, FaChevronRight, FaSignOutAlt, FaBars } from "react-icons/fa";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { iconos, generarRuta, getSubPath } from '@/app/utils/menu';
 import { useMenu } from '@/app/hooks/useMenu';
 
@@ -22,16 +22,29 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
     const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
     const { menus } = useMenu();
     const [sidebarAbierto, setSidebarAbierto] = useState(false);
+    const [email, setEmail] = useState<string>('');
 
+    // Lee el email del usuario desde la cookie httpOnly vía la ruta /api/auth/session
+    useEffect(() => {
+        fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(data => { if (data?.email) setEmail(data.email); })
+            .catch(() => { });
+    }, []);
+
+    // Cierra el sidebar en móvil (usado al navegar o al hacer clic en el overlay)
     const cerrarSidebar = () => setSidebarAbierto(false);
 
+    // Aplica la clase activa si la ruta actual coincide con el path del link
     const linkClass = (path: any) =>
         pathname === path ? styles.active : styles.link;
 
+    // Alterna el submenú abierto; si se presiona el mismo, lo cierra
     const gestionSubmenu = (idMenu: number) => {
         setMenuAbierto(e => e === idMenu ? null : idMenu);
     }
 
+    // Llama al endpoint de logout y redirige al login al tener éxito
     const handleLogout = async () => {
         try {
             const res = await fetch('/api/auth/logout', {
@@ -51,6 +64,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
 
     return (
         <>
+            {/* Botón hamburguesa — visible solo en <800px */}
             <button
                 className={`${styles.hamburger} ${sidebarAbierto ? styles.open : ''}`}
                 onClick={() => setSidebarAbierto(v => !v)}
@@ -59,11 +73,13 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                 <span /><span /><span />
             </button>
 
+            {/* Overlay oscuro detrás del sidebar en móvil; cierra al hacer clic */}
             <div
                 className={`${styles.overlay} ${sidebarAbierto ? styles.visible : ''}`}
                 onClick={cerrarSidebar}
             />
             <div className={`${styles.sidebar} ${sidebarAbierto ? styles.open : ''} ${colapsado ? styles.colapsado : ''}`} >
+                {/* Botón para colapsar/expandir el sidebar en desktop */}
                 <div className={`${styles.contentToggle} ${colapsado ? styles.contentToggleColapsado : ''}`}>
                     <button className={styles.toggleBtn} onClick={onToggle} aria-label="Colapsar menú">
                         <FaBars size={25} />
@@ -71,34 +87,25 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                 </div>
 
                 <div className={styles.sidebarInner}>
-                    
+
+                    {/* Foto y email del usuario; se ocultan cuando el sidebar está colapsado */}
                     <div className={styles.tag}>
-                        
                         <div className={styles.contenttag}>
                             <Image src={imagen} alt="Logo Zamorano" />
                             {
                                 !colapsado && (
-                                    <>
-                                        <h4><strong>usuario</strong></h4>
-                                        <p>NombreAlumno</p>
+                                    <>                                        
+                                        <p>{email}</p>
+                                        <p>Nombre Usuario</p>
                                     </>
                                 )
                             }
-                            
+
                         </div>
-                        
+
                     </div>
 
                     <nav className={styles.nav}>
-
-                        {/* <Link href="/resumenestudiante" className={linkClass("/resumenestudiante")}><FaHome size={20} />Home</Link >
-                    <Link href="/estadodecuenta" className={linkClass("/estadodecuenta")}><FaCoins size={20} />Estado de Cuenta</Link>
-                    <Link href="/historialacademico" className={linkClass("/historialacademico")}><FaFileAlt size={20} />Historial Academico</Link >
-                    <Link href="/clases" className={linkClass("/clases")}><FaBook size={20} />Clases</Link >
-                    <Link href="/historialdisciplinario" className={linkClass("/historialdisciplinario")}><FaFolder size={20} />Historial Disciplinario</Link >
-                    <Link href="/documentos" className={linkClass("/documentos")}><FaFile size={20} />Documentos</Link >
-                    <Link href="/quejasosugerencias" className={linkClass("/quejasosugerencias")}><FaClipboardCheck size={20} />Quejas o Sugerencias</Link > */}
-
                         {
                             menus.map((menu) => {
                                 const path = generarRuta(menu.opcion);
@@ -109,6 +116,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                                     <div key={menu.iD_Menu}>
                                         {tieneSubmenus ? (
                                             <>
+                                                {/* Menú con submenús: botón que expande/colapsa la lista hija */}
                                                 <button
                                                     className={`${styles.link} ${styles.menuBtn}`}
                                                     onClick={() => gestionSubmenu(menu.iD_Menu)}
@@ -119,6 +127,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                                                     {!colapsado && (estaAbierto ? <FaChevronDown size={12} /> : <FaChevronRight size={12} />)}
                                                 </button>
 
+                                                {/* Submenús — solo visibles cuando el menú padre está abierto y no colapsado */}
                                                 {estaAbierto && !colapsado && (
                                                     <div className={styles.submenus}>
                                                         {menu.submenus
@@ -140,6 +149,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                                                 )}
                                             </>
                                         ) : (
+                                            // Menú sin hijo, link directo a la ruta
                                             <Link href={path} onClick={cerrarSidebar} className={linkClass(path)} title={colapsado ? menu.opcion : ''}>
                                                 {Icono && <Icono size={20} />}
                                                 {!colapsado && menu.opcion}
@@ -154,6 +164,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
 
                 </div>
 
+                {/* Botón de cierre de sesión,  muestra solo el icono cuando está colapsado */}
                 <div className={styles.logout}>
                     <button className={styles.logoutBTN} onClick={handleLogout} title={colapsado ? 'Cerrar Sesión' : ''}>
                         {!colapsado && 'Cerrar Sesion'} <FaSignOutAlt size={25} /></button>

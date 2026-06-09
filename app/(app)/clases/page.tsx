@@ -1,3 +1,6 @@
+//Creado por Diego Castro
+//Pagina donde se mostraran las clases que lleva un estudiante en el periodo actual
+
 "use client"
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";

@@ -1,3 +1,6 @@
+//Creado por Diego Castro
+//Pagina donde se mostrara el historial acdemico del estudiante
+
 "use client"
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
@@ -8,6 +11,7 @@ import styles from "../../styles/tablas.module.css"
 export default function HistorialDisciplinario() {
     //useAuth();
 
+    //Datos de prueba para mostrar en la tabla
     const [data, setData] = useState([
         { id: 1, faltas: 1, clase: 'Quimica', estado: 'Leve' },
         { id: 2, faltas: 2, clase: 'Biologia', estado: 'Grave' }

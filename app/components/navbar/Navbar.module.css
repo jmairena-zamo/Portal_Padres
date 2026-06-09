@@ -44,6 +44,73 @@
     left: 60px; 
 }
 
+.menuBtn{
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.estudianteWrapper {
+    position: relative;
+    display: flex;
+    gap: 15px;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    min-width: 180px;
+    z-index: 100;
+}
+
+.dropdownItem {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #374151;
+    transition: background-color 0.15s;
+}
+
+.dropdownItem:hover {
+    background-color: #f3f4f6;
+}
+
+.dropdownItemActivo {
+    font-weight: 600;
+    color: #005221; 
+}
+
+.chevron {
+    transition: transform 0.2s ease;
+    margin-right: 6px;
+}
+
+.chevronAbierto {
+    transform: rotate(180deg);
+}
+
+.userImgClickable {
+    cursor: pointer;
+    border-radius: 50%;
+    transition: opacity 0.15s;
+}
+
+.userImgClickable:hover {
+    opacity: 0.8;
+}
+
 @media (max-width: 800px) {
     .header, .headerColapsado {
         left: 0 !important;
@@ -64,7 +131,16 @@
 }
 
 @media (max-width: 420px) {
-    .navbarright span {
-        display: none; 
+
+    .nombreEstudiante {
+        display: none;
+    }
+
+    .menuBtn {
+        display: none;
+    }
+
+    .userImg {
+        cursor: pointer;
     }
 }
