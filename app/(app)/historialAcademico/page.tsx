@@ -4,7 +4,7 @@ import { InformacionEstudiante } from "@/app/components/informacionEstudiante/In
 import { useState } from "react";
 import index from './page.module.css'
 import styles from "../../styles/tablas.module.css"
-import Paginacion from "@/app/components/paginacion/Paginacion";
+import Paginacion from "@/app/components/ui/Paginacion";
 
 export default function HistorialAcademico() {
     //useAuth();

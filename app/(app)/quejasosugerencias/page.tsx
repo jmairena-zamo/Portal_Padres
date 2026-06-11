@@ -8,9 +8,9 @@
 import React, { useState } from 'react'
 import styles from './page.module.css'
 import { quejaData, quejaSchema } from '@/app/utils/validations'
-import Loading from '@/app/components/Loading/Loading'
+import Loading from '@/app/components/ui/Loading'
 import { useToast } from '@/app/hooks/useToast'
-import Toast from '@/app/components/toast/Toast'
+import Toast from '@/app/components/ui/Toast'
 
 export default function QuejasSugerencias() {
 

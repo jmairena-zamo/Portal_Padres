@@ -6,8 +6,8 @@
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useState } from "react"
 import styles from "../../styles/tablas.module.css"
-import Paginacion from "@/app/components/paginacion/Paginacion";
-import Tabla from "@/app/components/Tabla/Tabla";
+import Paginacion from "@/app/components/ui/Paginacion";
+import Tabla from "@/app/components/ui/Tabla";
 
 export default function Clases() {
 

@@ -1,52 +1,60 @@
-//Creado por Diego Castro
-// Página de inicio de sesión del portal de padres.
-// Valida el formulario localmente con Zod antes de enviar al endpoint /api/auth/login.
+"use client";
 
-"use client"
-
-import { Navbar } from "../components/navbar/Navbar";
-import { Sidebar } from "../components/sidebar/Sidebar";
-import styles from "./layout.module.css"
+import "@/app/globals.css";
+import { Navbar } from "../components/layout/Navbar";
+import { Sidebar } from "../components/layout/Sidebar";
 import { useEffect, useState } from "react";
-import Modal from "../components/modal/Modal";
+import ModalSuplantar from "../components/modals/ModalSuplantar";
 import { MenuProvider } from "../hooks/useMenu";
-import Loading from "../components/Loading/Loading";
+import Loading from "../components/ui/Loading";
 
-export default function AppLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
+export default function AppLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [colapsado, setColapsado] = useState(false);
 
-    //Constantes 
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const [loading, setLoading] = useState(true); 
-    const [colapsado, setColapsado] = useState(false);
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.iD_Rol === 2) setShowModal(true); //si el id del usuario es el id de administradr muestra el modal de alumnos
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-    useEffect(() => {
-        const cantidadHijos = 1;
-        
-        if(cantidadHijos && Number(cantidadHijos) > 1){
-            setShowModal(true);
-        }
+  if (loading) return <Loading />;
 
-        setLoading(false);
-    }, [])
+  return (
+    <MenuProvider>
+      {showModal && <ModalSuplantar OnClose={() => setShowModal(false)} />}
 
-    if (loading) return <Loading />;
+      {!showModal && (
+        <div className="bg-[#F6F6F6] min-h-screen">
+          <Sidebar
+            colapsado={colapsado}
+            onToggle={() => setColapsado((v) => !v)}
+          />
 
-    return (
-        <MenuProvider>
-            {showModal && <Modal OnClose={() => setShowModal(false)}/>}
+          {/* main: empuja el contenido a la derecha del sidebar */}
+          <div
+            className={[
+              "flex flex-col mt-13.75 transition-[margin-left] duration-300 ease-in-out",
+              colapsado ? "ml-15" : "ml-62.5",
+              "max-[800px]:ml-0",
+            ].join(" ")}
+          >
+            <Navbar colapsado={colapsado} />
 
-            {!showModal && (
-                <div className={styles.body}>
-                    <Sidebar colapsado={colapsado} onToggle={() => setColapsado(v => !v)}/>
-                    <div className={`${styles.main} ${colapsado ? styles.mainColapsado : ''}`}>
-                        <Navbar colapsado={colapsado} />
-                        <div className={styles.content}>
-                            {children}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-        </MenuProvider>
-    )
+            {/* content */}
+            <div className="w-full p-2.5 box-border max-[800px]:px-3.75 max-[420px]:p-2.5">
+              {children}
+            </div>
+          </div>
+        </div>
+      )}
+    </MenuProvider>
+  );
 }

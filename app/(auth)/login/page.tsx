@@ -1,139 +1,196 @@
-//Creado por Diego Castro
-// Página de inicio de sesión del portal de padres.
-// Valida el formulario localmente con Zod antes de enviar al endpoint /api/auth/login.
+"use client";
 
-"use client"
-
-import styles from "./page.module.css"
-import zamorano from "../../img/Logo-Universidad-Zamorano.png"
-import Image from "next/image"
-import React, { useState } from "react"
-import { useRouter } from "next/navigation"
-import { cifrarDato } from "../../utils/encrypt"
-import { loginSchema, LoginFormData } from "../../utils/validations"
+import zamorano from "../../img/Logo-Universidad-Zamorano.png";
+import Image from "next/image";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { loginSchema, LoginFormData } from "../../utils/validations";
+import { BtnPrimario, Input, SpanError } from "@/app/components/ui";
 
 export default function Login() {
+  const [esValidoCorreo, setEsValidoCorreo] = useState(true);
+  const [esValidoPass, setEsValidoPass] = useState(true);
+  const [errorServidor, setErrorServidor] = useState("");
+  const [cargando, setCargando] = useState(false);
+  const [errorContra, setErrorContra] = useState("");
 
-    const [esValidoCorreo, setEsValidoCorreo] = useState(true);
-    const [esValidoPass, setEsValidoPass] = useState(true);
-    const [errorServidor, setErrorServidor] = useState('');
-    const [cargando, setCargando] = useState(false);
-    const [errorContra, setErrorContra] = useState('');
+  const router = useRouter();
 
-    const router = useRouter();
+  const [form, setForm] = useState<LoginFormData>({
+    correo: "",
+    contrasena: "",
+  });
 
-    const [form, setForm] = useState<LoginFormData>({
-        correo: '',
-        contrasena: ''
-    });
+  // Limpia el error del campo que el usuario está editando
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((values) => ({ ...values, [name]: value }));
+    if (name === "correo" && !esValidoCorreo) setEsValidoCorreo(true);
+    if (name === "contrasena" && !esValidoPass) setEsValidoPass(true);
+  };
 
-    // Limpia el error del campo que el usuario está editando para no bloquear el botón prematuramente.
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm((values) => ({
-            ...values,
-            [name]: value,
-        }));
-        if (name === "correo") {
-            if (!esValidoCorreo) setEsValidoCorreo(true);
-        }
+  const validationCorreo = () => {
+    const result = loginSchema.shape.correo.safeParse(form.correo);
+    setEsValidoCorreo(result.success);
+  };
 
-        if (name === "contrasena") {
-            if (!esValidoPass) setEsValidoPass(true);
-        }
+  const validationPass = () => {
+    const result = loginSchema.shape.contrasena.safeParse(form.contrasena);
+    if (!result.success) {
+      setEsValidoPass(false);
+      setErrorContra(result.error.issues[0].message);
+    } else {
+      setEsValidoPass(true);
+      setErrorContra("");
+    }
+  };
+
+  // Valida todo el form antes de llamar a la API
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorServidor("");
+
+    const validate = loginSchema.safeParse(form);
+    if (!validate.success) {
+      setEsValidoCorreo(false);
+      setEsValidoPass(false);
+      return;
     }
 
-    //Validación onBlur para el correo y contraseña
-    const validationCorreo = () => {
-        const result = loginSchema.shape.correo.safeParse(form.correo);
-        setEsValidoCorreo(result.success);
+    setCargando(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validate.data),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorServidor(data.error);
+        return;
+      }
+
+      router.push("/resumenestudiante");
+    } catch (error) {
+      setErrorServidor("Error de conexión. Intenta de nuevo.");
+      console.log("Error: ", error);
+    } finally {
+      setCargando(false);
     }
+  };
 
-    const validationPass = () => {
-        const result = loginSchema.shape.contrasena.safeParse(form.contrasena);
-        if (!result.success) {
-            setEsValidoPass(false);
-            setErrorContra(result.error.issues[0].message);
-        } else {
-            setEsValidoPass(true);
-            setErrorContra('');
+  return (
+    <>
+      {/* overlay ::before via inline style */}
+      <style>{`
+        .login-bg::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background-color: rgba(229, 227, 227, 0.6);
+          border-radius: 5px;
         }
-    }
+      `}</style>
 
-    // Valida todo el form antes de llamar a la API; el backend devuelve { error } en caso de fallo.
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setErrorServidor("");
+      {/* fondo */}
+      <div
+        className="
+        login-bg relative w-full min-h-screen flex items-center justify-center gap-5
+        bg-[url('/img/Zamorano2.jpg')] bg-center bg-cover
+        max-[400px]:items-start max-[400px]:pt-10 max-[400px]:h-auto
+      "
+      >
+        {/* card */}
+        <form
+          onSubmit={handleSubmit}
+          className="
+            relative z-10 text-center flex flex-col items-center gap-7.5
+            bg-white w-125 h-106.25 rounded-[5px]
+            shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)]
+            max-[800px]:gap-5
+            max-[400px]:max-w-[calc(100%-24px)] max-[400px]:rounded-lg max-[400px]:gap-4 max-[400px]:mb-10 max-[400px]:h-auto
+          "
+        >
+          {/* logo */}
+          <div
+            className="
+            w-full h-[60%] rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)]
+            flex items-center justify-center
+          "
+          >
+            <Image
+              src={zamorano}
+              alt="Logo Zamorano"
+              width={200}
+              height={200}
+              loading="eager"
+              className="w-60 h-12.5 max-[800px]:w-45 max-[800px]:h-auto max-[400px]:w-37.5"
+            />
+          </div>
 
-        const validate = loginSchema.safeParse(form);
-        if (!validate.success) {
-            setEsValidoCorreo(false);
-            setEsValidoPass(false);
-            return;
-        }
+          {/* inputs */}
+          <div
+            className="
+            mb-10 w-87.5 flex flex-col text-left gap-2.5
+            max-[800px]:gap-2
+            max-[400px]:max-w-[calc(100%-40px)]
+          "
+          >
+            {/* correo */}
+            <div className="flex flex-col">
+              <label>Correo Electrónico:</label>
+              <Input
+                id="correo"
+                type="text"
+                name="correo"
+                esValido={esValidoCorreo}
+                placeholder="Ingrese Correo"
+                value={form.correo}
+                onChange={handleOnChange}
+                onBlur={validationCorreo}
+              />
+              <SpanError
+                visible={!esValidoCorreo}
+                mensaje="El Correo no es válido"
+              />
+            </div>
 
-        setCargando(true);
-        try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(validate.data),
-            });
+            {/* contraseña */}
+            <div className="flex flex-col">
+              <label>Contraseña:</label>
+              <Input
+                type="password"
+                name="contrasena"
+                esValido={esValidoPass}
+                placeholder="Ingrese Contraseña"
+                value={form.contrasena}
+                onChange={handleOnChange}
+                onBlur={validationPass}
+              />
+              <SpanError visible={!esValidoPass} mensaje={errorContra} />
+            </div>
 
-            const data = await res.json();
+            {/* submit */}
+            <BtnPrimario
+              type="submit"
+              disabled={!esValidoPass || !esValidoCorreo || cargando}
+            >
+              Ingresar
+            </BtnPrimario>
 
-            if (!res.ok) {
-                setErrorServidor(data.error);                
-                return;
-            }
+            <a
+              href="/recuperarContrasena"
+              className="text-center text-[13px] text-blue-600 hover:cursor-pointer"
+            >
+              ¿Has olvidado tu contraseña?
+            </a>
 
-            router.push("/resumenestudiante");
-
-        } catch (error) {
-            setErrorServidor('Error de conexión. Intenta de nuevo.');
-            console.log("Error: ", error);
-        } finally {
-            setCargando(false);
-        }
-    }
-
-    return (
-        <div className={styles.contentlogin}>
-            <form className={styles.loginform} onSubmit={handleSubmit}>
-                <div className={styles.logo}>
-                    <Image src={zamorano} alt="Logo Zamorano"
-                        width={200}
-                        height={200}
-                        loading="eager"
-                    />
-                </div>
-                <div className={styles.inputslogin}>
-                    <div className={styles.inputlogin}>
-                        <label>Correo Electrónico:
-                        </label>
-                        {/* inputError resalta el borde en rojo; spanError/err muestra el mensaje */}
-                        <input id="correo" type="text" name="correo" placeholder="Ingrese Correo"
-                            value={form.correo} onChange={handleOnChange} onBlur={validationCorreo}
-                            className={!esValidoCorreo ? styles.inputError : ""} />
-                        <span className={`${styles.spanError} ${!esValidoCorreo ? styles.err : ""}`}>El correo no es válido</span>
-                    </div>
-                    <div className={styles.inputlogin}>
-                        <label>Contraseña:
-                        </label>
-                        <input type="password" name="contrasena" placeholder="Ingrese Contraseña"
-                            value={form.contrasena} onChange={handleOnChange} onBlur={validationPass}
-                            className={!esValidoPass ? styles.inputError : ""} />
-                        <span className={`${styles.spanError} ${!esValidoPass ? styles.err : ""}`}>{errorContra}</span>
-                    </div>
-                    {/* Deshabilitado mientras haya errores de validación o la petición esté en vuelo */}
-                    <button type="submit" disabled={!esValidoPass || !esValidoCorreo || cargando}>Ingresar</button>
-                    <a href="/recuperarContrasena">¿Has olvidado tu contraseña?</a>
-                    <span className={`${styles.spanError} ${errorServidor ? styles.err : ""}`}>
-                        {errorServidor || "."}
-                    </span>
-                </div>
-
-            </form>
-        </div>
-    )
+            {/* error servidor */}
+            <SpanError visible={!!errorServidor} mensaje={errorServidor} />
+          </div>
+        </form>
+      </div>
+    </>
+  );
 }
