@@ -11,10 +11,8 @@ export default function CambiarContrasena() {
   const searchParams = useSearchParams();
   const route = useRouter();
 
-  // const correo = searchParams.get('correo');
-  const correo = "PRACTICANTEIT_2@ZAMORANO.EDU";
-  //   const token = searchParams.get("token");
-  const token = "token";
+  const id = searchParams.get("id");
+  const token = searchParams.get("token");
 
   const [newContrasena, setNewContrasena] = useState("");
   const [esValidoNewContras, setesValidoNewContras] = useState(true);
@@ -29,12 +27,12 @@ export default function CambiarContrasena() {
   const [errorConfirmContras, setErrorConfirmContras] = useState("");
 
   useEffect(() => {
-    if (!correo || !token) {
+    if (!id || !token) {
       setErrorServidor("Link Invalido o Expirado");
       return;
     }
 
-    fetch(`/api/user/obtenerUsuario?correo=${correo}`)
+    fetch(`/api/user/obtenerUsuario?token=${token}&id=${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.error) {
@@ -44,7 +42,7 @@ export default function CambiarContrasena() {
         setUserData(data);
       })
       .catch(() => setErrorServidor("Error de conexión 1"));
-  }, [correo, token]);
+  }, [id, token]);
 
   if (errorServidor) {
     return (
@@ -130,11 +128,12 @@ export default function CambiarContrasena() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id_useremail: userData.id,
-          correoElectronico: correo,
+          correoElectronico: userData.correo,
           relacion: userData.relacion,
-          tipoUsuario: userData.tipoUsuario,
+          iD_Rol: userData.iD_Rol,
           contrasena: newContrasena,
           usuario: userData.usuario,
+          token: token,
         }),
       });
 

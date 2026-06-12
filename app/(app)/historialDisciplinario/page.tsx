@@ -1,55 +1,61 @@
 //Creado por Diego Castro
 //Pagina donde se mostrara el historial acdemico del estudiante
 
-"use client"
+"use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useState } from "react"
-import styles from "../../styles/tablas.module.css"
-
+import { useState } from "react";
+import { Paginacion, Tabla } from "@/app/components/ui";
 
 export default function HistorialDisciplinario() {
-    //useAuth();
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
+  //Datos de prueba para mostrar en la tabla
+  const [data, setData] = useState([
+    { id: 1, faltas: 1, clase: "Quimica", fecha: "27/04/2026", estado: "Leve" },
+    {
+      id: 2,
+      faltas: 2,
+      clase: "Biologia",
+      fecha: "27/04/2026",
+      estado: "Grave",
+    },
+  ]);
 
-    //Datos de prueba para mostrar en la tabla
-    const [data, setData] = useState([
-        { id: 1, faltas: 1, clase: 'Quimica', estado: 'Leve' },
-        { id: 2, faltas: 2, clase: 'Biologia', estado: 'Grave' }
-    ]);
+  const handleCambiarRegistros = (cantidad: number) => {
+    setRegistrosPorPagina(cantidad);
+    setPaginaActual(1);
+  };
 
-    const fecha = new Date();
+  const indexInicio = (paginaActual - 1) * registrosPorPagina;
+  const indexFin = indexInicio + registrosPorPagina;
+  const datosPaginados = data.slice(indexInicio, indexFin);
 
-    return (
-        <div className={styles.pageContent}>
-            <InformacionEstudiante />
-            <div className={styles.pageCard}>
-                <h2>Historial Disciplinario</h2>
-                <table className={styles.table}>
-                    <thead className={styles.tableHead}>
-                        <tr>
-                            <th># Falta</th>
-                            <th>Clase</th>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody className={styles.tableBody}>
-                        {
-                            data.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{item.id}</td>
-                                    <td>{item.clase}</td>
-                                    <td>27/04/2026</td>
-                                    <td>{item.estado}</td>
-                                    <td><button>Ver Más</button></td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
-                </table>
+  const fecha = new Date();
 
-            </div>
-        </div>
-    )
+  return (
+    <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
+      <InformacionEstudiante />
+      <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] mb-3.75">
+        <h2 className="font-bold text-lg">Historial Disciplinario</h2>
+        <Tabla
+          datos={datosPaginados}
+          keyExtractor={(item) => item.id}
+          columnas={[
+            { header: "# Falta", accessor: "faltas" },
+            { header: "Clase", accessor: "clase" },
+            { header: "Fecha", accessor: "fecha" },
+            { header: "Estado", accessor: "estado" },
+          ]}
+        />
+        <Paginacion
+          totalRegistros={data.length}
+          registrosPorPagina={registrosPorPagina}
+          paginaActual={paginaActual}
+          onCambiarPagina={setPaginaActual}
+          onCambiarRegistrosPorPagina={handleCambiarRegistros}
+        />
+      </div>
+    </div>
+  );
 }

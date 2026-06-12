@@ -1,33 +1,47 @@
+import { API_URL } from "@/app/config/api";
 import { NextRequest, NextResponse } from "next/server";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 export async function GET(request: NextRequest) {
-    const correo = request.nextUrl.searchParams.get('correo');
+  const id = request.nextUrl.searchParams.get("id");
+  const token = request.nextUrl.searchParams.get("token");
 
-    if(!correo){
-        return NextResponse.json(
-            { error: 'Correo no válido'},
-            { status: 500}
-        )
-    }
+  if (!id) {
+    return NextResponse.json({ error: "Datos no válidos" }, { status: 500 });
+  }
 
-    const res = await fetch(`https://localhost:7233/portalpadres/v1/useremail/ListarPorCorreo/${correo}`);
+  const tokenRes = await fetch(`${API_URL}/tokensrecuperacion/Validar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: token,
+    }),
+  });
 
-    if (!res.ok) {
-        return NextResponse.json(
-            {error: 'Usuario no encontrado'},
-            { status: 404}
-        )
-    }
+  if (!tokenRes.ok) {
+    return NextResponse.json(
+      { error: "Link inválido o expirado" },
+      { status: 401 },
+    );
+  }
 
-    const data = await res.json();
+  const res = await fetch(`${API_URL}/useremail/Listar/${id}`);
 
-    return NextResponse.json({
-        id: data.response.iD_UserEmail,
-        correo: data.response.correoElectronico,
-        relacion: data.response.relacion,
-        tipoUsuario: data.response.tipoUsuario,
-        usuario: data.response.usuarioCreador,
-    });
+  if (!res.ok) {
+    return NextResponse.json(
+      { error: "Usuario no encontrado" },
+      { status: 404 },
+    );
+  }
+
+  const data = await res.json();
+
+  return NextResponse.json({
+    id: data.response.iD_UserEmail,
+    correo: data.response.correoElectronico,
+    relacion: data.response.relacion,
+    iD_Rol: data.response.iD_Rol,
+    usuario: data.response.usuarioCreador,
+  });
 }

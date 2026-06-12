@@ -1,59 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getRutasPermitidas } from './app/utils/menu';
+import { NextRequest, NextResponse } from "next/server";
+import { getRutasPermitidas } from "./app/utils/menu";
 
 export async function middleware(request: NextRequest) {
+  const session = request.cookies.get("session");
 
-    const session = request.cookies.get('session');
+  const path = request.nextUrl.pathname;
 
-    const path = request.nextUrl.pathname;
+  if (!session) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
-    if (!session) {
-        return NextResponse.redirect(
-            new URL('/', request.url)
-        );
-    }
+  const rutasProtegidas = [
+    "/resumenestudiante",
+    "/estadocuenta",
+    "/historialacademico",
+    "/clases",
+    "/historialdisciplinario",
+    "/documentos",
+    "/quejasosugerencias",
+    "/administracion",
+  ];
 
-    const rutasProtegidas = [
-        '/resumenestudiante',
-        '/estadocuenta',
-        '/historialacademico',
-        '/clases',
-        '/historialdisciplinario',
-        '/documentos',
-        '/quejasosugerencias',
-        '/administracion',
-    ];
+  const esRutaProtegida = rutasProtegidas.some((ruta) =>
+    request.nextUrl.pathname.startsWith(ruta),
+  );
 
-    const esRutaProtegida = rutasProtegidas.some((ruta) =>
-        request.nextUrl.pathname.startsWith(ruta)
-    );
+  if (esRutaProtegida && !session) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
-    if (esRutaProtegida && !session) {
-        return NextResponse.redirect(new URL('/', request.url));
-    }
+  const rutaactual = rutasProtegidas.find((ruta) => path.startsWith(ruta));
+  if (!rutaactual) return NextResponse.next();
 
-    const rutaactual = rutasProtegidas.find((ruta) => path.startsWith(ruta));
-    if (!rutaactual) return NextResponse.next();
+  if (!session) {
+    return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
+  }
 
-    if(!session){
-        return NextResponse.json(
-            { error: 'No hay sesion'},
-            { status: 400 }
-        )
-    }
+  const usuarioData = JSON.parse(session.value);
+  const idrol = usuarioData.iD_Rol;
 
-    const usuarioData = JSON.parse(session.value);
-    const idrol = usuarioData.iD_Rol;
+  const rutaspermitidas = await getRutasPermitidas(idrol);
+  console.log("PATH:", path);
+  console.log("RUTAS PERMITIDAS:", rutaspermitidas);
+  console.log("PERMISO:", rutaspermitidas.includes(path));
 
-    const rutaspermitidas = await getRutasPermitidas(idrol);
+  const permiso = rutaspermitidas.includes(path);
 
-    const permiso = rutaspermitidas.includes(path);
+  if (!permiso)
+    return NextResponse.redirect(new URL("/noautorizado", request.url));
 
-    if (!permiso) return NextResponse.redirect(new URL('/noautorizado', request.url));
+  return NextResponse.next();
 
-    return NextResponse.next();
-
-    /*if (!session) {
+  /*if (!session) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 
@@ -64,14 +62,14 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: [
-        '/resumenestudiante/:path*',
-        '/estadocuenta/:path*',
-        '/historialacademico/:path*',
-        '/clases/:path*',
-        '/historialdisciplinario/:path*',
-        '/documentos/:path*',
-        '/quejasosugerencias/:path*',
-        '/administracion/:path*',
-    ]
+  matcher: [
+    "/resumenestudiante/:path*",
+    "/estadocuenta/:path*",
+    "/historialacademico/:path*",
+    "/clases/:path*",
+    "/historialdisciplinario/:path*",
+    "/documentos/:path*",
+    "/quejasosugerencias/:path*",
+    "/administracion/:path*",
+  ],
 };

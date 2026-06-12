@@ -10,6 +10,7 @@ import SelectorIconos from "./selectorIconos";
 import { Input } from "./Input";
 import { SpanError } from "./SpanError";
 import { ToggleSwitch } from "./ToggleSwitch";
+import { TextArea } from "./TextArea";
 
 export {
   BtnPrimario,
@@ -27,4 +28,5 @@ export {
   Input,
   SpanError,
   ToggleSwitch,
+  TextArea,
 };

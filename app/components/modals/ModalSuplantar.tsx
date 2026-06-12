@@ -1,26 +1,31 @@
+"use client";
 import user from "../../img/logo-user.png";
 import logozamorano from "../../img/Logo-Universidad-Zamorano.png";
 import Image from "next/image";
-import { BtnPrimario } from "../ui";
+import { BtnPrimario, Buscador } from "../ui";
+import { useState } from "react";
 
 interface ModalProps {
   OnClose: () => void;
 }
 
-const estudiantes = [
-  { nombre: "Diego Sebastian", apellido: "Castro Lagos" },
-  { nombre: "María Valentina", apellido: "Mendoza Ortiz" },
-  { nombre: "Carlos Eduardo", apellido: "Alvarado Reyes" },
-  { nombre: "Ana Lucía", apellido: "Gómez Pastrana" },
-  { nombre: "Luis Fernando", apellido: "Rodríguez Zelaya" },
-  { nombre: "Sofía Alejandra", apellido: "Benítez Flores" },
-  { nombre: "Javier Andrés", apellido: "Martínez Colindres" },
-  { nombre: "Valeria Nicolle", apellido: "Castillo Núñez" },
-  { nombre: "Gabriel Enrique", apellido: "Pineda Aguilar" },
-  { nombre: "Camila Isabella", apellido: "Vásquez Mejía" },
-];
-
 export default function ModalSuplantar({ OnClose }: ModalProps) {
+  const estudiantesIniciales = [
+    { nombre: "Diego Sebastian", apellido: "Castro Lagos" },
+    { nombre: "María Valentina", apellido: "Mendoza Ortiz" },
+    { nombre: "Carlos Eduardo", apellido: "Alvarado Reyes" },
+    { nombre: "Ana Lucía", apellido: "Gómez Pastrana" },
+    { nombre: "Luis Fernando", apellido: "Rodríguez Zelaya" },
+    { nombre: "Sofía Alejandra", apellido: "Benítez Flores" },
+    { nombre: "Javier Andrés", apellido: "Martínez Colindres" },
+    { nombre: "Valeria Nicolle", apellido: "Castillo Núñez" },
+    { nombre: "Gabriel Enrique", apellido: "Pineda Aguilar" },
+    { nombre: "Camila Isabella", apellido: "Vásquez Mejía" },
+  ];
+  const [todosEstudiantes] = useState(estudiantesIniciales);
+  const [estudiantesFiltrados, setEstudiantesFiltrados] =
+    useState(estudiantesIniciales);
+
   return (
     <div className="fixed inset-0 bg-white flex flex-col">
       {/* logo */}
@@ -42,7 +47,17 @@ export default function ModalSuplantar({ OnClose }: ModalProps) {
 
         {/* lista */}
         <div className="flex-1 overflow-y-auto bg-white border border-t-0 border-gray-200 rounded-b-lg shadow-[0px_3px_5px_3px_rgba(0,0,0,0.1)] p-4 flex flex-col gap-3">
-          {estudiantes.map((u, index) => (
+          <div className="p-1.5">
+            <Buscador
+              datos={todosEstudiantes}
+              campos={["nombre"]}
+              placeholder="Buscar estudiante..."
+              onResultado={(resultados) => {
+                setEstudiantesFiltrados(resultados);
+              }}
+            />
+          </div>
+          {estudiantesFiltrados.map((u, index) => (
             <div
               key={index}
               className="flex items-center gap-4 bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md hover:border-[#008237] transition-all duration-200"
