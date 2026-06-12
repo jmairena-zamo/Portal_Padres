@@ -6,10 +6,6 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   const parsed = nuevaContrasenaSchema.safeParse(body);
-
-  if (!parsed.success) {
-    console.log(parsed.error.flatten().fieldErrors);
-  }
   if (!parsed.success) {
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
   }

@@ -8,7 +8,6 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface OpcionesCorreoBloqueo {
-  correoDestino: string;
   nombreUsuario: string;
   // URL completa del endpoint/página de cambio de contraseña
   urlCambioContrasena: string;
@@ -19,14 +18,13 @@ interface OpcionesCorreoBloqueo {
  * Retorna true si se envió correctamente, false si hubo error.
  */
 export async function enviarCorreoBloqueo({
-  correoDestino,
   nombreUsuario,
   urlCambioContrasena,
 }: OpcionesCorreoBloqueo): Promise<boolean> {
   try {
     const { error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL ?? "no-reply@zamorano.edu",
-      to: correoDestino,
+      from: "onboarding@resend.dev",
+      to: "practicanteit_2@zamorano.edu",
       subject: "Cuenta bloqueada — Portal de Padres Zamorano",
       html: plantillaHTML({ nombreUsuario, urlCambioContrasena }),
     });
@@ -53,87 +51,63 @@ function plantillaHTML({
   urlCambioContrasena: string;
 }): string {
   return `
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cuenta bloqueada</title>
-</head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 0;">
+<div style="font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 20px;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%"
+         style="max-width: 500px; background-color: #f9f9f9; border-collapse: collapse;">
+ 
+    <!-- Header verde igual al de recuperar contraseña -->
     <tr>
-      <td align="center">
-        <table width="560" cellpadding="0" cellspacing="0"
-               style="background:#ffffff;border-radius:8px;overflow:hidden;
-                      box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-
-          <!-- Header -->
-          <tr>
-            <td style="background:#1a3c5e;padding:28px 40px;">
-              <p style="margin:0;color:#ffffff;font-size:20px;font-weight:bold;">
-                Portal de Padres — Universidad Zamorano
-              </p>
-            </td>
-          </tr>
-
-          <!-- Body -->
-          <tr>
-            <td style="padding:36px 40px;">
-              <p style="margin:0 0 16px;font-size:16px;color:#111827;">
-                Hola, <strong>${nombreUsuario}</strong>
-              </p>
-              <p style="margin:0 0 16px;font-size:15px;color:#374151;line-height:1.6;">
-                Detectamos <strong>3 intentos de inicio de sesión fallidos</strong>
-                en tu cuenta, por lo que ha sido <strong>bloqueada temporalmente</strong>
-                por razones de seguridad.
-              </p>
-              <p style="margin:0 0 24px;font-size:15px;color:#374151;line-height:1.6;">
-                Para recuperar el acceso, debes restablecer tu contraseña haciendo
-                clic en el botón de abajo. Una vez que lo hagas, tu cuenta se
-                desbloqueará automáticamente.
-              </p>
-
-              <!-- CTA Button -->
-              <table cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
-                <tr>
-                  <td style="background:#1a3c5e;border-radius:6px;">
-                    <a href="${urlCambioContrasena}"
-                       style="display:inline-block;padding:14px 28px;
-                              color:#ffffff;font-size:15px;font-weight:bold;
-                              text-decoration:none;">
-                      Restablecer contraseña
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">
-                Si no reconoces esta actividad, contacta al administrador del sistema
-                de inmediato.
-              </p>
-              <p style="margin:0;font-size:13px;color:#6b7280;">
-                Este enlace es de un solo uso y expira según la política de tu institución.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background:#f9fafb;padding:20px 40px;
-                       border-top:1px solid #e5e7eb;">
-              <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-                Universidad Zamorano · Sistema de información para padres de familia<br/>
-                Este es un mensaje automático, por favor no respondas a este correo.
-              </p>
-            </td>
-          </tr>
-
-        </table>
+      <td align="center" bgcolor="#008237" style="padding: 20px 0;">
+        <h1 style="color: #ffffff; margin: 0; font-family: Arial, sans-serif; font-size: 28px;">
+          Zamorano
+        </h1>
       </td>
     </tr>
+ 
+    <!-- Cuerpo -->
+    <tr>
+      <td style="padding: 30px; font-family: Arial, sans-serif;">
+        <h2 style="color: #333333; text-align: center; margin-top: 0; margin-bottom: 20px;">
+          Cuenta Bloqueada
+        </h2>
+ 
+        <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 16px;">
+          Hola, <strong>${nombreUsuario}</strong>
+        </p>
+ 
+        <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 16px;">
+          Detectamos <strong>3 intentos de inicio de sesión fallidos</strong> en tu cuenta,
+          por lo que ha sido <strong>bloqueada temporalmente</strong> por razones de seguridad.
+        </p>
+ 
+        <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
+          Para recuperar el acceso, restablece tu contraseña haciendo clic en el botón:
+        </p>
+ 
+        <!-- Botón azul igual al de recuperar contraseña -->
+        <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 30px;">
+          <tr>
+            <td align="center" bgcolor="#0070f3" style="border-radius: 5px; padding: 5px;">
+              <a href="${urlCambioContrasena}" target="_blank"
+                 style="font-size: 16px; font-family: Arial, sans-serif; color: #ffffff;
+                        text-decoration: none; border-radius: 5px; padding: 14px 28px;
+                        display: inline-block; font-weight: bold; background-color: #0070f3;">
+                Restablecer Contraseña
+              </a>
+            </td>
+          </tr>
+        </table>
+ 
+        <p style="color: #777777; font-size: 12px; text-align: center; margin-bottom: 8px; line-height: 1.5;">
+          Si no reconoces esta actividad, contacta al administrador del sistema de inmediato.
+        </p>
+        <p style="color: #777777; font-size: 12px; text-align: center; margin: 0; line-height: 1.5;">
+          Este es un mensaje automático, por favor no respondas a este correo.
+        </p>
+      </td>
+    </tr>
+ 
   </table>
-</body>
-</html>
+</div>
   `.trim();
 }

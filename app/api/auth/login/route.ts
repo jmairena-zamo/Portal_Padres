@@ -1,26 +1,90 @@
-//Creado por Diego Castro
+// Creado por Diego Castro
 
 import { loginSchema } from "@/app/utils/validations";
 import { NextRequest, NextResponse } from "next/server";
 import rateLimit from "@/app/utils/rateLimits";
+import { enviarCorreoBloqueo } from "@/app/utils/correoBloqueado";
 import { API_URL } from "@/app/config/api";
 
-//POST /api/auth/login
-//Autentica al usuario con correo y contraseña
-//Crean una cookie si las credenciales son validas
-//Aplica un rate limits de 10 intentos en 15 min
-//valida a traves de zod antes de prcesar
+// POST /api/auth/login
+// Autentica al usuario con correo y contraseña
+// Crea una cookie httpOnly si las credenciales son válidas
+// Capa 1: rate limit por IP — 10 intentos en 15 min
+// Capa 2: bloqueo de cuenta por intentos fallidos — controlado con campo habilitado en BD
 
-// Deshabilita la verificación TLS para el entorno de desarrollo local
 if (process.env.NODE_ENV === "development") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
+const MAX_INTENTOS = 3;
+const VENTANA_MS = 60 * 60 * 1000;
+
+// Conteo de intentos fallidos en memoria por correo.
+// Solo se usa para contar — la fuente de verdad del bloqueo es el campo habilitado en BD.
+// Se reinicia al hacer login exitoso o al bloquear la cuenta.
+interface RegistroIntentos {
+  cantidad: number;
+  primerIntento: number; // timestamp en ms
+}
+const intentosFallidos = new Map<string, RegistroIntentos>();
+
+// Tipado del objeto usuario que devuelve el backend
+interface UsuarioBackend {
+  iD_UserEmail: number;
+  correoElectronico: string;
+  relacion: string;
+  habilitado: number;
+  iD_Rol: number;
+  contrasena: string;
+}
+
+/**
+ * Llama al PUT del backend para actualizar el campo habilitado del usuario.
+ * Envía el objeto completo que devolvió ListarPorCorreo con habilitado modificado.
+ * Nota: el backend maneja contraseña en texto plano — esto es responsabilidad del equipo .NET.
+ */
+async function actualizarHabilitado(
+  usuario: UsuarioBackend,
+  habilitado: 0 | 1,
+): Promise<boolean> {
+  try {
+    const res = await fetch(
+      `${API_URL}/useremail/Actualizar/${usuario.iD_UserEmail}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...usuario, habilitado }),
+      },
+    );
+    return res.ok;
+  } catch (err) {
+    console.error("[login] Error al actualizar habilitado:", err);
+    return false;
+  }
+}
+
+function registrarIntento(correo: string): number {
+  const ahora = Date.now();
+  const registro = intentosFallidos.get(correo);
+
+  // Sin registro previo, o la ventana de 1 hora ya expiró → reiniciar
+  if (!registro || ahora - registro.primerIntento > VENTANA_MS) {
+    intentosFallidos.set(correo, { cantidad: 1, primerIntento: ahora });
+    return 1;
+  }
+
+  // Dentro de la ventana → incrementar
+  registro.cantidad += 1;
+  intentosFallidos.set(correo, registro);
+  return registro.cantidad;
+}
+
 export async function POST(request: NextRequest) {
-  // Bloquea la petición si el IP superó el límite de intentos
+  // ── Capa 1: rate limit por IP ──────────────────────────────────────────────
   const limitResult = rateLimit(request, 10, 15 * 60 * 1000);
   if (limitResult) return limitResult;
 
+  // ── Validación Zod ─────────────────────────────────────────────────────────
   const body = await request.json();
   const parsed = loginSchema.safeParse(body);
 
@@ -28,20 +92,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
   }
 
-  const correoUsuario: string | undefined =
-    parsed.data?.correo ?? parsed.data?.correo ?? undefined;
-  const { correo } = parsed.data;
-  const { contrasena } = parsed.data;
-
-  const correoLimpio = correoUsuario.trim();
-  const contrasenaLimpia = contrasena.trim();
+  const correoLimpio = parsed.data.correo.trim().toLowerCase();
+  const contrasenaLimpia = parsed.data.contrasena.trim();
 
   try {
+    // ── Obtener usuario del backend ──────────────────────────────────────────
     const res = await fetch(
       `${API_URL}/useremail/ListarPorCorreo/${correoLimpio}`,
     );
 
-    // Correo no encontrado en el backend
+    // Correo no encontrado — NO contamos intento fallido aquí.
+    // Si contáramos, cualquiera podría bloquear cuentas ajenas enviando correos inexistentes.
     if (!res.ok) {
       return NextResponse.json(
         { error: "Correo o Contraseña Incorrectos" },
@@ -50,20 +111,93 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await res.json();
+    const usuario: UsuarioBackend = data.response;
 
-    // Contraseña incorrecta
-    if (contrasenaLimpia != data.response.contrasena) {
+    // ── Capa 2: verificar si la cuenta está bloqueada en BD ──────────────────
+    if (usuario.habilitado === 0) {
       return NextResponse.json(
-        { error: "Correo o Contraseña Incorrectos" },
+        {
+          error:
+            "Tu cuenta está bloqueada por múltiples intentos fallidos. " +
+            "Revisa tu correo para restablecer tu contraseña.",
+        },
+        { status: 403 },
+      );
+    }
+
+    // ── Contraseña incorrecta → contar intento ───────────────────────────────
+    if (contrasenaLimpia !== usuario.contrasena) {
+      const intentosActuales = registrarIntento(correoLimpio);
+      const intentosRestantes = MAX_INTENTOS - intentosActuales;
+
+      // ── Límite alcanzado: bloquear en BD y enviar correo ───────────────────
+      if (intentosActuales >= MAX_INTENTOS) {
+        const id = usuario.iD_UserEmail;
+        const token = crypto.randomUUID();
+        const tokenRes = await fetch(`${API_URL}/tokensrecuperacion/Crear`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userEmail_ID: id,
+            token: token,
+          }),
+        });
+
+        if (!tokenRes.ok) {
+          const errorBody = await tokenRes.text();
+          console.error("Token error:", tokenRes.status, errorBody);
+          return NextResponse.json(
+            { message: "Error al generar el token de recuperación" },
+            { status: 500 },
+          );
+        }
+        const linkReset = `http://localhost:3000/cambiarContrasena?token=${token}&id=${id}`;
+        intentosFallidos.delete(correoLimpio); // limpiar conteo en memoria
+
+        // Bloquear en BD (habilitado → 0)
+        const bloqueadaOk = await actualizarHabilitado(usuario, 0);
+
+        if (!bloqueadaOk) {
+          // Si falla el PUT, igual avisamos pero no bloqueamos la UX
+          console.error(
+            `[login] No se pudo bloquear en BD la cuenta: ${correoLimpio}`,
+          );
+        }
+
+        // Enviar correo — fire & forget para no retrasar la respuesta
+        enviarCorreoBloqueo({
+          nombreUsuario: usuario.correoElectronico,
+          urlCambioContrasena: linkReset,
+        }).catch((err) =>
+          console.error("[login] No se pudo enviar correo de bloqueo:", err),
+        );
+
+        return NextResponse.json(
+          {
+            error:
+              "Has superado el límite de intentos. Tu cuenta ha sido bloqueada. " +
+              "Te enviamos un correo para restablecer tu contraseña.",
+          },
+          { status: 403 },
+        );
+      }
+
+      // Aún quedan intentos — avisar cuántos restan
+      return NextResponse.json(
+        {
+          error: `Correo o Contraseña Incorrectos. Te ${intentosRestantes === 1 ? "queda" : "quedan"} ${intentosRestantes} intento${intentosRestantes !== 1 ? "s" : ""}.`,
+        },
         { status: 401 },
       );
     }
 
-    // Guardar solo los campos necesarios en la cookie de sesión
+    // ── Login exitoso ────────────────────────────────────────────────────────
+    intentosFallidos.delete(correoLimpio); // limpiar conteo si había intentos previos
+
     const saveData = {
-      id: data.response.iD_UserEmail,
-      email: data.response.correoElectronico,
-      iD_Rol: data.response.iD_Rol,
+      id: usuario.iD_UserEmail,
+      email: usuario.correoElectronico,
+      iD_Rol: usuario.iD_Rol,
     };
 
     const response = NextResponse.json({ ok: true });
@@ -79,7 +213,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.log("Error al conectar con la API:", error);
+    console.error("[login] Error al conectar con la API:", error);
     return NextResponse.json(
       { error: "Error al conectar con el servidor" },
       { status: 500 },
