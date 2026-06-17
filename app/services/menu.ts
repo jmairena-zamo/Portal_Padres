@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+// Creado por Diego Castro
+// Genera las rutas permitidas segun el rl
 
 import {
   FaHome,
@@ -19,6 +20,8 @@ import {
 } from "react-icons/fa";
 import { API_URL } from "../config/api";
 
+// Diccionario de iconos utilizados en el menú.
+// La clave es el nombre del icono y el valor es el componente de React correspondiente
 export const iconos: Record<string, React.ElementType> = {
   FaHome,
   FaBook,
@@ -37,11 +40,16 @@ export const iconos: Record<string, React.ElementType> = {
   FaUsers,
 };
 
+// Obtiene las rutas permitidas para un rol específico.
+// 1. Consulta los menús habilitados para el rol.
+// 2. Consulta los submenús habilitados.
+// 3. Devuelve un arreglo con todas las rutas accesibles.
+// Utilizado en el middleware
 export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
   const rutasPorNombre: Record<string, string> = {
     "RESUMEN ESTUDIANTE": "/resumenestudiante",
     CLASES: "/clases",
-    "ESTADO DE CUENTA": "/estadocuenta",
+    "ESTADO DE CUENTA": "/estadodecuenta",
     "HISTORIAL ACADEMICO": "/historialacademico",
     "HISTORIAL DISCIPLINARIO": "/historialdisciplinario",
     DOCUMENTOS: "/documentos",
@@ -65,6 +73,7 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
       }),
     );
 
+    // Filtra menús habilitados y obtiene sus rutas
     const rutasMenus = menus
       .filter((m) => m !== null && m.habilitado === 1)
       .map((m) => rutasPorNombre[m.opcion.toUpperCase()])
@@ -91,6 +100,7 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
         }),
       );
 
+      // Construye rutas de submenús concatenando la ruta padre con la opción del submenú
       rutasSubmenus = submenus
         .filter((s) => s !== null && s.habilitado === 1)
         .map((s) => {
@@ -110,6 +120,8 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
   }
 };
 
+// Genera una ruta a partir de un nombre de opción.
+// Convierte a minúsculas, elimina acentos y espacios.
 export const generarRuta = (opcion: string): string => {
   return (
     "/" +
@@ -121,6 +133,8 @@ export const generarRuta = (opcion: string): string => {
   );
 };
 
+// Genera la ruta completa de un submenú.
+// Combina la ruta del menú padre con la opción del submenú.
 export const getSubPath = (menuOpcion: string, subOpcion: string): string => {
   const basePath = generarRuta(menuOpcion);
   return `${basePath}/${subOpcion.toLowerCase().replace(/\s+/g, "")}`;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRutasPermitidas } from "./app/utils/menu";
+import { getRutasPermitidas } from "./app/services/menu";
 
 export async function middleware(request: NextRequest) {
   const session = request.cookies.get("session");
@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
 
   const rutasProtegidas = [
     "/resumenestudiante",
-    "/estadocuenta",
+    "/estadodecuenta",
     "/historialacademico",
     "/clases",
     "/historialdisciplinario",
@@ -40,9 +40,6 @@ export async function middleware(request: NextRequest) {
   const idrol = usuarioData.iD_Rol;
 
   const rutaspermitidas = await getRutasPermitidas(idrol);
-  console.log("PATH:", path);
-  console.log("RUTAS PERMITIDAS:", rutaspermitidas);
-  console.log("PERMISO:", rutaspermitidas.includes(path));
 
   const permiso = rutaspermitidas.includes(path);
 
@@ -64,7 +61,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/resumenestudiante/:path*",
-    "/estadocuenta/:path*",
+    "/estadodecuenta/:path*",
     "/historialacademico/:path*",
     "/clases/:path*",
     "/historialdisciplinario/:path*",

@@ -1,5 +1,5 @@
-//Componente de buscador creado por Diego Castro
-//Este es un componente generico para buscar
+// Componente de buscador creado por Diego Castro
+// Este es un componente generico para buscar
 
 "use client";
 

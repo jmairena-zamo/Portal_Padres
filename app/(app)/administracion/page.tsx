@@ -954,7 +954,7 @@ export default function Administracion() {
 
   const tieneRoles = datosPaginadosRoles && datosPaginadosRoles.length > 0;
 
-  if (cargando) return <Loading />;
+  // if (cargando) return <Loading />;
 
   //----RENDER----------------------------------------------------------
   return (
@@ -1039,23 +1039,25 @@ export default function Administracion() {
               />
             </div>
           </div>
-
-          <div className="w-full max-[800px]:overflow-x-auto">
-            {!tieneMenus ? (
-              <Vacio
-                titulo="No hay Menus"
-                descripcion="No se encontraron menus con ese nombre"
-              />
-            ) : (
-              <Tabla
-                datos={datosPaginadosMenus}
-                keyExtractor={(menu) => menu.iD_Menu}
-                estaExpandida={(menu) => menuAbierto === menu.iD_Menu}
-                filaExpandida={(menu) =>
-                  menu.submenus.map((sub) => (
-                    <tr
-                      key={sub.iD_SubMenu}
-                      className="
+          {cargando ? (
+            <Loading />
+          ) : (
+            <div className="w-full max-[800px]:overflow-x-auto">
+              {!tieneMenus ? (
+                <Vacio
+                  titulo="No hay Menus"
+                  descripcion="No se encontraron menus con ese nombre"
+                />
+              ) : (
+                <Tabla
+                  datos={datosPaginadosMenus}
+                  keyExtractor={(menu) => menu.iD_Menu}
+                  estaExpandida={(menu) => menuAbierto === menu.iD_Menu}
+                  filaExpandida={(menu) =>
+                    menu.submenus.map((sub) => (
+                      <tr
+                        key={sub.iD_SubMenu}
+                        className="
                                                                 bg-[rgb(216,216,216)]
                                                                 [&>td]:text-center
                                                                 [&>td]:p-2.5
@@ -1065,222 +1067,226 @@ export default function Administracion() {
                                                                 max-[420px]:[&>td]:py-1.5
                                                                 max-[420px]:[&>td]:text-[12px]
                                                             "
-                    >
-                      <td>{sub.opcion}</td>
-                      <td>
-                        {/* Input inline para editar posición; valida al perder foco */}
+                      >
+                        <td>{sub.opcion}</td>
+                        <td>
+                          {/* Input inline para editar posición; valida al perder foco */}
+                          <input
+                            type="number"
+                            className="w-15 p-1 text-center"
+                            value={
+                              posicionesEditando[`sub-${sub.iD_SubMenu}`] ??
+                              sub.posicion
+                            }
+                            onChange={(e) => {
+                              setPosicionesEditando((prev) => ({
+                                ...prev,
+                                [`sub-${sub.iD_SubMenu}`]: Number(
+                                  e.target.value,
+                                ),
+                              }));
+                            }}
+                            onBlur={async (e) => {
+                              const nueva = Number(e.target.value);
+                              if (nueva !== sub.posicion) {
+                                if (
+                                  posicionSubMenuOcupada(
+                                    nueva,
+                                    sub.menu_ID,
+                                    sub.iD_SubMenu,
+                                  )
+                                ) {
+                                  mostrarError(
+                                    `La posición ${nueva} ya está ocupada en este menú`,
+                                  );
+                                  setPosicionesEditando((prev) => ({
+                                    ...prev,
+                                    [`sub-${sub.iD_SubMenu}`]: sub.posicion,
+                                  }));
+                                  return;
+                                }
+                                await cambiarPosicionSUB(sub, nueva);
+                              }
+                              setPosicionesEditando((prev) => {
+                                const nuevo = { ...prev };
+                                delete nuevo[`sub-${sub.iD_SubMenu}`];
+                                return nuevo;
+                              });
+                            }}
+                          />
+                        </td>
+                        {/* estilo para el boton de gestionar roles */}
+                        <td
+                          className="border border-white flex flex-row justify-center align-center p-2.5 border-b border-b-black 
+                                                    max-[420px]:px-1 max-[420px]:py-1.5 max-[420px]:text-[12px]"
+                        >
+                          <BtnOutline onClick={() => abrirPermisos(sub)}>
+                            {
+                              menu.rolesAsignados.filter(
+                                (r) => r.habilitado === 1,
+                              ).length
+                            }{" "}
+                            de {roles.length}
+                          </BtnOutline>
+                        </td>
+                        <td>
+                          <ToggleSwitch
+                            checked={sub.habilitado === 1}
+                            onChange={() => HabilitarSUB(sub)}
+                          />
+                        </td>
+                        <td>
+                          <div className="flex gap-3.75 justify-center items-center">
+                            <BtnPrimario
+                              type="button"
+                              onClick={() => {
+                                setSubMenuSeleccionadoEditar(sub);
+                                setFormDataSubMenu({
+                                  opcion: sub.opcion,
+                                  posicion: sub.posicion,
+                                });
+                                setModalSubMenu(true);
+                                setModoSubMenu("editar");
+                              }}
+                            >
+                              <FaEdit />
+                            </BtnPrimario>
+                            <BtnPeligro
+                              type="button"
+                              onClick={() => pedirConfirmacionEliminarSub(sub)}
+                            >
+                              <FaTrash />
+                            </BtnPeligro>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  }
+                  columnas={[
+                    {
+                      header: "Menú",
+                      render: (menu) => (
+                        // Chevron indica si el menú tiene submenús y si están expandidos
+                        <button
+                          className="bg-transparent border-none cursor-pointer font-bold flex items-center gap-1.5"
+                          onClick={() => gestionSubmenu(menu.iD_Menu)}
+                        >
+                          {menu.opcion}
+                          {menu.submenus?.length > 0 &&
+                            (menuAbierto === menu.iD_Menu ? (
+                              <FaChevronDown size={12} />
+                            ) : (
+                              <FaChevronRight size={12} />
+                            ))}
+                        </button>
+                      ),
+                    },
+                    {
+                      header: "Posición",
+                      render: (menu) => (
                         <input
                           type="number"
                           className="w-15 p-1 text-center"
                           value={
-                            posicionesEditando[`sub-${sub.iD_SubMenu}`] ??
-                            sub.posicion
+                            posicionesEditando[`menu-${menu.iD_Menu}`] ??
+                            menu.posicion
                           }
                           onChange={(e) => {
                             setPosicionesEditando((prev) => ({
                               ...prev,
-                              [`sub-${sub.iD_SubMenu}`]: Number(e.target.value),
+                              [`menu-${menu.iD_Menu}`]: Number(e.target.value),
                             }));
                           }}
                           onBlur={async (e) => {
                             const nueva = Number(e.target.value);
-                            if (nueva !== sub.posicion) {
-                              if (
-                                posicionSubMenuOcupada(
-                                  nueva,
-                                  sub.menu_ID,
-                                  sub.iD_SubMenu,
-                                )
-                              ) {
+                            if (nueva !== menu.posicion) {
+                              if (posicionMenuOcupada(nueva, menu.iD_Menu)) {
                                 mostrarError(
-                                  `La posición ${nueva} ya está ocupada en este menú`,
+                                  `La posición ${nueva} ya está ocupada por otro menú`,
                                 );
                                 setPosicionesEditando((prev) => ({
                                   ...prev,
-                                  [`sub-${sub.iD_SubMenu}`]: sub.posicion,
+                                  [`menu-${menu.iD_Menu}`]: menu.posicion,
                                 }));
                                 return;
                               }
-                              await cambiarPosicionSUB(sub, nueva);
+                              await cambiarPosicion(menu, nueva);
                             }
                             setPosicionesEditando((prev) => {
                               const nuevo = { ...prev };
-                              delete nuevo[`sub-${sub.iD_SubMenu}`];
+                              delete nuevo[`menu-${menu.iD_Menu}`];
                               return nuevo;
                             });
                           }}
                         />
-                      </td>
-                      {/* estilo para el boton de gestionar roles */}
-                      <td
-                        className="border border-white flex flex-row justify-center align-center p-2.5 border-b border-b-black 
-                                                    max-[420px]:px-1 max-[420px]:py-1.5 max-[420px]:text-[12px]"
-                      >
-                        <BtnOutline onClick={() => abrirPermisos(sub)}>
-                          {
-                            menu.rolesAsignados.filter(
-                              (r) => r.habilitado === 1,
-                            ).length
-                          }{" "}
-                          de {roles.length}
-                        </BtnOutline>
-                      </td>
-                      <td>
+                      ),
+                    },
+                    {
+                      header: "Roles",
+                      render: (menu) => (
+                        <div className="flex gap-3.75 justify-center items-center">
+                          <BtnOutline onClick={() => abrirPermisos(menu)}>
+                            {
+                              menu.rolesAsignados.filter(
+                                (r) => r.habilitado === 1,
+                              ).length
+                            }{" "}
+                            de {roles.length}
+                          </BtnOutline>
+                        </div>
+                      ),
+                    },
+                    {
+                      header: "Estado",
+                      render: (menu) => (
                         <ToggleSwitch
-                          checked={sub.habilitado === 1}
-                          onChange={() => HabilitarSUB(sub)}
+                          checked={menu.habilitado === 1}
+                          onChange={() => Habilitar(menu)}
                         />
-                      </td>
-                      <td>
+                      ),
+                    },
+                    {
+                      header: "Acciones",
+                      render: (menu) => (
                         <div className="flex gap-3.75 justify-center items-center">
                           <BtnPrimario
                             type="button"
                             onClick={() => {
-                              setSubMenuSeleccionadoEditar(sub);
-                              setFormDataSubMenu({
-                                opcion: sub.opcion,
-                                posicion: sub.posicion,
+                              setMenuSeleccionadoEditar(menu);
+                              setFormDataMenu({
+                                opcion: menu.opcion,
+                                icono: menu.icono,
+                                posicion: menu.posicion,
                               });
-                              setModalSubMenu(true);
-                              setModoSubMenu("editar");
+                              setModalMenu(true);
+                              setModoMenu("editar");
                             }}
                           >
                             <FaEdit />
                           </BtnPrimario>
                           <BtnPeligro
                             type="button"
-                            onClick={() => pedirConfirmacionEliminarSub(sub)}
+                            onClick={() => pedirConfirmacionEliminarMenu(menu)}
                           >
                             <FaTrash />
                           </BtnPeligro>
                         </div>
-                      </td>
-                    </tr>
-                  ))
-                }
-                columnas={[
-                  {
-                    header: "Menú",
-                    render: (menu) => (
-                      // Chevron indica si el menú tiene submenús y si están expandidos
-                      <button
-                        className="bg-transparent border-none cursor-pointer font-bold flex items-center gap-1.5"
-                        onClick={() => gestionSubmenu(menu.iD_Menu)}
-                      >
-                        {menu.opcion}
-                        {menu.submenus?.length > 0 &&
-                          (menuAbierto === menu.iD_Menu ? (
-                            <FaChevronDown size={12} />
-                          ) : (
-                            <FaChevronRight size={12} />
-                          ))}
-                      </button>
-                    ),
-                  },
-                  {
-                    header: "Posición",
-                    render: (menu) => (
-                      <input
-                        type="number"
-                        className="w-15 p-1 text-center"
-                        value={
-                          posicionesEditando[`menu-${menu.iD_Menu}`] ??
-                          menu.posicion
-                        }
-                        onChange={(e) => {
-                          setPosicionesEditando((prev) => ({
-                            ...prev,
-                            [`menu-${menu.iD_Menu}`]: Number(e.target.value),
-                          }));
-                        }}
-                        onBlur={async (e) => {
-                          const nueva = Number(e.target.value);
-                          if (nueva !== menu.posicion) {
-                            if (posicionMenuOcupada(nueva, menu.iD_Menu)) {
-                              mostrarError(
-                                `La posición ${nueva} ya está ocupada por otro menú`,
-                              );
-                              setPosicionesEditando((prev) => ({
-                                ...prev,
-                                [`menu-${menu.iD_Menu}`]: menu.posicion,
-                              }));
-                              return;
-                            }
-                            await cambiarPosicion(menu, nueva);
-                          }
-                          setPosicionesEditando((prev) => {
-                            const nuevo = { ...prev };
-                            delete nuevo[`menu-${menu.iD_Menu}`];
-                            return nuevo;
-                          });
-                        }}
-                      />
-                    ),
-                  },
-                  {
-                    header: "Roles",
-                    render: (menu) => (
-                      <div className="flex gap-3.75 justify-center items-center">
-                        <BtnOutline onClick={() => abrirPermisos(menu)}>
-                          {
-                            menu.rolesAsignados.filter(
-                              (r) => r.habilitado === 1,
-                            ).length
-                          }{" "}
-                          de {roles.length}
-                        </BtnOutline>
-                      </div>
-                    ),
-                  },
-                  {
-                    header: "Estado",
-                    render: (menu) => (
-                      <ToggleSwitch
-                        checked={menu.habilitado === 1}
-                        onChange={() => Habilitar(menu)}
-                      />
-                    ),
-                  },
-                  {
-                    header: "Acciones",
-                    render: (menu) => (
-                      <div className="flex gap-3.75 justify-center items-center">
-                        <BtnPrimario
-                          type="button"
-                          onClick={() => {
-                            setMenuSeleccionadoEditar(menu);
-                            setFormDataMenu({
-                              opcion: menu.opcion,
-                              icono: menu.icono,
-                              posicion: menu.posicion,
-                            });
-                            setModalMenu(true);
-                            setModoMenu("editar");
-                          }}
-                        >
-                          <FaEdit />
-                        </BtnPrimario>
-                        <BtnPeligro
-                          type="button"
-                          onClick={() => pedirConfirmacionEliminarMenu(menu)}
-                        >
-                          <FaTrash />
-                        </BtnPeligro>
-                      </div>
-                    ),
-                  },
-                ]}
-              />
-            )}
+                      ),
+                    },
+                  ]}
+                />
+              )}
 
-            <Paginacion
-              totalRegistros={menus.length}
-              registrosPorPagina={registrosPorPagina}
-              paginaActual={paginaActualMenus}
-              onCambiarPagina={setPaginaActualMenus}
-              onCambiarRegistrosPorPagina={handleCambiarRegistros}
-            />
-          </div>
+              <Paginacion
+                totalRegistros={menus.length}
+                registrosPorPagina={registrosPorPagina}
+                paginaActual={paginaActualMenus}
+                onCambiarPagina={setPaginaActualMenus}
+                onCambiarRegistrosPorPagina={handleCambiarRegistros}
+              />
+            </div>
+          )}
+
           {/* Modal crear/editar menú: campo posición solo aparece al crear */}
           {modalMenu && (
             <ModalForm
@@ -1489,46 +1495,53 @@ export default function Administracion() {
               </BtnPrimario>
             </div>
           </div>
-          {!tieneRoles ? (
-            <Vacio
-              titulo="No hay Roles"
-              descripcion="No se encontraron roles"
-            />
+          {cargando ? (
+            <Loading />
           ) : (
-            <Tabla
-              datos={datosPaginadosRoles}
-              keyExtractor={(rol) => rol.iD_Rol}
-              columnas={[
-                {
-                  header: "Rol",
-                  accessor: "rol",
-                },
-                {
-                  header: "Acciones",
-                  render: (rol) => (
-                    <div className="flex gap-3.75 justify-center items-center">
-                      <BtnPrimario onClick={() => abrirEditarRol(rol)}>
-                        <FaEdit />
-                      </BtnPrimario>
-                      <BtnPeligro
-                        onClick={() => pedirConfirmacionEliminar(rol)}
-                      >
-                        <FaTrash />
-                      </BtnPeligro>
-                    </div>
-                  ),
-                },
-              ]}
-            />
+            <div className="w-full max-[800px]:overflow-x-auto">
+              {!tieneRoles ? (
+                <Vacio
+                  titulo="No hay Roles"
+                  descripcion="No se encontraron roles"
+                />
+              ) : (
+                <Tabla
+                  datos={datosPaginadosRoles}
+                  keyExtractor={(rol) => rol.iD_Rol}
+                  columnas={[
+                    {
+                      header: "Rol",
+                      accessor: "rol",
+                    },
+                    {
+                      header: "Acciones",
+                      render: (rol) => (
+                        <div className="flex gap-3.75 justify-center items-center">
+                          <BtnPrimario onClick={() => abrirEditarRol(rol)}>
+                            <FaEdit />
+                          </BtnPrimario>
+                          <BtnPeligro
+                            onClick={() => pedirConfirmacionEliminar(rol)}
+                          >
+                            <FaTrash />
+                          </BtnPeligro>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              )}
+
+              <Paginacion
+                totalRegistros={roles.length}
+                registrosPorPagina={registrosPorPagina}
+                paginaActual={paginaActualRoles}
+                onCambiarPagina={setPaginaActualRoles}
+                onCambiarRegistrosPorPagina={handleCambiarRegistros}
+              />
+            </div>
           )}
 
-          <Paginacion
-            totalRegistros={roles.length}
-            registrosPorPagina={registrosPorPagina}
-            paginaActual={paginaActualRoles}
-            onCambiarPagina={setPaginaActualRoles}
-            onCambiarRegistrosPorPagina={handleCambiarRegistros}
-          />
           {modalRol && (
             <ModalForm
               titulo={modoRol === "crear" ? "Crear Rol" : "Editar Rol"}

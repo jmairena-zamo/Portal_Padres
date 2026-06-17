@@ -8,7 +8,13 @@ import { useState } from "react";
 import logozamorano from "../../img/Logo-Universidad-Zamorano.png";
 import Image from "next/image";
 import { loginSchema, LoginFormData } from "../../utils/validations";
-import { BtnPrimario, Input, SpanError } from "@/app/components/ui/";
+import {
+  BtnPrimario,
+  Input,
+  SpanError,
+  BtnOutline,
+} from "@/app/components/ui/";
+import router from "next/router";
 
 export default function RecuperarContrasena() {
   const [esValidoCorreo, setEsValidoCorreo] = useState(true);
@@ -51,35 +57,37 @@ export default function RecuperarContrasena() {
   };
 
   return (
-    <div className="fixed inset-0 bg-white">
+    <div className="fixed inset-0 bg-gray-50 overflow-y-auto">
       {/* logo */}
-      <div className="mt-5 mb-5 flex items-center justify-center h-21.25">
+      <div className="mt-5 mb-5 flex items-center justify-center h-20">
         <Image src={logozamorano} alt="Logo Zamorano" width={300} height={75} />
       </div>
 
       {/* card */}
-      <div className="bg-white mx-auto w-full max-w-112.5 min-h-100 p-3.75 rounded-[5px] flex flex-col gap-1.25">
+      <div className="bg-white mx-auto w-full max-w-md min-h-96 p-4 rounded-md shadow-md border border-gray-100 flex flex-col gap-3 mb-10">
         <h2 className="font-bold text-[22px] text-center">
           Recuperar Contraseña
         </h2>
 
-        <p className="text-center text-[15px]">
+        <p className="text-center text-[15px] text-gray-600">
           Ingrese su dirección de correo electrónico y le enviaremos un link
           para restablecer su contraseña.
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col" noValidate>
           {/* campo correo */}
           <div className="flex flex-col mt-5 mb-5 text-[14px] font-bold">
-            <label>Correo Electrónico:</label>
+            <label htmlFor="correo">Correo Electrónico:</label>
             <Input
               id="correo"
-              type="text"
+              type="email"
               name="correo"
               esValido={esValidoCorreo}
               placeholder="Ingrese Correo Electrónico"
               onChange={handleOnChange}
               onBlur={validationCorreo}
+              disabled={cargando || !!mensaje}
+              autoComplete="email"
             />
             <SpanError
               visible={!esValidoCorreo}
@@ -87,21 +95,23 @@ export default function RecuperarContrasena() {
             />
           </div>
 
-          <BtnPrimario type="submit" disabled={!esValidoCorreo || cargando}>
-            {cargando
-              ? "Enviando..."
-              : "Enviar Correo Para Restablecer Contraseña"}
+          <BtnPrimario
+            type="submit"
+            disabled={!esValidoCorreo || cargando || !!mensaje}
+          >
+            {cargando ? "Enviando..." : "Enviar Enlace de Recuperación"}
           </BtnPrimario>
         </form>
 
-        {/* mensaje de respuesta */}
         {mensaje && (
           <p className="mt-4 text-green-600 text-center">{mensaje}</p>
         )}
 
-        <a href="/" className="block mt-4 text-center">
-          Volver al login
-        </a>
+        <BtnOutline type="button">
+          <a href="/" className="block text-center">
+            Volver al login
+          </a>
+        </BtnOutline>
       </div>
     </div>
   );

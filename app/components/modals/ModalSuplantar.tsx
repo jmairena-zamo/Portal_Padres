@@ -1,30 +1,47 @@
+//Creado pr Diego Castro
+//Modal que se muestra al rol administrador para suplantar estudiante
+
 "use client";
 import user from "../../img/logo-user.png";
 import logozamorano from "../../img/Logo-Universidad-Zamorano.png";
 import Image from "next/image";
 import { BtnPrimario, Buscador } from "../ui";
 import { useState } from "react";
+import { registrarIngreso } from "@/app/services/registrarIngreso";
 
+//Cerrar el modal luego de seleccinar estudiante
 interface ModalProps {
   OnClose: () => void;
 }
 
 export default function ModalSuplantar({ OnClose }: ModalProps) {
+  //Array temporal de estudiantes
   const estudiantesIniciales = [
-    { nombre: "Diego Sebastian", apellido: "Castro Lagos" },
-    { nombre: "María Valentina", apellido: "Mendoza Ortiz" },
-    { nombre: "Carlos Eduardo", apellido: "Alvarado Reyes" },
-    { nombre: "Ana Lucía", apellido: "Gómez Pastrana" },
-    { nombre: "Luis Fernando", apellido: "Rodríguez Zelaya" },
-    { nombre: "Sofía Alejandra", apellido: "Benítez Flores" },
-    { nombre: "Javier Andrés", apellido: "Martínez Colindres" },
-    { nombre: "Valeria Nicolle", apellido: "Castillo Núñez" },
-    { nombre: "Gabriel Enrique", apellido: "Pineda Aguilar" },
-    { nombre: "Camila Isabella", apellido: "Vásquez Mejía" },
+    { id: 1, nombre: "Diego Sebastian", apellido: "Castro Lagos" },
+    { id: 2, nombre: "María Valentina", apellido: "Mendoza Ortiz" },
+    { id: 3, nombre: "Carlos Eduardo", apellido: "Alvarado Reyes" },
+    { id: 4, nombre: "Ana Lucía", apellido: "Gómez Pastrana" },
+    { id: 5, nombre: "Luis Fernando", apellido: "Rodríguez Zelaya" },
+    { id: 6, nombre: "Sofía Alejandra", apellido: "Benítez Flores" },
+    { id: 7, nombre: "Javier Andrés", apellido: "Martínez Colindres" },
+    { id: 8, nombre: "Valeria Nicolle", apellido: "Castillo Núñez" },
+    { id: 9, nombre: "Gabriel Enrique", apellido: "Pineda Aguilar" },
+    { id: 10, nombre: "Camila Isabella", apellido: "Vásquez Mejía" },
   ];
   const [todosEstudiantes] = useState(estudiantesIniciales);
   const [estudiantesFiltrados, setEstudiantesFiltrados] =
     useState(estudiantesIniciales);
+
+  //registra el ingreso con el bannerID del estudiante
+  const seleccionarEstudiante = async (bannerID: Number) => {
+    await fetch("/api/auth/seleccionarEstudiante", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bannerID: bannerID }), // reemplaza con el real cuando tengas los datos
+    });
+
+    OnClose();
+  };
 
   return (
     <div className="fixed inset-0 bg-white flex flex-col">
@@ -86,7 +103,9 @@ export default function ModalSuplantar({ OnClose }: ModalProps) {
               </div>
 
               {/* botón */}
-              <BtnPrimario onClick={OnClose}>Ver</BtnPrimario>
+              <BtnPrimario onClick={() => seleccionarEstudiante(u.id)}>
+                Ver
+              </BtnPrimario>
             </div>
           ))}
         </div>

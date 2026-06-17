@@ -1,7 +1,6 @@
-/**
- * Template del correo enviado cuando se bloquea una cuenta por intentos fallidos.
- * Usa Resend. Creado por Diego.
- */
+// Creado por Diego Castro
+// Template del correo enviado cuando se bloquea una cuenta por intentos fallidos.
+// Utiliza Resend
 
 import { Resend } from "resend";
 
@@ -100,9 +99,6 @@ function plantillaHTML({
  
         <p style="color: #777777; font-size: 12px; text-align: center; margin-bottom: 8px; line-height: 1.5;">
           Si no reconoces esta actividad, contacta al administrador del sistema de inmediato.
-        </p>
-        <p style="color: #777777; font-size: 12px; text-align: center; margin: 0; line-height: 1.5;">
-          Este es un mensaje automático, por favor no respondas a este correo.
         </p>
       </td>
     </tr>

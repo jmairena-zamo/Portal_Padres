@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import { Resend } from "resend";
 import { recuperarContrasenaSchema } from "@/app/utils/validations";
-import LogoZamorano from "../../../img/Logo-Universidad-Zamorano.png";
 import { API_URL } from "@/app/config/api";
+import { enviarCorreoRecuperarCon } from "@/app/services/correoRecuperarCon";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -62,47 +62,15 @@ export async function POST(request: NextRequest) {
 
     const linkReset = `http://localhost:3000/cambiarContrasena?token=${token}&id=${id}`;
 
-    const emailResult = await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: "practicanteit_2@zamorano.edu",
-      //to: "diegocastrol2017@gmail.com",
-      subject: "Recuperar contraseña - Portal Padres Zamorano",
-      html: `
-                <div style="font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 20px;">
-                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #f9f9f9; border-collapse: collapse;">
-                        
-                        <tr>
-                            <td align="center" bgcolor="#008237" style="padding: 20px 0;">
-                                <h1 style="color: #ffffff; margin: 0; font-family: Arial, sans-serif; font-size: 28px;">Zamorano</h1>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="padding: 30px; font-family: Arial, sans-serif;">
-                                <h2 style="color: #333333; text-align: center; margin-top: 0; margin-bottom: 20px;">Recuperar Contraseña</h2>
-                                <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
-                                    Recibimos una solicitud para restablecer tu contraseña. Haz click en el botón para continuar:
-                                </p>
-                                
-                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 30px auto;">
-                                    <tr>
-                                        <td align="center" bgcolor="#0070f3" style="border-radius: 5px; padding: 5px">
-                                            <a href="${linkReset}" target="_blank" style="font-size: 16px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 5px; padding: 14px 28px; display: inline-block; font-weight: bold; background-color: #0070f3;">
-                                                Cambiar Contraseña
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                                <p style="color: #777777; font-size: 12px; text-align: center; margin-top: 30px; margin-bottom: 0; line-height: 1.5;">
-                                    Este link expira en 12 horas.
-                                </p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            `,
-    });
+    enviarCorreoRecuperarCon({
+      nombreUsuario: saveData.email,
+      urlCambioContrasena: linkReset,
+    }).catch((err) =>
+      console.error(
+        "[login] No se pudo enviar correo de recuperar contraseña:",
+        err,
+      ),
+    );
 
     return NextResponse.json(
       { message: "Email enviado correctamente." },

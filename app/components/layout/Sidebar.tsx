@@ -11,7 +11,7 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { iconos, generarRuta, getSubPath } from "@/app/utils/menu";
+import { iconos, generarRuta, getSubPath } from "@/app/services/menu";
 import { useMenu } from "@/app/hooks/useMenu";
 
 interface Props {

@@ -3,8 +3,9 @@
 import { loginSchema } from "@/app/utils/validations";
 import { NextRequest, NextResponse } from "next/server";
 import rateLimit from "@/app/utils/rateLimits";
-import { enviarCorreoBloqueo } from "@/app/utils/correoBloqueado";
+import { enviarCorreoBloqueo } from "@/app/services/correoBloqueado";
 import { API_URL } from "@/app/config/api";
+import { registrarIngreso } from "@/app/services/registrarIngreso";
 
 // POST /api/auth/login
 // Autentica al usuario con correo y contraseña
@@ -17,7 +18,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const MAX_INTENTOS = 3;
-const VENTANA_MS = 60 * 60 * 1000;
+const VENTANA_MS = 1 * 60 * 1000;
 
 // Conteo de intentos fallidos en memoria por correo.
 // Solo se usa para contar — la fuente de verdad del bloqueo es el campo habilitado en BD.
@@ -29,7 +30,7 @@ interface RegistroIntentos {
 const intentosFallidos = new Map<string, RegistroIntentos>();
 
 // Tipado del objeto usuario que devuelve el backend
-interface UsuarioBackend {
+interface Usuario {
   iD_UserEmail: number;
   correoElectronico: string;
   relacion: string;
@@ -44,7 +45,7 @@ interface UsuarioBackend {
  * Nota: el backend maneja contraseña en texto plano — esto es responsabilidad del equipo .NET.
  */
 async function actualizarHabilitado(
-  usuario: UsuarioBackend,
+  usuario: Usuario,
   habilitado: 0 | 1,
 ): Promise<boolean> {
   try {
@@ -101,8 +102,8 @@ export async function POST(request: NextRequest) {
       `${API_URL}/useremail/ListarPorCorreo/${correoLimpio}`,
     );
 
-    // Correo no encontrado — NO contamos intento fallido aquí.
-    // Si contáramos, cualquiera podría bloquear cuentas ajenas enviando correos inexistentes.
+    // Correo no encontrado
+    // no se cuentan intentos todavia, solo se verifica que exista el correo
     if (!res.ok) {
       return NextResponse.json(
         { error: "Correo o Contraseña Incorrectos" },
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await res.json();
-    const usuario: UsuarioBackend = data.response;
+    const usuario: Usuario = data.response;
 
     // ── Capa 2: verificar si la cuenta está bloqueada en BD ──────────────────
     if (usuario.habilitado === 0) {
@@ -144,8 +145,6 @@ export async function POST(request: NextRequest) {
         });
 
         if (!tokenRes.ok) {
-          const errorBody = await tokenRes.text();
-          console.error("Token error:", tokenRes.status, errorBody);
           return NextResponse.json(
             { message: "Error al generar el token de recuperación" },
             { status: 500 },
@@ -182,10 +181,11 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Aún quedan intentos — avisar cuántos restan
+      // Aún quedan intentos
       return NextResponse.json(
         {
-          error: `Correo o Contraseña Incorrectos. Te ${intentosRestantes === 1 ? "queda" : "quedan"} ${intentosRestantes} intento${intentosRestantes !== 1 ? "s" : ""}.`,
+          error: "Correo o Contraseña Incorrectos",
+          // error: `Correo o Contraseña Incorrectos. Te ${intentosRestantes === 1 ? "queda" : "quedan"} ${intentosRestantes} intento${intentosRestantes !== 1 ? "s" : ""}.`,
         },
         { status: 401 },
       );
@@ -194,11 +194,28 @@ export async function POST(request: NextRequest) {
     // ── Login exitoso ────────────────────────────────────────────────────────
     intentosFallidos.delete(correoLimpio); // limpiar conteo si había intentos previos
 
+    let bannerID: number | null;
+
+    // Si es admin el bannerID es nulo
+    // En el modal de suplantar se registra de nuevo
+    if (usuario.iD_Rol === 2) {
+      bannerID = null;
+    } else {
+      bannerID = 1;
+    }
+
     const saveData = {
       id: usuario.iD_UserEmail,
       email: usuario.correoElectronico,
       iD_Rol: usuario.iD_Rol,
     };
+
+    // Registrar ingreso inicial al sistema
+    await registrarIngreso(
+      usuario.iD_UserEmail,
+      bannerID,
+      usuario.correoElectronico,
+    );
 
     const response = NextResponse.json({ ok: true });
 

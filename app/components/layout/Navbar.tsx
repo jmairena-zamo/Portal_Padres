@@ -26,9 +26,21 @@ export const Navbar = ({ colapsado }: Props) => {
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const [hijoActivo, setHijoActivo] = useState(hijos[0]);
   const ref = useRef<HTMLDivElement>(null);
+  const [foto, setFoto] = useState<string | null>(null);
 
   // Cierra el dropdown al hacer clic fuera
   useEffect(() => {
+    const cargarFoto = async () => {
+      try {
+        const res = await fetch("/api/estudiantes/obtenerFoto");
+        const data = await res.json();
+        setFoto(data.foto ?? null);
+      } catch (error) {
+        console.log("error con la foto");
+        setFoto(null);
+      }
+    };
+    cargarFoto();
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setDropdownAbierto(false);
@@ -36,7 +48,7 @@ export const Navbar = ({ colapsado }: Props) => {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  }, [hijoActivo]);
 
   const seleccionarHijo = (hijo: (typeof hijos)[0]) => {
     setHijoActivo(hijo);
@@ -80,12 +92,12 @@ export const Navbar = ({ colapsado }: Props) => {
 
             {/* Avatar */}
             <Image
-              src={user}
+              src={foto ? `data:image/jpeg;base64,${foto}` : user}
               alt="Logo usuario"
               width={40}
               height={40}
               className={[
-                "rounded-full w-10 h-10",
+                "w-10 h-10 object-cover rounded-full max-[800px]:w-10 max-[800px]:h-10 max-[420px]:w-10 max-[420px]:h-10",
                 tieneVariosHijos &&
                   "cursor-pointer transition-opacity duration-150 hover:opacity-80",
               ]

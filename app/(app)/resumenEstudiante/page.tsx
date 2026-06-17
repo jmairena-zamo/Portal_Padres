@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import user from "../../img/logo-user.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaExclamationTriangle,
   FaExclamationCircle,
@@ -21,8 +21,23 @@ export default function ResumenEstudiante() {
   const [porcentaje, setPorcentaje] = useState(20.88);
   const promedio = 88.88;
   const horasClinica = 10;
+  const [foto, setFoto] = useState<string | null>(null);
 
   const data = [{ id: 1, name: "promedio", value: promedio }];
+
+  useEffect(() => {
+    const cargarFoto = async () => {
+      try {
+        const res = await fetch("/api/estudiantes/obtenerFoto");
+        const data = await res.json();
+        setFoto(data.foto ?? null);
+      } catch (error) {
+        console.log("error con la foto");
+        setFoto(null);
+      }
+    };
+    cargarFoto();
+  });
 
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
@@ -35,11 +50,16 @@ export default function ResumenEstudiante() {
           <br />
           <div className="flex justify-center">
             <Image
-              src={user}
+              src={foto ? `data:image/jpeg;base64,${foto}` : user}
               alt="Logo usuario"
               width={150}
               height={150}
-              className="w-37.5 h-37.5 rounded-full shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)]"
+              className="
+                        w-37.5 h-37.5 object-cover rounded-full shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)]
+                        max-[800px]:w-40 max-[800px]:h-40 
+                        max-[420px]:w-30 max-[420px]:h-30
+                    "
+              // className="w-37.5 h-37.5 rounded-full shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)]"
             />
           </div>
           <br />
