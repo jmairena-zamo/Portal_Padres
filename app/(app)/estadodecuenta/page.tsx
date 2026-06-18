@@ -16,8 +16,10 @@ interface FilaCuenta {
   tipo: string;
   monto: number;
   saldo: number;
+  intereses: number;
 }
 
+// Mapear los datos que vienen de la respuesta
 function mapearMovimiento(m: MovimientoCuenta): FilaCuenta {
   return {
     id: m.tbraccD_TRAN_NUMBER,
@@ -27,6 +29,7 @@ function mapearMovimiento(m: MovimientoCuenta): FilaCuenta {
     tipo: m.tbbdetC_TYPE_IND_DESC,
     monto: m.tbraccD_AMOUNT,
     saldo: m.tbraccD_BALANCE,
+    intereses: m.interest,
   };
 }
 
@@ -42,14 +45,15 @@ export default function EstadoCuenta() {
     cargarDatos();
   }, []);
 
+  // Obtener datos y mapearlos
   const cargarDatos = async () => {
     setCargando(true);
     try {
       const res = await fetch("/api/estudiantes/obtenerEstadoCuenta");
       const data = await res.json();
-      const filas = (data.response.details as MovimientoCuenta[]).map(
-        mapearMovimiento,
-      );
+      const filas = (data.response.details as MovimientoCuenta[])
+        .map(mapearMovimiento)
+        .sort((a, b) => a.id - b.id);
       setData(filas);
       setDataFiltrada(filas);
       setBalance(data.response.balance);
@@ -77,7 +81,7 @@ export default function EstadoCuenta() {
         <Buscador
           datos={data}
           placeholder="Buscar..."
-          campos={["tipo", "categoria"]}
+          campos={["tipo", "categoria", "descripcion"]}
           onResultado={(resultados) => {
             setDataFiltrada(resultados);
             setPaginaActual(1);
@@ -98,6 +102,7 @@ export default function EstadoCuenta() {
                 { header: "Categoria", accessor: "categoria" },
                 { header: "Monto", accessor: "monto" },
                 { header: "Saldo", accessor: "saldo" },
+                { header: "Intereses", accessor: "intereses" },
               ]}
             />
 

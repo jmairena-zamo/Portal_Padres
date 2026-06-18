@@ -9,6 +9,7 @@ import user from "../../img/logo-user.png";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import { BtnPrimario } from "../ui";
 
 // Simulación — reemplaza con tus datos reales
 const hijos = [
@@ -19,22 +20,30 @@ const hijos = [
 
 interface Props {
   colapsado: boolean;
+  onSuplantar?: () => void;
 }
 
-export const Navbar = ({ colapsado }: Props) => {
+export const Navbar = ({ colapsado, onSuplantar }: Props) => {
   const tieneVariosHijos = hijos.length > 1;
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const [hijoActivo, setHijoActivo] = useState(hijos[0]);
   const ref = useRef<HTMLDivElement>(null);
   const [foto, setFoto] = useState<string | null>(null);
+  const [showBoton, setShowBoton] = useState<boolean>(false);
 
   // Cierra el dropdown al hacer clic fuera
   useEffect(() => {
     const cargarFoto = async () => {
       try {
-        const res = await fetch("/api/estudiantes/obtenerFoto");
-        const data = await res.json();
-        setFoto(data.foto ?? null);
+        const resSesion = await fetch("/api/auth/session");
+        const dataSesion = await resSesion.json();
+        if (dataSesion?.iD_Rol === 2) {
+          setShowBoton(true);
+        }
+
+        const resFoto = await fetch("/api/estudiantes/obtenerFoto");
+        const dataFoto = await resFoto.json();
+        setFoto(dataFoto.foto ?? null);
       } catch (error) {
         console.log("error con la foto");
         setFoto(null);
@@ -48,7 +57,7 @@ export const Navbar = ({ colapsado }: Props) => {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [hijoActivo]);
+  }, [hijoActivo, showBoton]);
 
   const seleccionarHijo = (hijo: (typeof hijos)[0]) => {
     setHijoActivo(hijo);
@@ -68,11 +77,22 @@ export const Navbar = ({ colapsado }: Props) => {
     >
       <div className="text-black flex items-center justify-between w-full px-2.5 max-[800px]:pr-3.75 max-[800px]:pl-0">
         {/* Logo */}
-        <Image src={zamorano} alt="Logo Zamorano" width={200} />
+        <Image
+          className="object-cover"
+          src={zamorano}
+          alt="Logo Zamorano"
+          width={200}
+        />
 
         {/* Derecha: selector de hijo + avatar */}
         <nav className="flex justify-between items-center gap-5 mr-10 max-[800px]:mr-2.5">
           <div className="relative flex gap-3.75" ref={ref}>
+            {showBoton && (
+              <div className="flex justify-center items-center mr-9">
+                <BtnPrimario onClick={onSuplantar}>Suplantar</BtnPrimario>
+              </div>
+            )}
+
             {/* Botón nombre + chevron — oculto en <420px */}
             {tieneVariosHijos && (
               <button

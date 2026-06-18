@@ -58,7 +58,7 @@ export const HistorialAcademico: HistorialAcademicoResponse = {
       studyPathSequenceNumber: 1.0,
       attemptedHours: 7.0,
       creditHours: 7.0,
-      grade: "96.00",
+      grade: "66.00", //Originalmente 96.00
       mode: "N",
       modeDescription: "CALIFICACION NUMERICA",
       sequenceNumber: 1.0,

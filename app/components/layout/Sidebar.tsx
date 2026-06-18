@@ -139,11 +139,11 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
         </div>
 
         {/* Contenido interior scrollable */}
-        <div className="flex-1 overflow-hidden w-[95%] max-[800px]:mt-3.75">
+        <div className="flex-1 overflow-y-auto w-[95%] max-[800px]:mt-3.75 flex flex-col">
           {/* Tag: logo + email */}
           <div
             className={[
-              "w-full mt-2.5 mb-6.25 px-2.5 py-2 rounded-[5px] relative",
+              "w-full mt-2.5 mb-6.25 px-2.5 py-2 rounded-[5px] relative shrink-0",
               colapsado ? "h-auto py-2 px-0" : "h-30",
             ].join(" ")}
           >
@@ -170,7 +170,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
           <nav
             className={[
               "flex flex-col gap-2 border-t border-white pt-2.5 px-2.5",
-              "max-h-[57vh] overflow-y-auto w-full box-border",
+              "flex-1 overflow-y-auto w-full box-border", // ← flex-1 reemplaza max-h-[57vh]
               "[&::-webkit-scrollbar]:w-1.5",
               "[&::-webkit-scrollbar-thumb]:bg-white [&::-webkit-scrollbar-thumb]:rounded-[20px]",
               colapsado ? "items-center px-0" : "items-start",

@@ -1,3 +1,7 @@
+// Creado por Diego Castro
+// Pantalla que permite al usuario establecer una nueva contraseña
+// a partir de un enlace de recuperación enviado por correo.
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -16,9 +20,9 @@ interface UsuarioRecuperacion {
 }
 
 export default function CambiarContrasena() {
+  // Obtiene parámetros del enlace (id y token)
   const searchParams = useSearchParams();
   const route = useRouter();
-
   const id = searchParams.get("id");
   const token = searchParams.get("token");
 
@@ -37,6 +41,7 @@ export default function CambiarContrasena() {
   const [mostrarNewContras, setMostrarNewContras] = useState(false);
   const [mostrarConfirmContras, setMostrarConfirmContras] = useState(false);
 
+  // Validación inicial del enlace (token + id)
   useEffect(() => {
     if (!id || !token) {
       setErrorServidor("Link inválido o expirado");
@@ -57,6 +62,7 @@ export default function CambiarContrasena() {
       .finally(() => setValidandoLink(false));
   }, [id, token]);
 
+  // Funcion para manejar cambios
   const handleOnChangeNew = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setNewContrasena(value);
@@ -69,6 +75,7 @@ export default function CambiarContrasena() {
     }
   };
 
+  // Validar contraseña
   const validationNewContra = () => {
     const result =
       nuevaContrasenaSchema.shape.contrasena.safeParse(newContrasena);
@@ -82,12 +89,14 @@ export default function CambiarContrasena() {
     }
   };
 
+  // Funcion para manejar cambios
   const handleOnChangeConfirm = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setConfirmContrasena(value);
     if (!esValidoConfirmContras) setesValidoConfirmContras(true);
   };
 
+  // Validar que los 2 campos tengan exactamente la misma contraseña
   const compararContrasenas = (nueva: string, confirmacion: string) => {
     if (confirmacion && nueva !== confirmacion) {
       setesValidoConfirmContras(false);
@@ -99,6 +108,7 @@ export default function CambiarContrasena() {
     return true;
   };
 
+  // Validar el campo de confirmar contraseña
   const validationConfirmContra = () => {
     const result =
       nuevaContrasenaSchema.shape.contrasena.safeParse(confirmContrasena);
@@ -112,6 +122,8 @@ export default function CambiarContrasena() {
     compararContrasenas(newContrasena, confirmContrasena);
   };
 
+  // Envío del formulario: guarda contraseña
+  // Si todo sale bien, muestra un mensaje y redirige al login.
   const handlerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");

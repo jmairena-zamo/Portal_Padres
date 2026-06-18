@@ -1,3 +1,8 @@
+// Creado por Diego Castro
+// Layout del portal
+// Se encarga de mostrar la barra lateral, la barra superior y el contenido,
+// además de manejar el modal de suplantación para administradores.
+
 "use client";
 
 import "@/app/globals.css";
@@ -15,16 +20,19 @@ export default function AppLayout({
   const [loading, setLoading] = useState(true);
   const [colapsado, setColapsado] = useState(false);
 
+  // Al cargar, se consulta la sesión del usuario
+  // Si el rol corresponde a administrador (idRol = 2), se muestra el modal
   useEffect(() => {
     fetch("/api/auth/session")
       .then((res) => res.json())
       .then((data) => {
-        if (data?.iD_Rol === 2) setShowModal(true); //si el id del usuario es el id de administradr muestra el modal de alumnos
+        if (data?.iD_Rol === 2) setShowModal(true);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
+  // Mientras se valida la sesión, se muestra pantalla de carga
   if (loading) return <Loading />;
 
   return (
@@ -46,7 +54,10 @@ export default function AppLayout({
               "max-[800px]:ml-0",
             ].join(" ")}
           >
-            <Navbar colapsado={colapsado} />
+            <Navbar
+              colapsado={colapsado}
+              onSuplantar={() => setShowModal(true)}
+            />
 
             {/* content */}
             <div className="w-full p-2.5 box-border max-[800px]:px-3.75 max-[420px]:p-2.5">

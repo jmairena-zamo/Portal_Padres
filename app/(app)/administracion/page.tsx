@@ -1122,7 +1122,7 @@ export default function Administracion() {
                         >
                           <BtnOutline onClick={() => abrirPermisos(sub)}>
                             {
-                              menu.rolesAsignados.filter(
+                              sub.rolesAsignados.filter(
                                 (r) => r.habilitado === 1,
                               ).length
                             }{" "}

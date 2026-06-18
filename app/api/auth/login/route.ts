@@ -21,7 +21,7 @@ const MAX_INTENTOS = 3;
 const VENTANA_MS = 1 * 60 * 1000;
 
 // Conteo de intentos fallidos en memoria por correo.
-// Solo se usa para contar — la fuente de verdad del bloqueo es el campo habilitado en BD.
+// Solo se usa para contar
 // Se reinicia al hacer login exitoso o al bloquear la cuenta.
 interface RegistroIntentos {
   cantidad: number;

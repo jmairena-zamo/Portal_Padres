@@ -22,6 +22,7 @@ export default function RecuperarContrasena() {
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
 
+  // Funcion para manejar los cambios
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCorreo(value);
@@ -30,11 +31,13 @@ export default function RecuperarContrasena() {
     }
   };
 
+  // Validar el correo
   const validationCorreo = () => {
     const result = loginSchema.shape.correo.safeParse(correo);
     setEsValidoCorreo(result.success);
   };
 
+  // Enviar correo
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCargando(true);

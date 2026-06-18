@@ -1,3 +1,6 @@
+// Creado por Diego Castro
+// Pagina de historial academico
+
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
@@ -15,11 +18,12 @@ interface FilaHistorial {
   nota: string;
 }
 
+// Mapear los datos que vienen de la respuesta
 function mapearCurso(curso: CursoHistorial): FilaHistorial {
   return {
     id: curso.id,
     anio: curso.term.slice(0, 4),
-    periodo: curso.termDescription,
+    periodo: curso.termDescription.replace("C", ""), //eliminar la C de cuatrimestre
     clase: curso.courseLongTitle,
     seccion: curso.courseReferenceNumber,
     codigo: curso.activityAcademic,
@@ -38,6 +42,7 @@ export default function HistorialAcademico() {
     cargarDatos();
   }, []);
 
+  // Obtener datos y mapearlos
   const cargarDatos = async () => {
     setCargando(true);
     try {
@@ -83,12 +88,15 @@ export default function HistorialAcademico() {
             <Tabla
               datos={datosPaginados}
               keyExtractor={(item) => item.id}
+              claseFilaExtra={(item) =>
+                parseFloat(item.nota) < 70 ? "bg-red-200" : ""
+              }
               columnas={[
+                { header: "Código", accessor: "codigo" },
                 { header: "Nombre Materia", accessor: "clase" },
                 { header: "Año", accessor: "anio" },
                 { header: "Periodo", accessor: "periodo" },
                 // { header: "Sección", accessor: "seccion" },
-                { header: "Código", accessor: "codigo" },
                 { header: "Nota Final", accessor: "nota" },
               ]}
             />

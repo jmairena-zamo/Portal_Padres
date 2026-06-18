@@ -72,21 +72,6 @@ export default function ResumenEstudiante() {
 
         {/* graphics */}
         <div className="flex flex-wrap justify-center gap-4 flex-[2_1_400px] max-[800px]:flex-[1_1_auto]">
-          {/* porcentaje carrera */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%]">
-            <h3>PORCENTAJE CARRERA</h3>
-            <hr />
-            <div className="w-full h-3.75 bg-[#e5e7eb] rounded-[10px] overflow-hidden mt-8.75">
-              <div
-                className="h-full bg-[#008237] rounded-[10px] transition-[width] duration-400 ease-in-out"
-                style={{ width: `${porcentaje}%` }}
-              />
-            </div>
-            <span className="text-[12px] text-[#555] mt-1 block text-center">
-              {porcentaje}%
-            </span>
-          </div>
-
           {/* promedio global */}
           <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%]">
             <h3>PROMEDIO GLOBAL</h3>
@@ -134,10 +119,24 @@ export default function ResumenEstudiante() {
                 data={data}
               >
                 <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
+                <RadialBar dataKey="value" cornerRadius={10} fill="#FFD200" />
               </RadialBarChart>
               <span className="font-bold text-[25px]">{promedio}%</span>
             </div>
+          </div>
+          {/* porcentaje carrera */}
+          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%]">
+            <h3>PORCENTAJE CARRERA</h3>
+            <hr />
+            <div className="w-full h-3.75 bg-[#e5e7eb] rounded-[10px] overflow-hidden mt-8.75">
+              <div
+                className="h-full bg-[#008237] rounded-[10px] transition-[width] duration-400 ease-in-out"
+                style={{ width: `${porcentaje}%` }}
+              />
+            </div>
+            <span className="text-[12px] text-[#555] mt-1 block text-center">
+              {porcentaje}%
+            </span>
           </div>
         </div>
       </div>
