@@ -11,6 +11,12 @@ import { Input } from "./Input";
 import { SpanError } from "./SpanError";
 import { ToggleSwitch } from "./ToggleSwitch";
 import { TextArea } from "./TextArea";
+import {
+  Decanatura,
+  ClaseAprenderHaciendo,
+  TecnologiasInformacion,
+} from "./CapsulasInformativas";
+import CardCausal from "./CardCausal";
 
 export {
   BtnPrimario,
@@ -29,4 +35,8 @@ export {
   SpanError,
   ToggleSwitch,
   TextArea,
+  Decanatura,
+  ClaseAprenderHaciendo,
+  TecnologiasInformacion,
+  CardCausal,
 };

@@ -7,8 +7,16 @@ import {
   FaExclamationCircle,
   FaExclamation,
   FaClock,
+  FaChevronDown,
 } from "react-icons/fa";
 import { RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
+import {
+  BtnTab,
+  CardCausal,
+  ClaseAprenderHaciendo,
+  Decanatura,
+  TecnologiasInformacion,
+} from "@/app/components/ui";
 
 export default function ResumenEstudiante() {
   const [estudiante, setEstudiante] = useState({
@@ -22,6 +30,10 @@ export default function ResumenEstudiante() {
   const promedio = 88.88;
   const horasClinica = 10;
   const [foto, setFoto] = useState<string | null>(null);
+  const [mostrarCapsulas, setMostrarCapsulas] = useState(false);
+  const [tabActiva, setTabActiva] = useState<
+    "decanatura" | "clases" | "tecnologias"
+  >("decanatura");
 
   const data = [{ id: 1, name: "promedio", value: promedio }];
 
@@ -45,7 +57,9 @@ export default function ResumenEstudiante() {
       <div className="flex flex-wrap gap-4 w-full max-[800px]:flex-col">
         {/* card info estudiante */}
         <div className="flex-[1_1_300px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center">INFORMACIÓN ESTUDIANTE</h3>
+          <h3 className="text-center font-semibold text-[#374151]">
+            INFORMACIÓN ESTUDIANTE
+          </h3>
           <hr />
           <br />
           <div className="flex justify-center">
@@ -73,70 +87,87 @@ export default function ResumenEstudiante() {
         {/* graphics */}
         <div className="flex flex-wrap justify-center gap-4 flex-[2_1_400px] max-[800px]:flex-[1_1_auto]">
           {/* promedio global */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%]">
-            <h3>PROMEDIO GLOBAL</h3>
-            <hr />
-            <div className="flex items-center gap-3.75 max-[420px]:justify-center">
+          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+            <h3 className="text-[14px] font-semibold text-[#374151]">
+              PROMEDIO GLOBAL
+            </h3>
+            <hr className="my-2" />
+            <div className="flex-1 flex items-center justify-center gap-3">
               <RadialBarChart
-                width={120}
-                height={100}
+                width={100}
+                height={90}
                 cx="50%"
                 cy="50%"
                 innerRadius="70%"
                 outerRadius="100%"
-                barSize={10}
+                barSize={9}
                 data={data}
               >
                 <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
                 <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
               </RadialBarChart>
-              <span className="font-bold text-[25px]">{promedio}%</span>
+              <span className="font-bold text-[24px] text-[#008237]">
+                {promedio}%
+              </span>
             </div>
           </div>
 
           {/* horas clínica */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%]">
-            <h3>HORAS EN CLINICA</h3>
-            <hr />
-            <p className="font-bold text-[40px] mt-3.75 max-[420px]:text-[30px]">
-              {horasClinica}
-            </p>
+          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+            <h3 className="text-[14px] font-semibold text-[#374151]">
+              HORAS EN CLÍNICA
+            </h3>
+            <hr className="my-2" />
+            <div className="flex-1 flex items-center justify-center">
+              <p className="font-bold text-[38px] text-[#2563eb]">
+                {horasClinica}
+              </p>
+            </div>
           </div>
 
           {/* último periodo */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%]">
-            <h3>ÚLTIMO PERIODO</h3>
-            <hr />
-            <div className="flex items-center gap-3.75 max-[420px]:justify-center">
+          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+            <h3 className="text-[14px] font-semibold text-[#374151]">
+              ÚLTIMO PERIODO
+            </h3>
+            <hr className="my-2" />
+            <div className="flex-1 flex items-center justify-center gap-3">
               <RadialBarChart
-                width={120}
-                height={100}
+                width={100}
+                height={90}
                 cx="50%"
                 cy="50%"
                 innerRadius="70%"
                 outerRadius="100%"
-                barSize={10}
+                barSize={9}
                 data={data}
               >
                 <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
                 <RadialBar dataKey="value" cornerRadius={10} fill="#FFD200" />
               </RadialBarChart>
-              <span className="font-bold text-[25px]">{promedio}%</span>
+              <span className="font-bold text-[24px] text-[#ca8a04]">
+                {promedio}%
+              </span>
             </div>
           </div>
+
           {/* porcentaje carrera */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%]">
-            <h3>PORCENTAJE CARRERA</h3>
-            <hr />
-            <div className="w-full h-3.75 bg-[#e5e7eb] rounded-[10px] overflow-hidden mt-8.75">
-              <div
-                className="h-full bg-[#008237] rounded-[10px] transition-[width] duration-400 ease-in-out"
-                style={{ width: `${porcentaje}%` }}
-              />
+          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+            <h3 className="text-[14px] font-semibold text-[#374151]">
+              PORCENTAJE CARRERA
+            </h3>
+            <hr className="my-2" />
+            <div className="flex-1 flex flex-col items-center justify-center gap-2 px-2">
+              <div className="w-full h-3 bg-[#e5e7eb] rounded-[10px] overflow-hidden">
+                <div
+                  className="h-full bg-[#008237] rounded-[10px] transition-[width] duration-400 ease-in-out"
+                  style={{ width: `${porcentaje}%` }}
+                />
+              </div>
+              <span className="text-[20px] font-bold text-[#008237]">
+                {porcentaje}%
+              </span>
             </div>
-            <span className="text-[12px] text-[#555] mt-1 block text-center">
-              {porcentaje}%
-            </span>
           </div>
         </div>
       </div>
@@ -145,45 +176,131 @@ export default function ResumenEstudiante() {
       <div className="flex flex-wrap gap-4 w-full max-[420px]:flex-col">
         {/* causales de sanción */}
         <div className="flex-[1_1_300px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center">CAUSALES DE SANCIÓN</h3>
+          <h3 className="text-center font-semibold text-[#374151]">
+            CAUSALES DE SANCIÓN
+          </h3>
           <hr />
-          <div className="mt-3 flex gap-17.5 text-[13px] max-[800px]:gap-7.5 max-[420px]:flex-col max-[420px]:gap-2.5">
-            <div className="flex flex-col gap-3.75">
-              <p className="flex items-center gap-2.5">
-                <FaExclamationTriangle /> FALTAS TOTALES:
-              </p>
-              <p className="flex items-center gap-2.5">
-                <FaExclamationCircle /> FALTAS DEL AÑO ACTUAL:
-              </p>
-            </div>
-            <div className="flex flex-col gap-3.75">
-              <p className="flex items-center gap-2.5">
-                <FaExclamation /> FALTAS DEL PERIODO:
-              </p>
-              <p className="flex items-center gap-2.5">
-                <FaClock /> FALTAS EN PROCESO:
-              </p>
-            </div>
+          <div className="grid grid-cols-2 gap-3 mt-4 max-[420px]:grid-cols-1">
+            <CardCausal
+              icono={FaExclamationTriangle}
+              color="#dc2626"
+              label="FALTAS TOTALES:"
+              valor={12}
+            />
+            <CardCausal
+              icono={FaExclamationCircle}
+              color="#ea580c"
+              label="FALTAS DEL AÑO ACTUAL:"
+              valor={12}
+            />
+            <CardCausal
+              icono={FaExclamation}
+              color="#ca8a04"
+              label="FALTAS DEL PERIODO:"
+              valor={12}
+            />
+            <CardCausal
+              icono={FaClock}
+              color="#2563eb"
+              label="FALTAS EN PROCESO:"
+              valor={12}
+            />
           </div>
         </div>
 
         {/* stats */}
-        <div className="flex-[1_1_250px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center">
-            AÑO {new Date().getFullYear()}, PERIODO 1
+        <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+          <h3 className="text-center font-semibold text-[#374151]">
+            DATOS ACADÉMICOS AL ÚLTIMO PERIODO
           </h3>
           <hr />
-          <div className="mt-3 flex gap-7.5 justify-center text-[13px] max-[420px]:flex-col max-[420px]:gap-3.75">
-            <div className="bg-white shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] p-2.5 rounded-[5px] text-center">
-              <p className="text-[13px]">ACTIVIDADES ACADEMICAS</p>
-              <p className="text-[13px]">5</p>
+
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
+              <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
+                POSICIÓN CLASE
+              </p>
+              <p className="text-[15px] font-bold text-[#374151] mt-1">
+                238/275
+              </p>
             </div>
-            <div className="bg-white shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] p-2.5 rounded-[5px] text-center">
-              <p className="text-[13px]">TOTAL NOTAS MIGRADAS</p>
-              <p className="text-[13px]">0/5</p>
+            <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
+              <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
+                POSICIÓN CARRERA
+              </p>
+              <p className="text-[15px] font-bold text-[#374151] mt-1">35/40</p>
+            </div>
+            <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
+              <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
+                POSICIÓN PAÍS
+              </p>
+              <p className="text-[15px] font-bold text-[#374151] mt-1">34/36</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 mt-3">
+            <div className="flex items-center justify-between text-[13px] px-1">
+              <span>CAT. DISCIPLINARIA PERIODO</span>
+              <span className="font-bold text-[11px] px-2 py-0.5 rounded-full">
+                EXCELENTE
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[13px] px-1">
+              <span>CAT. DISCIPLINARIA HISTÓRICA</span>
+              <span className="font-bold text-[11px] px-2 py-0.5 rounded-full">
+                REGULAR
+              </span>
             </div>
           </div>
         </div>
+      </div>
+      {/* fila 3 */}
+      <div className="bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+        <button
+          onClick={() => setMostrarCapsulas((prev) => !prev)}
+          className="w-full flex items-center justify-between cursor-pointer"
+        >
+          <h3 className="text-left font-semibold text-[#374151]">
+            CÁPSULAS INFORMATIVAS
+          </h3>
+          <FaChevronDown
+            className={`text-[#6b7280] transition-transform duration-300 ${
+              mostrarCapsulas ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+        <hr className="mt-2" />
+
+        {mostrarCapsulas && (
+          <>
+            <div className="flex gap-2.5 border-b border-gray-200 mt-5 max-[420px]:flex-wrap">
+              <BtnTab
+                activa={tabActiva === "decanatura"}
+                onClick={() => setTabActiva("decanatura")}
+              >
+                DECANATURA ACÁDEMICA
+              </BtnTab>
+              <BtnTab
+                activa={tabActiva === "clases"}
+                onClick={() => setTabActiva("clases")}
+              >
+                CLASES Y APRENDER HACIENDO
+              </BtnTab>
+              <BtnTab
+                activa={tabActiva === "tecnologias"}
+                onClick={() => setTabActiva("tecnologias")}
+              >
+                TECNOLOGÍAS DE INFORMACIÓN
+              </BtnTab>
+            </div>
+
+            <div className="mt-4">
+              {tabActiva === "decanatura" && <Decanatura />}
+              {tabActiva === "clases" && <ClaseAprenderHaciendo />}
+              {tabActiva === "tecnologias" && <TecnologiasInformacion />}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
