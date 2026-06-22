@@ -1,3 +1,6 @@
+// Creado por Diego Castro
+// Dashboard que muestra información general del estudiante
+
 "use client";
 import Image from "next/image";
 import user from "../../img/logo-user.png";
@@ -30,13 +33,15 @@ export default function ResumenEstudiante() {
   const promedio = 88.88;
   const horasClinica = 10;
   const [foto, setFoto] = useState<string | null>(null);
-  const [mostrarCapsulas, setMostrarCapsulas] = useState(false);
-  const [tabActiva, setTabActiva] = useState<
-    "decanatura" | "clases" | "tecnologias"
-  >("decanatura");
+
+  // Constantes para capsulas informativas
+  const [decanatura, setDecanatura] = useState<boolean>(false);
+  const [claseAH, setClaseAH] = useState<boolean>(false);
+  const [tecnologias, setTecnologias] = useState<boolean>(false);
 
   const data = [{ id: 1, name: "promedio", value: promedio }];
 
+  // Carga la fotografia del estudiante
   useEffect(() => {
     const cargarFoto = async () => {
       try {
@@ -49,7 +54,7 @@ export default function ResumenEstudiante() {
       }
     };
     cargarFoto();
-  });
+  }, []);
 
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
@@ -57,9 +62,7 @@ export default function ResumenEstudiante() {
       <div className="flex flex-wrap gap-4 w-full max-[800px]:flex-col">
         {/* card info estudiante */}
         <div className="flex-[1_1_300px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center font-semibold text-[#374151]">
-            INFORMACIÓN ESTUDIANTE
-          </h3>
+          <h3 className="text-center font-semibold">INFORMACIÓN ESTUDIANTE</h3>
           <hr />
           <br />
           <div className="flex justify-center">
@@ -88,9 +91,7 @@ export default function ResumenEstudiante() {
         <div className="flex flex-wrap justify-center gap-4 flex-[2_1_400px] max-[800px]:flex-[1_1_auto]">
           {/* promedio global */}
           <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3 className="text-[14px] font-semibold text-[#374151]">
-              PROMEDIO GLOBAL
-            </h3>
+            <h3 className="text-[14px] font-semibold">PROMEDIO GLOBAL</h3>
             <hr className="my-2" />
             <div className="flex-1 flex items-center justify-center gap-3">
               <RadialBarChart
@@ -114,7 +115,10 @@ export default function ResumenEstudiante() {
 
           {/* horas clínica */}
           <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3 className="text-[14px] font-semibold text-[#374151]">
+            <h3
+              className="text-[14px] font-semibold 
+            "
+            >
               HORAS EN CLÍNICA
             </h3>
             <hr className="my-2" />
@@ -127,9 +131,7 @@ export default function ResumenEstudiante() {
 
           {/* último periodo */}
           <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3 className="text-[14px] font-semibold text-[#374151]">
-              ÚLTIMO PERIODO
-            </h3>
+            <h3 className="text-[14px] font-semibold">ÚLTIMO PERIODO</h3>
             <hr className="my-2" />
             <div className="flex-1 flex items-center justify-center gap-3">
               <RadialBarChart
@@ -153,9 +155,7 @@ export default function ResumenEstudiante() {
 
           {/* porcentaje carrera */}
           <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3 className="text-[14px] font-semibold text-[#374151]">
-              PORCENTAJE CARRERA
-            </h3>
+            <h3 className="text-[14px] font-semibold">PORCENTAJE CARRERA</h3>
             <hr className="my-2" />
             <div className="flex-1 flex flex-col items-center justify-center gap-2 px-2">
               <div className="w-full h-3 bg-[#e5e7eb] rounded-[10px] overflow-hidden">
@@ -176,9 +176,7 @@ export default function ResumenEstudiante() {
       <div className="flex flex-wrap gap-4 w-full max-[420px]:flex-col">
         {/* causales de sanción */}
         <div className="flex-[1_1_300px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center font-semibold text-[#374151]">
-            CAUSALES DE SANCIÓN
-          </h3>
+          <h3 className="text-center font-semibold">CAUSALES DE SANCIÓN</h3>
           <hr />
           <div className="grid grid-cols-2 gap-3 mt-4 max-[420px]:grid-cols-1">
             <CardCausal
@@ -210,7 +208,7 @@ export default function ResumenEstudiante() {
 
         {/* stats */}
         <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center font-semibold text-[#374151]">
+          <h3 className="text-center font-semibold ">
             DATOS ACADÉMICOS AL ÚLTIMO PERIODO
           </h3>
           <hr />
@@ -220,21 +218,19 @@ export default function ResumenEstudiante() {
               <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
                 POSICIÓN CLASE
               </p>
-              <p className="text-[15px] font-bold text-[#374151] mt-1">
-                238/275
-              </p>
+              <p className="text-[15px] font-bold mt-1">238/275</p>
             </div>
             <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
               <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
                 POSICIÓN CARRERA
               </p>
-              <p className="text-[15px] font-bold text-[#374151] mt-1">35/40</p>
+              <p className="text-[15px] font-bold mt-1">35/40</p>
             </div>
             <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
               <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
                 POSICIÓN PAÍS
               </p>
-              <p className="text-[15px] font-bold text-[#374151] mt-1">34/36</p>
+              <p className="text-[15px] font-bold mt-1">34/36</p>
             </div>
           </div>
 
@@ -256,51 +252,71 @@ export default function ResumenEstudiante() {
       </div>
       {/* fila 3 */}
       <div className="bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-        <button
-          onClick={() => setMostrarCapsulas((prev) => !prev)}
-          className="w-full flex items-center justify-between cursor-pointer"
-        >
-          <h3 className="text-left font-semibold text-[#374151]">
-            CÁPSULAS INFORMATIVAS
-          </h3>
-          <FaChevronDown
+        <h3 className="text-center font-semibold">CÁPSULAS INFORMATIVAS</h3>
+        {/* <FaChevronDown
             className={`text-[#6b7280] transition-transform duration-300 ${
               mostrarCapsulas ? "rotate-180" : ""
             }`}
-          />
-        </button>
+          /> */}
         <hr className="mt-2" />
 
-        {mostrarCapsulas && (
-          <>
-            <div className="flex gap-2.5 border-b border-gray-200 mt-5 max-[420px]:flex-wrap">
-              <BtnTab
-                activa={tabActiva === "decanatura"}
-                onClick={() => setTabActiva("decanatura")}
-              >
-                DECANATURA ACÁDEMICA
-              </BtnTab>
-              <BtnTab
-                activa={tabActiva === "clases"}
-                onClick={() => setTabActiva("clases")}
-              >
-                CLASES Y APRENDER HACIENDO
-              </BtnTab>
-              <BtnTab
-                activa={tabActiva === "tecnologias"}
-                onClick={() => setTabActiva("tecnologias")}
-              >
-                TECNOLOGÍAS DE INFORMACIÓN
-              </BtnTab>
-            </div>
+        <div className="flex flex-col border-b border-gray-200 mt-5 max-[420px]:flex-wrap">
+          <div className="mb-3">
+            <button
+              className="bg-[#008237] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 "
+              onClick={() => setDecanatura(!decanatura)}
+            >
+              <FaChevronDown
+                className={`text-[white] transition-transform duration-300 ${
+                  decanatura ? "rotate-180" : ""
+                }`}
+              />
+              DECANATURA ACÁDEMICA
+            </button>
+            {decanatura && (
+              <div className="border border-[#008237] rounded-b-[5px]">
+                <Decanatura />
+              </div>
+            )}
+          </div>
+          <div className="mb-3">
+            <button
+              className="bg-[#dc2626] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3"
+              onClick={() => setClaseAH(!claseAH)}
+            >
+              <FaChevronDown
+                className={`text-[white] transition-transform duration-300 ${
+                  claseAH ? "rotate-180" : ""
+                }`}
+              />
+              CLASES Y APRENDER HACIENDO
+            </button>
+            {claseAH && (
+              <div className="border border-[#dc2626] rounded-b-[5px]">
+                <ClaseAprenderHaciendo />
+              </div>
+            )}
+          </div>
 
-            <div className="mt-4">
-              {tabActiva === "decanatura" && <Decanatura />}
-              {tabActiva === "clases" && <ClaseAprenderHaciendo />}
-              {tabActiva === "tecnologias" && <TecnologiasInformacion />}
-            </div>
-          </>
-        )}
+          <div>
+            <button
+              className="bg-[#2563eb] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3"
+              onClick={() => setTecnologias(!tecnologias)}
+            >
+              <FaChevronDown
+                className={`text-[white] transition-transform duration-300 ${
+                  tecnologias ? "rotate-180" : ""
+                }`}
+              />
+              TECNOLOGÍAS DE INFORMACIÓN
+            </button>
+            {tecnologias && (
+              <div className="border border-[#2563eb] rounded-b-[5px]">
+                <TecnologiasInformacion />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

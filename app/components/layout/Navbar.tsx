@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { BtnPrimario } from "../ui";
+import { useRol } from "@/app/hooks/useRol";
 
 // Simulación — reemplaza con tus datos reales
 const hijos = [
@@ -21,26 +22,28 @@ const hijos = [
 interface Props {
   colapsado: boolean;
   onSuplantar?: () => void;
+  onSeleccionar: (estudiante: { id: number; nombre: string }) => void;
+  hijoActivo: { id: number; nombre: string } | null;
+  hijos: { id: number; nombre: string }[];
 }
 
-export const Navbar = ({ colapsado, onSuplantar }: Props) => {
-  const tieneVariosHijos = hijos.length > 1;
+export const Navbar = ({
+  colapsado,
+  onSuplantar,
+  hijoActivo,
+  onSeleccionar,
+}: Props) => {
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
-  const [hijoActivo, setHijoActivo] = useState(hijos[0]);
   const ref = useRef<HTMLDivElement>(null);
   const [foto, setFoto] = useState<string | null>(null);
-  const [showBoton, setShowBoton] = useState<boolean>(false);
+  const { rol, loading } = useRol();
+  const esAdmin = rol === 2;
+  const tieneVariosHijos = !esAdmin && hijos.length > 1;
 
   // Cierra el dropdown al hacer clic fuera
   useEffect(() => {
     const cargarFoto = async () => {
       try {
-        const resSesion = await fetch("/api/auth/session");
-        const dataSesion = await resSesion.json();
-        if (dataSesion?.iD_Rol === 2) {
-          setShowBoton(true);
-        }
-
         const resFoto = await fetch("/api/estudiantes/obtenerFoto");
         const dataFoto = await resFoto.json();
         setFoto(dataFoto.foto ?? null);
@@ -57,10 +60,10 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [hijoActivo, showBoton]);
+  }, [hijoActivo]);
 
   const seleccionarHijo = (hijo: (typeof hijos)[0]) => {
-    setHijoActivo(hijo);
+    onSeleccionar(hijo);
     setDropdownAbierto(false);
   };
 
@@ -87,25 +90,32 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
         {/* Derecha: selector de hijo + avatar */}
         <nav className="flex justify-between items-center gap-5 mr-10 max-[800px]:mr-2.5">
           <div className="relative flex gap-3.75" ref={ref}>
-            {showBoton && (
+            {esAdmin && (
               <div className="flex justify-center items-center mr-9">
                 <BtnPrimario onClick={onSuplantar}>Suplantar</BtnPrimario>
               </div>
             )}
 
             {/* Botón nombre + chevron — oculto en <420px */}
-            {tieneVariosHijos && (
+            {hijoActivo && (
               <button
                 onClick={() => setDropdownAbierto((prev) => !prev)}
-                className="bg-transparent border-none cursor-pointer font-bold flex items-center gap-1.5 max-[420px]:hidden"
+                className={[
+                  "bg-transparent border-none font-bold flex items-center gap-1.5 max-[420px]:hidden",
+                  tieneVariosHijos && "cursor-pointer",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
-                <FaChevronDown
-                  size={12}
-                  className={[
-                    "mr-1.5 transition-transform duration-200",
-                    dropdownAbierto ? "rotate-180" : "rotate-0",
-                  ].join(" ")}
-                />
+                {tieneVariosHijos && (
+                  <FaChevronDown
+                    size={12}
+                    className={[
+                      "mr-1.5 transition-transform duration-200",
+                      dropdownAbierto ? "rotate-180" : "rotate-0",
+                    ].join(" ")}
+                  />
+                )}
                 <span>{hijoActivo.nombre}</span>
               </button>
             )}
@@ -124,12 +134,14 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
                 .filter(Boolean)
                 .join(" ")}
               onClick={() =>
-                tieneVariosHijos && setDropdownAbierto((prev) => !prev)
+                !esAdmin &&
+                tieneVariosHijos &&
+                setDropdownAbierto((prev) => !prev)
               }
             />
 
             {/* Dropdown */}
-            {tieneVariosHijos && dropdownAbierto && (
+            {!esAdmin && tieneVariosHijos && dropdownAbierto && (
               <ul
                 className="
                                 absolute top-[calc(100%+8px)] right-0 z-100
@@ -145,7 +157,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
                     className={[
                       "px-4 py-2.5 cursor-pointer text-[0.9rem] text-[#374151]",
                       "transition-colors duration-150 hover:bg-[#f3f4f6]",
-                      hijo.id === hijoActivo.id &&
+                      hijoActivo?.id === hijo.id &&
                         "font-semibold text-[#005221]",
                     ]
                       .filter(Boolean)

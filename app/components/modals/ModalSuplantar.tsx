@@ -12,9 +12,10 @@ import { registrarIngreso } from "@/app/services/registrarIngreso";
 //Cerrar el modal luego de seleccinar estudiante
 interface ModalProps {
   OnClose: () => void;
+  onSeleccionar: (estudiante: { id: number; nombre: string }) => void;
 }
 
-export default function ModalSuplantar({ OnClose }: ModalProps) {
+export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
   //Array temporal de estudiantes
   const estudiantesIniciales = [
     { id: 1, nombre: "Diego Sebastian", apellido: "Castro Lagos" },
@@ -33,13 +34,16 @@ export default function ModalSuplantar({ OnClose }: ModalProps) {
     useState(estudiantesIniciales);
 
   //registra el ingreso con el bannerID del estudiante
-  const seleccionarEstudiante = async (bannerID: Number) => {
+  const seleccionarEstudiante = async (estudiante: {
+    id: number;
+    nombre: string;
+  }) => {
     await fetch("/api/auth/seleccionarEstudiante", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bannerID: bannerID }), // reemplaza con el real cuando tengas los datos
+      body: JSON.stringify({ bannerID: estudiante.id }), // reemplaza con el real cuando tengas los datos
     });
-
+    onSeleccionar(estudiante);
     OnClose();
   };
 
@@ -103,7 +107,7 @@ export default function ModalSuplantar({ OnClose }: ModalProps) {
               </div>
 
               {/* botón */}
-              <BtnPrimario onClick={() => seleccionarEstudiante(u.id)}>
+              <BtnPrimario onClick={() => seleccionarEstudiante(u)}>
                 Ver
               </BtnPrimario>
             </div>

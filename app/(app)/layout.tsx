@@ -11,33 +11,53 @@ import { Sidebar } from "../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import ModalSuplantar from "../components/modals/ModalSuplantar";
 import { MenuProvider } from "../hooks/useMenu";
-import Loading from "../components/ui/Loading";
+import { Loading } from "../components/ui";
+import { useRol } from "../hooks/useRol";
 
 export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [colapsado, setColapsado] = useState(false);
+  const [hijoActivo, setHijoActivo] = useState<{
+    id: number;
+    nombre: string;
+  } | null>(null);
+  const [hijos, setHijos] = useState<{ id: number; nombre: string }[]>([]);
+  const { rol, loading } = useRol();
+  const esAdmin = rol === 2;
 
   // Al cargar, se consulta la sesión del usuario
   // Si el rol corresponde a administrador (idRol = 2), se muestra el modal
   useEffect(() => {
-    fetch("/api/auth/session")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.iD_Rol === 2) setShowModal(true);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    esAdmin && setShowModal(true);
+    if (!esAdmin) {
+      const hijosTemp = [
+        { id: 1, nombre: "Carlos Martínez" },
+        { id: 2, nombre: "Sofía Martínez" },
+        { id: 3, nombre: "Luis Martínez" },
+      ];
+
+      setHijos(hijosTemp);
+      setHijoActivo(hijosTemp[0]);
+    }
+  }, [esAdmin]);
 
   // Mientras se valida la sesión, se muestra pantalla de carga
   if (loading) return <Loading />;
 
   return (
     <MenuProvider>
-      {showModal && <ModalSuplantar OnClose={() => setShowModal(false)} />}
+      {showModal && (
+        <ModalSuplantar
+          OnClose={() => setShowModal(false)}
+          onSeleccionar={(est) => {
+            setHijoActivo(est);
+            setShowModal(false);
+          }}
+        />
+      )}
 
       {!showModal && (
         <div className="bg-[#F6F6F6] min-h-screen">
@@ -57,6 +77,9 @@ export default function AppLayout({
             <Navbar
               colapsado={colapsado}
               onSuplantar={() => setShowModal(true)}
+              onSeleccionar={setHijoActivo}
+              hijoActivo={hijoActivo}
+              hijos={hijos}
             />
 
             {/* content */}

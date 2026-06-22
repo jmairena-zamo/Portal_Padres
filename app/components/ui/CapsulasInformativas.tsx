@@ -3,7 +3,7 @@
 
 export const Decanatura = () => (
   <div className="p-6 bg-white rounded ">
-    <h2 className="text-center text-xl font-bold mt-2 mb-10 text-[#005221]">
+    <h2 className="text-center text-xl font-bold mt-2 mb-10">
       REGULACIONES RELACIONADAS CON EL GOCE DE FINES DE SEMANA (SALIDAS Y
       REGRESO)
     </h2>
@@ -138,7 +138,7 @@ export const ClaseAprenderHaciendo = () => (
 
 export const TecnologiasInformacion = () => (
   <div className="p-6 bg-white rounded">
-    <h2 className="text-xl font-bold mt-4 mb-10 text-[#005221]">
+    <h2 className="text-xl font-bold mt-4 mb-10">
       32. SERVICIOS OFRECIDOS Y PROCEDIMIENTOS ESTABLECIDOS POR LA OFICINA DE
       TECNOLOGÍAS DE INFORMACIÓN (IT)
     </h2>
