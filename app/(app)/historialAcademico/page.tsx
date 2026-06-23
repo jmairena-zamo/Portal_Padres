@@ -89,7 +89,7 @@ export default function HistorialAcademico() {
               datos={datosPaginados}
               keyExtractor={(item) => item.id}
               claseFilaExtra={(item) =>
-                parseFloat(item.nota) < 70 ? "bg-red-200" : ""
+                parseFloat(item.nota) < 70 ? "bg-red-400" : ""
               }
               columnas={[
                 { header: "Código", accessor: "codigo" },

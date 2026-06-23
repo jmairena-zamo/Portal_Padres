@@ -11,6 +11,9 @@ import {
   FaExclamation,
   FaClock,
   FaChevronDown,
+  FaUniversity,
+  FaBookOpen,
+  FaLaptopCode,
 } from "react-icons/fa";
 import { RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import {
@@ -33,6 +36,9 @@ export default function ResumenEstudiante() {
   const promedio = 88.88;
   const horasClinica = 10;
   const [foto, setFoto] = useState<string | null>(null);
+  const [faltasTotales, setFaltasTotales] = useState<number>(0);
+  const [faltasTotalesAnio, setFaltasTotalesAnio] = useState<number>(0);
+  const [categoriaDisc, setCategoriaDisc] = useState<string>("");
 
   // Constantes para capsulas informativas
   const [decanatura, setDecanatura] = useState<boolean>(false);
@@ -43,17 +49,23 @@ export default function ResumenEstudiante() {
 
   // Carga la fotografia del estudiante
   useEffect(() => {
-    const cargarFoto = async () => {
+    const cargarData = async () => {
       try {
-        const res = await fetch("/api/estudiantes/obtenerFoto");
-        const data = await res.json();
-        setFoto(data.foto ?? null);
+        const resFoto = await fetch("/api/estudiantes/obtenerFoto");
+        const dataFoto = await resFoto.json();
+        setFoto(dataFoto.foto ?? null);
+
+        const resFaltas = await fetch("/api/estudiantes/obtenerFaltas");
+        const dataFaltas = await resFaltas.json();
+
+        setFaltasTotales(dataFaltas.Tfaltas);
+        setFaltasTotalesAnio(dataFaltas.TfaltasAnio);
+        setCategoriaDisc(dataFaltas.CATdisc);
       } catch (error) {
-        console.log("error con la foto");
         setFoto(null);
       }
     };
-    cargarFoto();
+    cargarData();
   }, []);
 
   return (
@@ -145,9 +157,9 @@ export default function ResumenEstudiante() {
                 data={data}
               >
                 <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                <RadialBar dataKey="value" cornerRadius={10} fill="#FFD200" />
+                <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
               </RadialBarChart>
-              <span className="font-bold text-[24px] text-[#ca8a04]">
+              <span className="font-bold text-[24px] text-[#008237]">
                 {promedio}%
               </span>
             </div>
@@ -177,56 +189,56 @@ export default function ResumenEstudiante() {
         {/* causales de sanción */}
         <div className="flex-[1_1_300px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
           <h3 className="text-center font-semibold">CAUSALES DE SANCIÓN</h3>
-          <hr />
+          <hr className="my-2" />
           <div className="grid grid-cols-2 gap-3 mt-4 max-[420px]:grid-cols-1">
             <CardCausal
               icono={FaExclamationTriangle}
               color="#dc2626"
               label="FALTAS TOTALES:"
-              valor={12}
+              valor={faltasTotales}
             />
             <CardCausal
               icono={FaExclamationCircle}
               color="#ea580c"
               label="FALTAS DEL AÑO ACTUAL:"
-              valor={12}
+              valor={faltasTotalesAnio}
             />
             <CardCausal
               icono={FaExclamation}
               color="#ca8a04"
               label="FALTAS DEL PERIODO:"
-              valor={12}
+              valor={0}
             />
             <CardCausal
               icono={FaClock}
               color="#2563eb"
               label="FALTAS EN PROCESO:"
-              valor={12}
+              valor={2}
             />
           </div>
         </div>
 
         {/* stats */}
-        <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center font-semibold ">
+        <div className="flex-[1_1_200px] bg-white p-4 rounded-lg shadow-md">
+          <h3 className="text-center font-semibold text-gray-800">
             DATOS ACADÉMICOS AL ÚLTIMO PERIODO
           </h3>
-          <hr />
+          <hr className="my-2" />
 
           <div className="grid grid-cols-3 gap-2 mt-4">
-            <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
+            <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
               <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
                 POSICIÓN CLASE
               </p>
               <p className="text-[15px] font-bold mt-1">238/275</p>
             </div>
-            <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
+            <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
               <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
                 POSICIÓN CARRERA
               </p>
               <p className="text-[15px] font-bold mt-1">35/40</p>
             </div>
-            <div className="text-center bg-[#f9fafb] rounded-[5px] p-2">
+            <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
               <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
                 POSICIÓN PAÍS
               </p>
@@ -234,44 +246,42 @@ export default function ResumenEstudiante() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 mt-3">
-            <div className="flex items-center justify-between text-[13px] px-1">
-              <span>CAT. DISCIPLINARIA PERIODO</span>
-              <span className="font-bold text-[11px] px-2 py-0.5 rounded-full">
-                EXCELENTE
+          {/* Categorías disciplinarias */}
+          <div className="flex flex-col justify-center mt-8">
+            <div className="flex items-center justify-between text-sm">
+              <span>CAT. DISCIPLINARIA</span>
+              <span className="font-bold text-[14px] px-2 py-0.5 rounded-full bg-green-100 text-[#008237]">
+                {categoriaDisc}
               </span>
             </div>
-            <div className="flex items-center justify-between text-[13px] px-1">
+            {/* <div className="flex items-center justify-between text-sm">
               <span>CAT. DISCIPLINARIA HISTÓRICA</span>
-              <span className="font-bold text-[11px] px-2 py-0.5 rounded-full">
+              <span className="font-bold text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
                 REGULAR
               </span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
       {/* fila 3 */}
       <div className="bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
         <h3 className="text-center font-semibold">CÁPSULAS INFORMATIVAS</h3>
-        {/* <FaChevronDown
-            className={`text-[#6b7280] transition-transform duration-300 ${
-              mostrarCapsulas ? "rotate-180" : ""
-            }`}
-          /> */}
+
         <hr className="mt-2" />
 
         <div className="flex flex-col border-b border-gray-200 mt-5 max-[420px]:flex-wrap">
           <div className="mb-3">
             <button
-              className="bg-[#008237] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 "
+              className="bg-[#008237] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setDecanatura(!decanatura)}
             >
-              <FaChevronDown
+              <FaUniversity />
+              DECANATURA ACÁDEMICA
+              {/* <FaChevronDown
                 className={`text-[white] transition-transform duration-300 ${
                   decanatura ? "rotate-180" : ""
                 }`}
-              />
-              DECANATURA ACÁDEMICA
+              /> */}
             </button>
             {decanatura && (
               <div className="border border-[#008237] rounded-b-[5px]">
@@ -281,18 +291,19 @@ export default function ResumenEstudiante() {
           </div>
           <div className="mb-3">
             <button
-              className="bg-[#dc2626] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3"
+              className="bg-blue-600 h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setClaseAH(!claseAH)}
             >
-              <FaChevronDown
+              {/* <FaChevronDown
                 className={`text-[white] transition-transform duration-300 ${
                   claseAH ? "rotate-180" : ""
                 }`}
-              />
+              /> */}
+              <FaBookOpen />
               CLASES Y APRENDER HACIENDO
             </button>
             {claseAH && (
-              <div className="border border-[#dc2626] rounded-b-[5px]">
+              <div className="border border-blue-600 rounded-b-[5px]">
                 <ClaseAprenderHaciendo />
               </div>
             )}
@@ -300,18 +311,19 @@ export default function ResumenEstudiante() {
 
           <div>
             <button
-              className="bg-[#2563eb] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3"
+              className="bg-gray-600 h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setTecnologias(!tecnologias)}
             >
-              <FaChevronDown
+              {/* <FaChevronDown
                 className={`text-[white] transition-transform duration-300 ${
                   tecnologias ? "rotate-180" : ""
                 }`}
-              />
+              /> */}
+              <FaLaptopCode />
               TECNOLOGÍAS DE INFORMACIÓN
             </button>
             {tecnologias && (
-              <div className="border border-[#2563eb] rounded-b-[5px]">
+              <div className="border border-gray-600 rounded-b-[5px]">
                 <TecnologiasInformacion />
               </div>
             )}

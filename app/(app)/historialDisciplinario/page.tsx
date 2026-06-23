@@ -4,23 +4,68 @@
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Paginacion, Tabla } from "@/app/components/ui";
+import { accionesEstudiantiles } from "@/app/respuestasAPI/faltas";
+
+interface FilaHistorialDisciplinario {
+  id: number;
+  tipo: string;
+  fecha?: string;
+  periodo?: number;
+  descripcionCorta: string;
+  descripcionDetallada: string;
+  reportadaPor?: string;
+}
+
+function mapearHistorialDisciplinario(
+  m: accionesEstudiantiles,
+  index: number,
+): FilaHistorialDisciplinario {
+  return {
+    id: index,
+    tipo: m.tipoCodigoAccion,
+    fecha: m.fechaAccion,
+    periodo: m.periodo,
+    descripcionCorta: m.descripcionTipoAccion,
+    descripcionDetallada: m.descripcionDetallada,
+    reportadaPor: m.reportadaPor,
+  };
+}
 
 export default function HistorialDisciplinario() {
   const [paginaActual, setPaginaActual] = useState(1);
   const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
   //Datos de prueba para mostrar en la tabla
-  const [data, setData] = useState([
-    { id: 1, faltas: 1, clase: "Quimica", fecha: "27/04/2026", estado: "Leve" },
-    {
-      id: 2,
-      faltas: 2,
-      clase: "Biologia",
-      fecha: "27/04/2026",
-      estado: "Grave",
-    },
-  ]);
+  // const [data, setData] = useState([
+  //   { id: 1, faltas: 1, clase: "Quimica", fecha: "27/04/2026", estado: "Leve" },
+  //   {
+  //     id: 2,
+  //     faltas: 2,
+  //     clase: "Biologia",
+  //     fecha: "27/04/2026",
+  //     estado: "Grave",
+  //   },
+  // ]);
+  const [data, setData] = useState<FilaHistorialDisciplinario[]>([]);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    const cargarData = async () => {
+      try {
+        const res = await fetch("/api/estudiantes/obtenerFaltas");
+        const data = await res.json();
+        const filas = (
+          data.AccionesEstudiantiles as accionesEstudiantiles[]
+        ).map(mapearHistorialDisciplinario);
+        setData(filas);
+      } catch (error) {
+      } finally {
+        setCargando(false);
+      }
+    };
+    cargarData();
+  }, []);
 
   const handleCambiarRegistros = (cantidad: number) => {
     setRegistrosPorPagina(cantidad);
@@ -31,8 +76,6 @@ export default function HistorialDisciplinario() {
   const indexFin = indexInicio + registrosPorPagina;
   const datosPaginados = data.slice(indexInicio, indexFin);
 
-  const fecha = new Date();
-
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
@@ -42,10 +85,12 @@ export default function HistorialDisciplinario() {
           datos={datosPaginados}
           keyExtractor={(item) => item.id}
           columnas={[
-            { header: "# Falta", accessor: "faltas" },
-            { header: "Clase", accessor: "clase" },
+            { header: "Tipo", accessor: "tipo" },
             { header: "Fecha", accessor: "fecha" },
-            { header: "Estado", accessor: "estado" },
+            { header: "Periodo", accessor: "periodo" },
+            { header: "Descripción", accessor: "descripcionCorta" },
+            { header: "Detalle", accessor: "descripcionDetallada" },
+            { header: "Reportada Por", accessor: "reportadaPor" },
           ]}
         />
         <Paginacion
