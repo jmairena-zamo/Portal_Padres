@@ -21,24 +21,24 @@ import {
   CardCausal,
   ClaseAprenderHaciendo,
   Decanatura,
+  Loading,
   TecnologiasInformacion,
 } from "@/app/components/ui";
+import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 export default function ResumenEstudiante() {
-  const [estudiante, setEstudiante] = useState({
-    Nombre: "xxxxxx",
-    Apellido: "xxxxx",
-    Codigo: "12345e",
-    Carrera: "xcxcxc",
-  });
-
   const [porcentaje, setPorcentaje] = useState(20.88);
   const promedio = 88.88;
   const horasClinica = 10;
-  const [foto, setFoto] = useState<string | null>(null);
-  const [faltasTotales, setFaltasTotales] = useState<number>(0);
-  const [faltasTotalesAnio, setFaltasTotalesAnio] = useState<number>(0);
-  const [categoriaDisc, setCategoriaDisc] = useState<string>("");
+
+  const {
+    cargando,
+    foto,
+    estudiante,
+    faltasTotales,
+    faltasTotalesAnio,
+    categoriaDisc,
+  } = useEstudiante();
 
   // Constantes para capsulas informativas
   const [decanatura, setDecanatura] = useState<boolean>(false);
@@ -47,26 +47,7 @@ export default function ResumenEstudiante() {
 
   const data = [{ id: 1, name: "promedio", value: promedio }];
 
-  // Carga la fotografia del estudiante
-  useEffect(() => {
-    const cargarData = async () => {
-      try {
-        const resFoto = await fetch("/api/estudiantes/obtenerFoto");
-        const dataFoto = await resFoto.json();
-        setFoto(dataFoto.foto ?? null);
-
-        const resFaltas = await fetch("/api/estudiantes/obtenerFaltas");
-        const dataFaltas = await resFaltas.json();
-
-        setFaltasTotales(dataFaltas.Tfaltas);
-        setFaltasTotalesAnio(dataFaltas.TfaltasAnio);
-        setCategoriaDisc(dataFaltas.CATdisc);
-      } catch (error) {
-        setFoto(null);
-      }
-    };
-    cargarData();
-  }, []);
+  if (cargando) return <Loading />;
 
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
@@ -92,11 +73,9 @@ export default function ResumenEstudiante() {
             />
           </div>
           <br />
-          <h4>
-            Estudiante: {estudiante.Nombre} {estudiante.Apellido}
-          </h4>
-          <h4>Codigo Estudiante: {estudiante.Codigo}</h4>
-          <h4>Carrera: {estudiante.Carrera}</h4>
+          <h4>Estudiante: {estudiante?.Nombre}</h4>
+          <h4>Codigo Estudiante: {estudiante?.CodigoEstudiante}</h4>
+          <h4>Carrera: {estudiante?.Carrera}</h4>
         </div>
 
         {/* graphics */}

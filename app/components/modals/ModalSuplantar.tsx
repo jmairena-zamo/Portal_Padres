@@ -8,42 +8,44 @@ import Image from "next/image";
 import { BtnPrimario, Buscador } from "../ui";
 import { useState } from "react";
 import { registrarIngreso } from "@/app/services/registrarIngreso";
+import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 //Cerrar el modal luego de seleccinar estudiante
 interface ModalProps {
   OnClose: () => void;
-  onSeleccionar: (estudiante: { id: number; nombre: string }) => void;
+  onSeleccionar: (estudiante: { bannerID: number; Nombre: string }) => void;
 }
 
 export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
   //Array temporal de estudiantes
   const estudiantesIniciales = [
-    { id: 1, nombre: "Diego Sebastian", apellido: "Castro Lagos" },
-    { id: 2, nombre: "María Valentina", apellido: "Mendoza Ortiz" },
-    { id: 3, nombre: "Carlos Eduardo", apellido: "Alvarado Reyes" },
-    { id: 4, nombre: "Ana Lucía", apellido: "Gómez Pastrana" },
-    { id: 5, nombre: "Luis Fernando", apellido: "Rodríguez Zelaya" },
-    { id: 6, nombre: "Sofía Alejandra", apellido: "Benítez Flores" },
-    { id: 7, nombre: "Javier Andrés", apellido: "Martínez Colindres" },
-    { id: 8, nombre: "Valeria Nicolle", apellido: "Castillo Núñez" },
-    { id: 9, nombre: "Gabriel Enrique", apellido: "Pineda Aguilar" },
-    { id: 10, nombre: "Camila Isabella", apellido: "Vásquez Mejía" },
+    { bannerID: 1, Nombre: "Diego Sebastian Castro Lagos" },
+    { bannerID: 2, Nombre: "María Valentina Mendoza Ortiz" },
+    { bannerID: 3, Nombre: "Carlos Eduardo Alvarado Reyes" },
+    { bannerID: 4, Nombre: "Ana Lucía Gómez Pastrana" },
+    { bannerID: 5, Nombre: "Luis Fernando Rodríguez Zelaya" },
+    { bannerID: 6, Nombre: "Sofía Alejandra Benítez Flores" },
+    { bannerID: 7, Nombre: "Javier Andrés Martínez Colindres" },
+    { bannerID: 8, Nombre: "Valeria Nicolle Castillo Núñez" },
+    { bannerID: 9, Nombre: "Gabriel Enrique Pineda Aguilar" },
+    { bannerID: 10, Nombre: "Camila Isabella Vásquez Mejía" },
   ];
   const [todosEstudiantes] = useState(estudiantesIniciales);
   const [estudiantesFiltrados, setEstudiantesFiltrados] =
     useState(estudiantesIniciales);
+  const { setHijoActivo, foto } = useEstudiante();
 
   //registra el ingreso con el bannerID del estudiante
   const seleccionarEstudiante = async (estudiante: {
-    id: number;
-    nombre: string;
+    bannerID: number;
+    Nombre: string;
   }) => {
     await fetch("/api/auth/seleccionarEstudiante", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bannerID: estudiante.id }), // reemplaza con el real cuando tengas los datos
+      body: JSON.stringify({ bannerID: estudiante.bannerID }), // reemplaza con el real cuando se tengan los datos
     });
-    onSeleccionar(estudiante);
+    setHijoActivo(estudiante);
     OnClose();
   };
 
@@ -71,7 +73,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
           <div className="p-1.5">
             <Buscador
               datos={todosEstudiantes}
-              campos={["nombre"]}
+              campos={["Nombre"]}
               placeholder="Buscar estudiante..."
               onResultado={(resultados) => {
                 setEstudiantesFiltrados(resultados);
@@ -85,7 +87,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
             >
               <div className="shrink-0">
                 <Image
-                  src={user}
+                  src={foto ? `data:image/jpeg;base64,${foto}` : user}
                   alt="Imagen Estudiante"
                   width={50}
                   height={50}
@@ -99,10 +101,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
                   Estudiante
                 </p>
                 <p className="text-[15px] font-semibold text-gray-800 truncate">
-                  {u.nombre}
-                </p>
-                <p className="text-[13px] text-gray-500 truncate">
-                  {u.apellido}
+                  {u.Nombre}
                 </p>
               </div>
 

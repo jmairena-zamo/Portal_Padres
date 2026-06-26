@@ -1,4 +1,5 @@
 import { API_URL } from "@/app/config/api";
+// import { invalidarCacheRol } from "@/app/services/menu";
 import { NextRequest, NextResponse } from "next/server";
 
 //POST /api/menu/asignarMenuRol
@@ -34,6 +35,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // invalidarCacheRol(body.rol_ID);
+
   return NextResponse.json({ ok: true });
 }
 
@@ -65,6 +68,8 @@ export async function PUT(request: NextRequest) {
   if (!res.ok) {
     return NextResponse.json({ error: "Error al quitar Rol" }, { status: 500 });
   }
+
+  // invalidarCacheRol(body.rol_ID);
 
   return NextResponse.json({ ok: true });
 }

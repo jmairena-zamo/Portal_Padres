@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { iconos, generarRuta, getSubPath } from "@/app/services/menu";
 import { useMenu } from "@/app/hooks/useMenu";
+import { useSession } from "@/app/hooks/useSession";
 
 interface Props {
   colapsado: boolean;
@@ -25,17 +26,8 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
   const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
   const { menus } = useMenu();
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
-  const [email, setEmail] = useState<string>("");
-
-  // Lee el email del usuario desde la cookie httpOnly vía la ruta /api/auth/session
-  useEffect(() => {
-    fetch("/api/auth/session")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.email) setEmail(data.email);
-      })
-      .catch(() => {});
-  }, []);
+  const { sesion, cerrarSesion } = useSession();
+  const email = sesion?.email ?? "";
 
   // Cierra el sidebar en móvil
   const cerrarSidebar = () => setSidebarAbierto(false);
@@ -59,6 +51,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
         credentials: "include",
       });
       if (res.ok) {
+        cerrarSesion();
         route.replace("/");
         route.refresh();
       }

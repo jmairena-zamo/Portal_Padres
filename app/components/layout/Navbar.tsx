@@ -11,48 +11,25 @@ import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { BtnPrimario } from "../ui";
 import { useRol } from "@/app/hooks/useRol";
-
-// Simulación — reemplaza con tus datos reales
-const hijos = [
-  { id: 1, nombre: "Carlos Martínez" },
-  { id: 2, nombre: "Sofía Martínez" },
-  { id: 3, nombre: "Luis Martínez" },
-];
+import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 interface Props {
   colapsado: boolean;
   onSuplantar?: () => void;
-  onSeleccionar: (estudiante: { id: number; nombre: string }) => void;
-  hijoActivo: { id: number; nombre: string } | null;
-  hijos: { id: number; nombre: string }[];
 }
 
-export const Navbar = ({
-  colapsado,
-  onSuplantar,
-  hijoActivo,
-  onSeleccionar,
-}: Props) => {
+export const Navbar = ({ colapsado, onSuplantar }: Props) => {
+  const { hijos, hijoActivo, setHijoActivo } = useEstudiante();
+
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const [foto, setFoto] = useState<string | null>(null);
-  const { rol, loading } = useRol();
+  const { foto } = useEstudiante();
+  const { rol, cargando } = useRol();
   const esAdmin = rol === 2;
   const tieneVariosHijos = !esAdmin && hijos.length > 1;
 
   // Cierra el dropdown al hacer clic fuera
   useEffect(() => {
-    const cargarFoto = async () => {
-      try {
-        const resFoto = await fetch("/api/estudiantes/obtenerFoto");
-        const dataFoto = await resFoto.json();
-        setFoto(dataFoto.foto ?? null);
-      } catch (error) {
-        console.log("error con la foto");
-        setFoto(null);
-      }
-    };
-    cargarFoto();
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setDropdownAbierto(false);
@@ -63,7 +40,7 @@ export const Navbar = ({
   }, [hijoActivo]);
 
   const seleccionarHijo = (hijo: (typeof hijos)[0]) => {
-    onSeleccionar(hijo);
+    setHijoActivo(hijo);
     setDropdownAbierto(false);
   };
 
@@ -116,7 +93,7 @@ export const Navbar = ({
                     ].join(" ")}
                   />
                 )}
-                <span>{hijoActivo.nombre}</span>
+                <span>{hijoActivo.Nombre}</span>
               </button>
             )}
 
@@ -152,18 +129,18 @@ export const Navbar = ({
               >
                 {hijos.map((hijo) => (
                   <li
-                    key={hijo.id}
+                    key={hijo.bannerID}
                     onClick={() => seleccionarHijo(hijo)}
                     className={[
                       "px-4 py-2.5 cursor-pointer text-[0.9rem] text-[#374151]",
                       "transition-colors duration-150 hover:bg-[#f3f4f6]",
-                      hijoActivo?.id === hijo.id &&
+                      hijoActivo?.bannerID === hijo.bannerID &&
                         "font-semibold text-[#005221]",
                     ]
                       .filter(Boolean)
                       .join(" ")}
                   >
-                    {hijo.nombre}
+                    {hijo.Nombre}
                   </li>
                 ))}
               </ul>

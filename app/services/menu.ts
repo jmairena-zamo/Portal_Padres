@@ -1,5 +1,5 @@
 // Creado por Diego Castro
-// Genera las rutas permitidas segun el rl
+// Genera las rutas permitidas
 
 import {
   FaHome,
@@ -45,6 +45,7 @@ export const iconos: Record<string, React.ElementType> = {
 // 2. Consulta los submenús habilitados.
 // 3. Devuelve un arreglo con todas las rutas accesibles.
 // Utilizado en el middleware
+
 export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
   const rutasPorNombre: Record<string, string> = {
     "RESUMEN ESTUDIANTE": "/resumenestudiante",
@@ -62,7 +63,9 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
     if (!resRol.ok) return [];
 
     const dataRol = await resRol.json();
-    const menuIDs: number[] = dataRol.response.map((item: any) => item.menu_ID);
+    const menuIDs: number[] = dataRol.response
+      .filter((item: any) => item.habilitado === 1)
+      .map((item: any) => item.menu_ID);
 
     const menus = await Promise.all(
       menuIDs.map(async (id) => {
@@ -87,9 +90,9 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
 
     if (resSubRol.ok) {
       const dataSubRol = await resSubRol.json();
-      const subMenuIDs: number[] = dataSubRol.response.map(
-        (item: any) => item.subMenu_ID,
-      );
+      const subMenuIDs: number[] = dataSubRol.response
+        .filter((item: any) => item.habilitado === 1)
+        .map((item: any) => item.subMenu_ID);
 
       const submenus = await Promise.all(
         subMenuIDs.map(async (id) => {

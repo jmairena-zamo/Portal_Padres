@@ -50,14 +50,17 @@ export default function Tabla<Table>({
                 {columnas.map((col, i) => (
                   <td
                     key={i}
-                    className="border border-white text-center p-2.5 border-b border-b-black 
+                    className="w-auto text-center p-2.5 border-b border-b-black 
                                         max-[420px]:px-1 max-[420px]:py-1.5 max-[420px]:text-[12px]"
                   >
                     {/* render tiene prioridad; si no hay, usa accessor; si no, vacío */}
                     {col.render
                       ? col.render(item)
                       : col.accessor
-                        ? String(item[col.accessor] ?? "")
+                        ? item[col.accessor] !== undefined &&
+                          item[col.accessor] !== null
+                          ? String(item[col.accessor])
+                          : "N/A"
                         : null}
                   </td>
                 ))}

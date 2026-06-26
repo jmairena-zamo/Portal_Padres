@@ -6,29 +6,15 @@
 
 import Image from "next/image";
 import user from "../../img/logo-user.png";
-import { useEffect, useState } from "react";
+import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 export const InformacionEstudiante = () => {
-  const [foto, setFoto] = useState<string | null>(null);
-
-  useEffect(() => {
-    const cargarFoto = async () => {
-      try {
-        const res = await fetch("/api/estudiantes/obtenerFoto");
-        const data = await res.json();
-        setFoto(data.foto ?? null);
-      } catch (error) {
-        console.log("error con la foto");
-        setFoto(null);
-      }
-    };
-    cargarFoto();
-  }, []);
+  const { foto, estudiante } = useEstudiante();
 
   return (
     <div
       className="
-            bg-white flex justify-evenly items-center gap-5 p-5 
+            bg-white flex justify-center items-center gap-36 p-5 
             shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-md w-full 
             max-[800px]:flex-wrap max-[800px]:justify-center max-[800px]:gap-6 
             max-[420px]:flex-col max-[420px]:items-center max-[420px]:p-2 max-[420px]:gap-2
@@ -36,49 +22,28 @@ export const InformacionEstudiante = () => {
     >
       <div
         className="
-                flex-1 min-w-55 text-start 
+                min-w-55 text-start 
                 max-[800px]:flex-[1_1_320px] max-[800px]:min-w-70 
                 max-[420px]:w-full max-[420px]:min-w-full max-[420px]:text-left
             "
       >
         <h3 className="mb-4 max-[420px]:text-center max-[420px]:mb-2">
-          INFORMACIÓN ESTUDIANTE
+          <strong>INFORMACIÓN ESTUDIANTE</strong>
         </h3>
         <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <strong>Estudiante:</strong> xxxxx xxxxx xxxxx xxxxx
+          <strong>Estudiante:</strong> {estudiante?.Nombre}
         </p>
         <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <strong>Código Estudiante:</strong> xxxxxx
+          <strong>Código Estudiante:</strong> {estudiante?.CodigoEstudiante}
         </p>
         <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <strong>Correo:</strong> xxxxxxxxxxxxxxxxxx
+          <strong>Correo:</strong> {estudiante?.Correo}
         </p>
       </div>
 
       <div
         className="
-                flex-1 min-w-55 text-start 
-                max-[800px]:flex-[1_1_320px] max-[800px]:min-w-70 
-                max-[420px]:w-full max-[420px]:min-w-full max-[420px]:text-left
-            "
-      >
-        <h3 className="mb-4 max-[420px]:text-center max-[420px]:mb-2">
-          INFORMACIÓN ESTUDIANTE
-        </h3>
-        <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <strong>Estudiante:</strong> xxxxx xxxxx xxxxx xxxxx
-        </p>
-        <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <strong>Código Estudiante:</strong> xxxxxx
-        </p>
-        <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <strong>Correo:</strong> xxxxxxxxxxxxxxxxxx
-        </p>
-      </div>
-
-      <div
-        className="
-                flex justify-center items-center min-w-45 
+                min-w-45 max-[800px]:flex justify-center items-center
                 max-[800px]:-order-1 max-[800px]:w-full max-[420px]:min-w-auto
             "
       >

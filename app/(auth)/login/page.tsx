@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginSchema, LoginFormData } from "../../utils/validations";
 import { BtnPrimario, Input, SpanError } from "@/app/components/ui";
+import { useSession } from "@/app/hooks/useSession";
 
 export default function Login() {
   const [esValidoCorreo, setEsValidoCorreo] = useState(true);
@@ -13,6 +14,7 @@ export default function Login() {
   const [errorServidor, setErrorServidor] = useState("");
   const [cargando, setCargando] = useState(false);
   const [errorContra, setErrorContra] = useState("");
+  const { recargarSesion } = useSession();
 
   const router = useRouter();
 
@@ -71,6 +73,7 @@ export default function Login() {
         return;
       }
 
+      await recargarSesion();
       router.push("/resumenestudiante");
     } catch (error) {
       setErrorServidor("Error de conexión. Intenta de nuevo.");
