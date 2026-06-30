@@ -49,7 +49,9 @@ export default function Administracion() {
   const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
 
   //----FILTROS--------------------------------------------------------------
-  const [rolFiltro, setRolFiltro] = useState<number | "todos">("todos");
+  const [rolFiltro, setRolFiltro] = useState<number | string | "todos">(
+    "todos",
+  );
   const [menusFiltradosBuscador, setMenusFiltradosBuscador] = useState<Menu[]>(
     [],
   );
@@ -146,6 +148,7 @@ export default function Administracion() {
     setConfirmModalSub,
     pedirConfirmacionEliminarSub,
     confirmarEliminarSub,
+    errorMenus,
   } = adminMenus;
 
   const adminPermisos = useAdminPermisos(menus, cargarDatos, mostrarExito);
@@ -201,7 +204,7 @@ export default function Administracion() {
 
   const tieneRoles = datosPaginadosRoles && datosPaginadosRoles.length > 0;
 
-  // if (cargando) return <Loading />;
+  if (cargando) return <Loading />;
 
   //----RENDER----------------------------------------------------------
   return (
@@ -293,7 +296,13 @@ export default function Administracion() {
               {!tieneMenus ? (
                 <Vacio
                   titulo="No hay Menus"
-                  descripcion="No se encontraron menus con ese nombre"
+                  descripcion="No se encontraron menus con ese nombre."
+                />
+              ) : errorMenus ? (
+                <Vacio
+                  titulo="Ocurrio un error"
+                  descripcion="No se pudieron cargar los menus."
+                  onReintentar={cargarDatos}
                 />
               ) : (
                 <Tabla

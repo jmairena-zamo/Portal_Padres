@@ -38,6 +38,29 @@ export interface HistorialAcademicoResponse {
   response: CursoHistorial[];
 }
 
+export interface FilaHistorial {
+  id: string;
+  anio: string;
+  periodo: string;
+  clase: string;
+  seccion: string;
+  codigo: string;
+  nota: string;
+}
+
+// Mapear los datos que vienen de la respuesta
+export function mapearCurso(curso: CursoHistorial): FilaHistorial {
+  return {
+    id: curso.id,
+    anio: curso.term.slice(0, 4),
+    periodo: curso.termDescription.replace("C", ""), //eliminar la C de cuatrimestre
+    clase: curso.courseLongTitle,
+    seccion: curso.courseReferenceNumber,
+    codigo: curso.activityAcademic,
+    nota: parseFloat(curso.grade).toFixed(2),
+  };
+}
+
 export const HistorialAcademico: HistorialAcademicoResponse = {
   status: 200,
   message: "Historial académico obtenido exitosamente",
@@ -58,7 +81,7 @@ export const HistorialAcademico: HistorialAcademicoResponse = {
       studyPathSequenceNumber: 1.0,
       attemptedHours: 7.0,
       creditHours: 7.0,
-      grade: "66.00", //Originalmente 96.00
+      grade: "56.00", //Originalmente 96.00
       mode: "N",
       modeDescription: "CALIFICACION NUMERICA",
       sequenceNumber: 1.0,

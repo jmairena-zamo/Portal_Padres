@@ -24,16 +24,28 @@ export default function Buscador<T>({
   onResultado,
 }: BuscadorProps<T>) {
   const [query, setQuery] = useState("");
+  const [queryDelay, setQueryDelay] = useState("");
 
-  // Se ejecuta cada vez que query o datos cambian
+  // Se ejecuta cada que query cambia
+  // Espera 500ms para actualizar queryDelay
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setQueryDelay(query);
+    }, 500);
+
+    // Si query cambia antes de los 500ms, se cancela el timeout anterior
+    return () => clearTimeout(timeoutId);
+  }, [query]);
+
+  // Se ejecuta cada vez que queryDelay o datos cambian
   useEffect(() => {
     // Si query esta vacio devuelve todos los datos
-    if (!query.trim()) {
+    if (!queryDelay.trim()) {
       onResultado(datos);
       return;
     }
 
-    const q = query.toUpperCase();
+    const q = queryDelay.toUpperCase();
 
     // Obtiene los datos que tengan coincidencia con query(q)
     const filtrados = datos.filter((item) =>
@@ -46,7 +58,7 @@ export default function Buscador<T>({
     );
 
     onResultado(filtrados);
-  }, [query, datos]);
+  }, [queryDelay, datos]);
 
   return (
     <div className="relative flex items-center w-full">

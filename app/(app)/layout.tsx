@@ -54,7 +54,7 @@ export default function AppLayout({
             {/* main: empuja el contenido a la derecha del sidebar */}
             <div
               className={[
-                "flex flex-col mt-13.75 transition-[margin-left] duration-300 ease-in-out",
+                "flex flex-col mt-13.75 transition-[margin-left] duration-500 ease-in-out",
                 colapsado ? "ml-15" : "ml-62.5",
                 "max-[800px]:ml-0",
               ].join(" ")}

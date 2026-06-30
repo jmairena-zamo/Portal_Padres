@@ -72,7 +72,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
           "flex-col gap-1.25 shadow-[0_2px_6px_rgba(0,0,0,0.3)]",
           "max-[800px]:flex",
           // estilos de las líneas del hamburger via [&>span]
-          "[&>span]:block [&>span]:w-3 [&>span]:h-0.5 [&>span]:bg-white [&>span]:rounded-sm [&>span]:transition-all [&>span]:duration-300",
+          "[&>span]:block [&>span]:w-3 [&>span]:h-0.5 [&>span]:bg-white [&>span]:rounded-sm [&>span]:transition-all [&>span]:duration-500",
           // animación X cuando está abierto
           sidebarAbierto &&
             "[&>span:nth-child(1)]:translate-y-1.75 [&>span:nth-child(1)]:rotate-45",

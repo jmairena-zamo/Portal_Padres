@@ -65,18 +65,32 @@ export function useAdminMenus(
   const [subMenuSeleccionadoEditar, setSubMenuSeleccionadoEditar] =
     useState<SubMenu | null>(null);
   const [errorPosicionSub, setErrorPosicionSub] = useState("");
+  const [errorMenus, setErrorMenus] = useState<boolean>(false);
 
   //----Carga inicial----------------------------------------------------------
-  /** Carga menús desde la API. Retorna también roles (mismo endpoint) por si el caller los necesita. */
+  /** Carga menús desde la API.*/
   const cargarDatos = async () => {
+    const inicio = Date.now();
     setCargando(true);
+    setErrorMenus(false);
     try {
       const res = await fetch("/api/menu/adminMenuRol");
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
+
       const data = await res.json();
       setMenus(data.menus);
+      const transcurrido = Date.now() - inicio;
+      const restante = 1000 - transcurrido;
+      if (restante > 0) {
+        await new Promise((resolve) => setTimeout(resolve, restante));
+      }
       return data;
     } catch {
       mostrarError("Error de conexión. Intenta de nuevo.");
+      setErrorMenus(true);
       return null;
     } finally {
       setCargando(false);
@@ -551,5 +565,6 @@ export function useAdminMenus(
     setConfirmModalSub,
     pedirConfirmacionEliminarSub,
     confirmarEliminarSub,
+    errorMenus,
   };
 }

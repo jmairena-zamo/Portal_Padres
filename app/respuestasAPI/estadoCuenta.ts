@@ -49,6 +49,30 @@ export interface EstadoCuentaResponse {
   };
 }
 
+export interface FilaCuenta {
+  id: number;
+  fecha: string;
+  descripcion: string;
+  categoria: string;
+  tipo: string;
+  monto: number;
+  saldo: number;
+  intereses: number;
+}
+
+export function mapearMovimiento(m: MovimientoCuenta): FilaCuenta {
+  return {
+    id: m.tbraccD_TRAN_NUMBER,
+    fecha: new Date(m.tbraccD_EFFECTIVE_DATE).toLocaleDateString("es-HN"),
+    descripcion: m.tbbdetC_DESC,
+    categoria: m.ttvdcaT_DESC,
+    tipo: m.tbbdetC_TYPE_IND_DESC,
+    monto: m.tbraccD_AMOUNT,
+    saldo: m.tbraccD_BALANCE,
+    intereses: m.interest,
+  };
+}
+
 export const EstadoCuenta: EstadoCuentaResponse = {
   status: 200,
   message: "Proceso exitoso",

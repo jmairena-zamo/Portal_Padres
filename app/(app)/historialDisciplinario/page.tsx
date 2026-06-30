@@ -5,7 +5,7 @@
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useEffect, useState } from "react";
-import { Loading, Paginacion, Tabla } from "@/app/components/ui";
+import { Loading, Paginacion, Tabla, Vacio } from "@/app/components/ui";
 import { accionesEstudiantiles } from "@/app/respuestasAPI/faltas";
 import ModalForm from "@/app/components/modals/ModalForm";
 
@@ -53,23 +53,40 @@ export default function HistorialDisciplinario() {
   const [cargando, setCargando] = useState(true);
   const [filaSeleccionada, setFilaSeleccionada] =
     useState<FilaHistorialDisciplinario | null>(null);
+  const [errorDisc, setErrorDisc] = useState(false);
 
   useEffect(() => {
-    const cargarData = async () => {
-      try {
-        const res = await fetch("/api/estudiantes/obtenerFaltas");
-        const data = await res.json();
-        const filas = (
-          data.AccionesEstudiantiles as accionesEstudiantiles[]
-        ).map(mapearHistorialDisciplinario);
-        setData(filas);
-      } catch (error) {
-      } finally {
-        setCargando(false);
-      }
-    };
     cargarData();
   }, []);
+
+  const cargarData = async () => {
+    setErrorDisc(false);
+    try {
+      const inicio = Date.now();
+
+      const res = await fetch("/api/estudiantes/obtenerFaltas");
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
+
+      const data = await res.json();
+      const filas = (data.AccionesEstudiantiles as accionesEstudiantiles[]).map(
+        mapearHistorialDisciplinario,
+      );
+      setData(filas);
+
+      const transcurrido = Date.now() - inicio;
+      const restante = 1000 - transcurrido;
+      if (restante > 0) {
+        await new Promise((resolve) => setTimeout(resolve, restante));
+      }
+    } catch (error) {
+      setErrorDisc(true);
+    } finally {
+      setCargando(false);
+    }
+  };
 
   const handleCambiarRegistros = (cantidad: number) => {
     setRegistrosPorPagina(cantidad);
@@ -86,36 +103,56 @@ export default function HistorialDisciplinario() {
       <InformacionEstudiante />
       <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] mb-3.75">
         <h2 className="font-bold text-lg">Historial Disciplinario</h2>
-        <Tabla
-          datos={datosPaginados}
-          keyExtractor={(item) => item.id}
-          columnas={[
-            { header: "Tipo", accessor: "tipo" },
-            { header: "Fecha", accessor: "fecha" },
-            { header: "Periodo", accessor: "periodo" },
-            {
-              header: "Descripción",
-              accessor: "descripcionCorta",
-              width: "400px",
-            },
-            { header: "Reportada Por", accessor: "reportadaPor" },
-            { header: "Num. Faltas", accessor: "numfaltas" },
-            { header: "Estado", accessor: "estado" },
-            {
-              header: "Detalle",
-              accessor: "descripcionDetallada",
-              render: (item) => (
-                <button
-                  onClick={() => setFilaSeleccionada(item)}
-                  className="truncate max-w-50 text-left text-[#008237] hover:underline cursor-pointer"
-                  title="Click para ver el detalle completo"
-                >
-                  Ver más
-                </button>
-              ),
-            },
-          ]}
-        />
+        {cargando ? (
+          <Loading />
+        ) : errorDisc ? (
+          <Vacio
+            titulo="Ocurrio un error"
+            descripcion="No se pudo cargar la información"
+            onReintentar={cargarData}
+          />
+        ) : (
+          <Tabla
+            datos={datosPaginados}
+            keyExtractor={(item) => item.id}
+            columnas={[
+              { header: "Tipo", accessor: "tipo" },
+              { header: "Fecha", accessor: "fecha" },
+              { header: "Periodo", accessor: "periodo" },
+              {
+                header: "Descripción",
+                accessor: "descripcionCorta",
+                width: "400px",
+              },
+              { header: "Reportada Por", accessor: "reportadaPor" },
+              { header: "Num. Faltas", accessor: "numfaltas" },
+              {
+                header: "Estado",
+                accessor: "estado",
+                render: (item) =>
+                  item.estado === "Eliminada" ? (
+                    <span className="text-red-600">{item.estado}</span>
+                  ) : (
+                    <span>{item.estado}</span>
+                  ),
+              },
+              {
+                header: "Detalle",
+                accessor: "descripcionDetallada",
+                render: (item) => (
+                  <button
+                    onClick={() => setFilaSeleccionada(item)}
+                    className="truncate max-w-50 text-left text-[#008237] hover:underline cursor-pointer"
+                    title="Click para ver el detalle completo"
+                  >
+                    Ver más
+                  </button>
+                ),
+              },
+            ]}
+          />
+        )}
+
         <Paginacion
           totalRegistros={data.length}
           registrosPorPagina={registrosPorPagina}

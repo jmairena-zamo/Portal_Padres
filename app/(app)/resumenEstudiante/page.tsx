@@ -79,73 +79,69 @@ export default function ResumenEstudiante() {
         </div>
 
         {/* graphics */}
-        <div className="flex flex-wrap justify-center gap-4 flex-[2_1_400px] max-[800px]:flex-[1_1_auto]">
+        <div className="flex flex-col justify-center gap-4 flex-[2_1_400px] max-[800px]:flex-[1_1_auto]">
           {/* promedio global */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3 className="text-[14px] font-semibold">PROMEDIO GLOBAL</h3>
-            <hr className="my-2" />
-            <div className="flex-1 flex items-center justify-center gap-3">
-              <RadialBarChart
-                width={100}
-                height={90}
-                cx="50%"
-                cy="50%"
-                innerRadius="70%"
-                outerRadius="100%"
-                barSize={9}
-                data={data}
-              >
-                <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
-              </RadialBarChart>
-              <span className="font-bold text-[24px] text-[#008237]">
-                {promedio}%
-              </span>
+          <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex-[1_1_200px] min-h-45 bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+              <h3 className="text-[14px] font-semibold">PROMEDIO GLOBAL</h3>
+              <hr className="my-2" />
+              <div className="flex-1 flex items-center justify-center gap-3">
+                <RadialBarChart
+                  width={100}
+                  height={90}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="70%"
+                  outerRadius="100%"
+                  barSize={9}
+                  data={data}
+                >
+                  <PolarAngleAxis
+                    type="number"
+                    domain={[0, 100]}
+                    tick={false}
+                  />
+                  <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
+                </RadialBarChart>
+                <span className="font-bold text-[24px] text-[#008237]">
+                  {promedio}%
+                </span>
+              </div>
             </div>
-          </div>
 
-          {/* horas clínica */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3
-              className="text-[14px] font-semibold 
-            "
-            >
-              HORAS EN CLÍNICA
-            </h3>
-            <hr className="my-2" />
-            <div className="flex-1 flex items-center justify-center">
-              <p className="font-bold text-[38px] text-[#2563eb]">
-                {horasClinica}
-              </p>
-            </div>
-          </div>
-
-          {/* último periodo */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3 className="text-[14px] font-semibold">ÚLTIMO PERIODO</h3>
-            <hr className="my-2" />
-            <div className="flex-1 flex items-center justify-center gap-3">
-              <RadialBarChart
-                width={100}
-                height={90}
-                cx="50%"
-                cy="50%"
-                innerRadius="70%"
-                outerRadius="100%"
-                barSize={9}
-                data={data}
-              >
-                <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
-              </RadialBarChart>
-              <span className="font-bold text-[24px] text-[#008237]">
-                {promedio}%
-              </span>
+            {/* último periodo */}
+            <div className="flex-[1_1_200px] min-h-45 bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+              <h3 className="text-[14px] font-semibold">
+                PROMEDIO ÚLTIMO PERIODO
+              </h3>
+              <hr className="my-2" />
+              <div className="flex-1 flex items-center justify-center gap-3">
+                <RadialBarChart
+                  width={100}
+                  height={90}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="70%"
+                  outerRadius="100%"
+                  barSize={9}
+                  data={data}
+                >
+                  <PolarAngleAxis
+                    type="number"
+                    domain={[0, 100]}
+                    tick={false}
+                  />
+                  <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
+                </RadialBarChart>
+                <span className="font-bold text-[24px] text-[#008237]">
+                  {promedio}%
+                </span>
+              </div>
             </div>
           </div>
 
           {/* porcentaje carrera */}
-          <div className="flex-[1_1_200px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+          <div className="flex-[0.5_1_150px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
             <h3 className="text-[14px] font-semibold">PORCENTAJE CARRERA</h3>
             <hr className="my-2" />
             <div className="flex-1 flex flex-col items-center justify-center gap-2 px-2">

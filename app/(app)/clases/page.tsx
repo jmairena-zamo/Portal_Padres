@@ -4,10 +4,11 @@
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useState } from "react";
-import { Tabla } from "@/app/components/ui";
+import { useEffect, useState } from "react";
+import { Loading, Tabla } from "@/app/components/ui";
 
 export default function Clases() {
+  const [cargando, setCargando] = useState<boolean>(false);
   const [data, setData] = useState([
     {
       id: 1,
@@ -32,6 +33,13 @@ export default function Clases() {
   const notaFinal = (a: number, b: number) => {
     return a + b;
   };
+
+  useEffect(() => {
+    setCargando(true);
+    setTimeout(() => setCargando(false), 1000);
+  }, []);
+
+  if (cargando) return <Loading />;
 
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
