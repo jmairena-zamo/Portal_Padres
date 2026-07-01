@@ -28,9 +28,9 @@ export default function ModalForm({
     // Overlay
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-1000">
       {/* Contenedor del modal */}
-      <div className="bg-white w-lg shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] border-2 border-[#008237] p-7.5 rounded-[10px] max-[800px]:w-[calc(100%-32px)] max-[800px]:p-[20px_15px] max-[420px]:w-[calc(100%-20px)] max-[420px]:p-[15px_10px]">
+      <div className="bg-white w-lg shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] border-2 border-[#43C302] p-7.5 rounded-[10px] max-[800px]:w-[calc(100%-32px)] max-[800px]:p-[20px_15px] max-[420px]:w-[calc(100%-20px)] max-[420px]:p-[15px_10px]">
         {/* Header */}
-        <div className="bg-[#008237] text-white rounded-tl-[5px] rounded-tr-[5px] mb-6.25 w-full">
+        <div className="bg-[#048047] text-[#FFF4E5] rounded-tl-[5px] rounded-tr-[5px] mb-6.25 w-full">
           <h2 className="py-1.25 text-[18px] text-center">{titulo}</h2>
         </div>
 

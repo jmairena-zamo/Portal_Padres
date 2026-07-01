@@ -2,13 +2,25 @@
 // Componente de selector de iconos utilizado en la creación o modificación de opciones de menú
 
 import {
-  FaHome, FaUser, FaCog, FaSignOutAlt, FaChartBar,
-  FaBook, FaEnvelope, FaBell, FaCalendarAlt, FaUsers,
-  FaClipboardCheck, FaFile, FaCoins, FaFileAlt, FaFolder
+  FaHome,
+  FaUser,
+  FaCog,
+  FaSignOutAlt,
+  FaChartBar,
+  FaBook,
+  FaEnvelope,
+  FaBell,
+  FaCalendarAlt,
+  FaUsers,
+  FaClipboardCheck,
+  FaFile,
+  FaCoins,
+  FaFileAlt,
+  FaFolder,
 } from "react-icons/fa";
 
 interface SelectorIconosProps {
-  selectedIcon: string;          // nombre del icono actual
+  selectedIcon: string; // nombre del icono actual
   onSelect: (iconName: string) => void; // recibe el nombre al seleccionar
 }
 
@@ -32,7 +44,10 @@ export const iconOptions = [
 
 // Muestra visualmente los iconos para que el usuario elija uno
 // El icono seleccionado cambia su estilo
-export default function SelectorIconos({ selectedIcon, onSelect }: SelectorIconosProps) {
+export default function SelectorIconos({
+  selectedIcon,
+  onSelect,
+}: SelectorIconosProps) {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(50px,1fr))] gap-2.5 mt-2.5">
       {iconOptions.map((icon) => {
@@ -45,11 +60,11 @@ export default function SelectorIconos({ selectedIcon, onSelect }: SelectorIcono
             type="button"
             onClick={() => onSelect(icon.name)}
             className={[
-              'flex justify-center items-center rounded-lg p-2 cursor-pointer text-[18px] transition-colors',
+              "flex justify-center items-center rounded-lg p-2 cursor-pointer text-[18px] transition-colors",
               isSelected
-                ? 'bg-[#008237] text-white border-2 border-[#006f2a]'
-                : 'bg-[#f3f4f6] border border-[#ccc] hover:bg-[#e5e7eb]',
-            ].join(' ')}
+                ? "bg-[#048047] text-[#FFF4E5] border-2 border-[#43C302]"
+                : "bg-[#f3f4f6] border border-[#ccc] hover:bg-[#e5e7eb]",
+            ].join(" ")}
           >
             <IconComp />
           </button>

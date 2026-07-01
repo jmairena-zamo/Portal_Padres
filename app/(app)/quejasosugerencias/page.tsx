@@ -17,8 +17,10 @@ import {
   CardInfo,
   ComboBoxFiltro,
   Input,
+  Label,
   SpanError,
   TextArea,
+  Titulo,
   Vacio,
 } from "@/app/components/ui";
 import { Queja, useQueja } from "@/app/hooks/useQueja";
@@ -187,7 +189,7 @@ export default function QuejasSugerencias() {
 
   const tieneQuejas = quejasFiltradas.length > 0;
 
-  if (cargando) return <Loading />;
+  if (cargandoQS || cargando) return <Loading />;
 
   return (
     <div className="mt-4 mx-4 mb-4 flex flex-col gap-4 sm:m-4 max-[420px]:m-2">
@@ -214,12 +216,8 @@ export default function QuejasSugerencias() {
       </div>
       {tabActiva === "ver" && (
         <div className="bg-white rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
-          <div className="flex items-center gap-11.25 flex-wrap max-[800px]:w-full max-[800px]:justify-between max-[420px]:gap-3.75">
-            <h2 className="font-bold text-center text-[22px] max-[420px]:text-[17px]">
-              Mis Quejas y Sugerencias
-            </h2>
-          </div>
-          <div className="mt-5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
+          <Titulo titulo="Quejas y Sugerencias" alineado={3} />
+          <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
             <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
               <Buscador
                 datos={quejas}
@@ -230,7 +228,7 @@ export default function QuejasSugerencias() {
                 }}
               />
             </div>
-            <div className="flex items-center gap-3.75 max-[420px]:gap-1.25">
+            <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
               <h4>Tipo:</h4>
               <ComboBoxFiltro
                 valor={tipoFiltro}
@@ -278,7 +276,7 @@ export default function QuejasSugerencias() {
           txtConfirmar="Cerrar"
           ocultarCancelar={true}
         >
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[#999999]">
             {new Date(quejaSeleccionada.fechaCreacion).toLocaleDateString(
               "es-HN",
               {
@@ -288,12 +286,12 @@ export default function QuejasSugerencias() {
               },
             )}
           </p>
-          <p className="text-gray-700 whitespace-pre-line">
+          <p className="text-[#555555] whitespace-pre-line">
             <strong>Asunto: </strong>
             {quejaSeleccionada.asunto}
           </p>
 
-          <p className="text-gray-700 whitespace-pre-line">
+          <p className="text-[#555555] whitespace-pre-line">
             <strong>Mensaje: </strong>
             {quejaSeleccionada.mensaje}
           </p>
@@ -305,15 +303,13 @@ export default function QuejasSugerencias() {
             onSubmit={handleSubmit}
             className="w-full max-w-187.5 rounded-[5px] bg-white p-5 text-center shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)]"
           >
-            <h2 className="text-[20px] font-bold text-[rgb(41,94,34)]">
-              ¡Quejas y Sugerencias!
-            </h2>
+            <Titulo titulo="¡Quejas y Sugerencias!" alineado={1} />
             <h3 className="text-[13px] text-[rgb(41,94,34)]">
               Siempre es un gusto saber su opinión sobre nuestro servicio
             </h3>
             <div className="mx-auto mt-5 flex w-full max-w-150 flex-col gap-2.5 text-left">
               <div className="flex flex-col">
-                <label>Teléfono:</label>
+                <Label nombre="Teléfono:" />
                 <Input
                   name="telefono"
                   type="text"
@@ -329,7 +325,7 @@ export default function QuejasSugerencias() {
                 />
               </div>
               <div className="flex flex-col">
-                <label>Opción:</label>
+                <Label nombre="Opción" />
                 <hr />
                 <div className="flex flex-col">
                   <label>
@@ -361,7 +357,7 @@ export default function QuejasSugerencias() {
                 />
               </div>
               <div className="flex flex-col">
-                <label>Asunto:</label>
+                <Label nombre="Asunto:" />
                 <TextArea
                   name="asunto"
                   placeholder="Ingrese Asunto"
@@ -376,7 +372,7 @@ export default function QuejasSugerencias() {
                 />
               </div>
               <div className="flex flex-col">
-                <label>Mensaje:</label>
+                <Label nombre="Mensaje" />
                 <TextArea
                   name="mensaje"
                   placeholder="Ingrese su Comentario..."

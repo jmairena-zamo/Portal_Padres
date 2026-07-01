@@ -45,7 +45,7 @@ export default function AppLayout({
         )}
 
         {!showModal && (
-          <div className="bg-[#F6F6F6] min-h-screen">
+          <div className="bg-[#faf9f6] min-h-screen">
             <Sidebar
               colapsado={colapsado}
               onToggle={() => setColapsado((v) => !v)}

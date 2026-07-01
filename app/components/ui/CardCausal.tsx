@@ -26,7 +26,7 @@ export default function CardCausal({
       </div>
 
       {/* Texto y valor */}
-      <div className="w-full flex justify-between items-center">
+      <div className="w-full flex justify-between items-center text-[#30545b]">
         <p className="text-[12px] font-medium text-gray-700">{label}</p>
         <p className="text-[18px] font-bold">{valor}</p>
       </div>

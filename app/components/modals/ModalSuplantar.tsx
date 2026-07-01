@@ -59,7 +59,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
       {/* contenido */}
       <div className="flex flex-col flex-1 overflow-hidden mx-auto w-full max-w-150 px-4 py-6">
         {/* encabezado */}
-        <div className="bg-[#008237] text-white rounded-t-lg px-6 py-3 shrink-0">
+        <div className="bg-[#048047] text-white rounded-t-lg px-6 py-3 shrink-0">
           <h2 className="text-[20px] font-bold text-center">
             Seleccionar Estudiante
           </h2>
@@ -100,7 +100,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
                 <p className="text-[11px] text-gray-400 uppercase tracking-wide font-semibold">
                   Estudiante
                 </p>
-                <p className="text-[15px] font-semibold text-gray-800 truncate">
+                <p className="text-[15px] font-semibold text-[#666666] truncate">
                   {u.Nombre}
                 </p>
               </div>

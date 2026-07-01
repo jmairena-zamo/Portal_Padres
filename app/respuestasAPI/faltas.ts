@@ -46,6 +46,43 @@ export interface FaltasResponse {
   };
 }
 
+export interface FilaHistorialDisciplinario {
+  id: number;
+  tipo: string;
+  fecha?: string;
+  periodo?: string;
+  descripcionCorta: string;
+  descripcionDetallada: string;
+  reportadaPor?: string;
+  numfaltas: number;
+  estado: string;
+  motivoRemosion?: string;
+  fechaAprobada?: string;
+  fechaEliminada?: string;
+}
+
+export function mapearHistorialDisciplinario(
+  m: accionesEstudiantiles,
+  index: number,
+): FilaHistorialDisciplinario {
+  const estado = m.aprobada ? "Aprobada" : m.eliminada ? "Eliminada" : "N/A";
+
+  return {
+    id: index,
+    tipo: m.tipoCodigoAccion,
+    fecha: m.fechaAccion?.substring(0, 10),
+    periodo: [m.ano, m.periodo].filter(Boolean).join(" - ") || undefined,
+    descripcionCorta: m.descripcionTipoAccion,
+    descripcionDetallada: m.descripcionDetallada,
+    reportadaPor: m.reportadaPor,
+    numfaltas: m.numeroFaltas,
+    estado: estado,
+    motivoRemosion: m.codigoMotivoRemosion,
+    fechaAprobada: m.fechaAprobada?.substring(0, 10),
+    fechaEliminada: m.fechaEliminada?.substring(0, 10),
+  };
+}
+
 export const FaltasEstudiante: FaltasResponse = {
   status: 200,
   message: "Proceso exitoso",

@@ -20,7 +20,7 @@ export function useQueja() {
   const [errorQS, setErrorQS] = useState(false);
   const [intento, setIntento] = useState(0);
 
-  // llamada al emdpoint para obtener quejas
+  // llamada al endpoint para obtener quejas
   const cargarQuejas = useCallback(async () => {
     setCargandoQS(true);
     setErrorQS(false);
@@ -40,7 +40,7 @@ export function useQueja() {
     } finally {
       // Delay mínimo para evitar parpadeo del loading, igual que en el resto del proyecto
       const transcurrido = Date.now() - inicio;
-      const restante = Math.max(0, 400 - transcurrido);
+      const restante = Math.max(0, 1000 - transcurrido);
       setTimeout(() => setCargandoQS(false), restante);
     }
   }, []);

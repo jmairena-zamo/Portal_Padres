@@ -18,6 +18,8 @@ import {
 } from "./CapsulasInformativas";
 import CardCausal from "./CardCausal";
 import { CardInfo } from "./CardInfo";
+import { Titulo } from "./Titulo";
+import { Label } from "./Label";
 
 export {
   BtnPrimario,
@@ -41,4 +43,6 @@ export {
   TecnologiasInformacion,
   CardCausal,
   CardInfo,
+  Titulo,
+  Label,
 };

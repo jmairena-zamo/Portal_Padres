@@ -32,6 +32,7 @@ import {
   Input,
   SpanError,
   ToggleSwitch,
+  Titulo,
 } from "@/app/components/ui/";
 
 import {
@@ -234,13 +235,9 @@ export default function Administracion() {
 
       {/* ── Tab: Menús ── */}
       {tabActiva === "menus" && (
-        <div className="bg-white rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
+        <div className="bg-[#ffffff] rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
           <div className="flex justify-between px-4 max-[800px]:flex-col max-[800px]:gap-2.5 max-[800px]:items-start max-[800px]:px-1.25">
-            <div className="flex items-center gap-11.25 flex-wrap max-[800px]:w-full max-[800px]:justify-between max-[420px]:gap-3.75">
-              <h2 className="font-bold text-center text-[22px] max-[420px]:text-[17px]">
-                Administración de Menú
-              </h2>
-            </div>
+            <Titulo titulo="Administración de Menú" alineado={3} />
 
             <div className="flex gap-2.5">
               <BtnPrimario
@@ -273,7 +270,7 @@ export default function Administracion() {
                 }}
               />
             </div>
-            <div className="flex items-center gap-3.75 max-[420px]:gap-1.25">
+            <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
               <h4>Rol:</h4>
               <ComboBoxFiltro
                 valor={rolFiltro}
@@ -740,9 +737,7 @@ export default function Administracion() {
       {tabActiva === "roles" && (
         <div className="bg-white rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
           <div className="flex justify-between px-4 max-[800px]:flex-col max-[800px]:gap-2.5 max-[800px]:items-start max-[800px]:px-1.25">
-            <h2 className="font-bold text-center text-[22px] max-[420px]:text-[17px]">
-              Administración de Roles
-            </h2>
+            <Titulo titulo="Administración de Roles" alineado={3} />
             <div className="flex gap-2.5">
               <BtnPrimario
                 onClick={() => {

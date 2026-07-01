@@ -63,25 +63,30 @@ export default function Buscador<T>({
   return (
     <div className="relative flex items-center w-full">
       {/* Icono lupa */}
-      <span className="absolute left-2.5 text-[14px] pointer-events-none opacity-50">
+      <span className="absolute left-2.5 text-[14px] pointer-events-none text-gray-400">
         <FaSearch />
       </span>
 
       <input
         type="text"
-        className="w-full px-8 py-1.75 border border-black rounded-md text-[14px] outline-none transition-colors duration-200 focus:border-[#005221] focus:shadow-[0_0_0_2px_rgba(0,130,55,0.15)]"
+        className="w-full px-8 py-2 border border-gray-300 rounded-md text-[14px] 
+                 outline-none transition-all duration-200 
+                 focus:border-gray-300 focus:shadow-[0_0_0_2px_rgba(0,82,33,0.15)] 
+                 placeholder-gray-400"
         placeholder={placeholder}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {/* Botón para limpiar, solo se muestra cuando query no es vacio */}
+      {/* Botón limpiar */}
       {query && (
         <button
-          className="absolute right-2 bg-transparent border-none cursor-pointer text-[13px] text-black leading-none p-0 hover:text-[#333]"
+          className="absolute right-2 bg-transparent border-none cursor-pointer 
+                   text-[13px] text-gray-500 leading-none p-0 
+                   hover:text-[#005221] transition-colors duration-200"
           onClick={() => setQuery("")}
         >
-          X
+          ✕
         </button>
       )}
     </div>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginSchema, LoginFormData } from "../../utils/validations";
-import { BtnPrimario, Input, SpanError } from "@/app/components/ui";
+import { BtnPrimario, Input, Label, SpanError } from "@/app/components/ui";
 import { useSession } from "@/app/hooks/useSession";
 
 export default function Login() {
@@ -142,7 +142,7 @@ export default function Login() {
           >
             {/* correo */}
             <div className="flex flex-col">
-              <label>Correo Electrónico:</label>
+              <Label nombre="Correo Electrónico:" />
               <Input
                 id="correo"
                 type="text"
@@ -161,7 +161,7 @@ export default function Login() {
 
             {/* contraseña */}
             <div className="flex flex-col">
-              <label>Contraseña:</label>
+              <Label nombre="Contraseña:" />
               <Input
                 type="password"
                 name="contrasena"

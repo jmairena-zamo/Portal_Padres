@@ -9,11 +9,11 @@ interface BtnTabProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 // Base común — evita repetir las mismas clases en los 2 botones
 const base =
-  "flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] text-white cursor-pointer border-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px] max-sm:min-w-[80px] max-[420px]:min-w-[50px] max-sm:text-[12px] max-sm:px-2";
+  "flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] text-[#FFF4E5] cursor-pointer border-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px] max-sm:min-w-[80px] max-[420px]:min-w-[50px] max-sm:text-[12px] max-sm:px-2";
 
 // Aceptar, editar, confirmar
 export const BtnPrimario = ({ children, ...props }: Props) => (
-  <button className={`${base} bg-[#008237] hover:bg-[#005221] `} {...props}>
+  <button className={`${base} bg-[#048047] hover:bg-[#036b3a] `} {...props}>
     {children}
   </button>
 );
@@ -41,10 +41,10 @@ export const BtnOutline = ({ children, ...props }: Props) => (
 
 export const BtnTab = ({ activa, children, ...props }: BtnTabProps) => (
   <button
-    className={`bg-white border-none px-2.5 py-1.25 shadow-[0px_0px_5px_2px_rgba(0,0,0,0.2)]
-      rounded-t-[5px] hover:text-[#005221] cursor-pointer
+    className={`bg-white border-none px-2.5 py-1.25 text-[#173426] shadow-[0px_0px_5px_2px_rgba(0,0,0,0.2)]
+      rounded-t-[5px] hover:text-[#006400] cursor-pointer
       max-[420px]:flex-1 max-[420px]:text-[13px] max-[420px]:text-center
-      ${activa ? "text-[#005221] border-b-2 border-[#005221] font-bold" : ""}`}
+      ${activa ? "text-[#43C302] border-b-2 border-[#43C302] font-bold" : ""}`}
     {...props}
   >
     {children}

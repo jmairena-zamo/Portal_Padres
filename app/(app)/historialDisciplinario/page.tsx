@@ -4,89 +4,41 @@
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useEffect, useState } from "react";
-import { Loading, Paginacion, Tabla, Vacio } from "@/app/components/ui";
-import { accionesEstudiantiles } from "@/app/respuestasAPI/faltas";
+import { use, useEffect, useState } from "react";
+import {
+  Buscador,
+  Loading,
+  Paginacion,
+  Tabla,
+  Titulo,
+  Vacio,
+} from "@/app/components/ui";
+import {
+  accionesEstudiantiles,
+  FilaHistorialDisciplinario,
+} from "@/app/respuestasAPI/faltas";
 import ModalForm from "@/app/components/modals/ModalForm";
-
-interface FilaHistorialDisciplinario {
-  id: number;
-  tipo: string;
-  fecha?: string;
-  periodo?: string;
-  descripcionCorta: string;
-  descripcionDetallada: string;
-  reportadaPor?: string;
-  numfaltas: number;
-  estado: string;
-  motivoRemosion?: string;
-  fechaAprobada?: string;
-  fechaEliminada?: string;
-}
-
-function mapearHistorialDisciplinario(
-  m: accionesEstudiantiles,
-  index: number,
-): FilaHistorialDisciplinario {
-  const estado = m.aprobada ? "Aprobada" : m.eliminada ? "Eliminada" : "N/A";
-
-  return {
-    id: index,
-    tipo: m.tipoCodigoAccion,
-    fecha: m.fechaAccion?.substring(0, 10),
-    periodo: [m.ano, m.periodo].filter(Boolean).join(" - ") || undefined,
-    descripcionCorta: m.descripcionTipoAccion,
-    descripcionDetallada: m.descripcionDetallada,
-    reportadaPor: m.reportadaPor,
-    numfaltas: m.numeroFaltas,
-    estado: estado,
-    motivoRemosion: m.codigoMotivoRemosion,
-    fechaAprobada: m.fechaAprobada?.substring(0, 10),
-    fechaEliminada: m.fechaEliminada?.substring(0, 10),
-  };
-}
+import { useHistorialDisciplinario } from "@/app/hooks/useHistorialDisciplinario";
 
 export default function HistorialDisciplinario() {
   const [paginaActual, setPaginaActual] = useState(1);
   const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
-  const [data, setData] = useState<FilaHistorialDisciplinario[]>([]);
-  const [cargando, setCargando] = useState(true);
   const [filaSeleccionada, setFilaSeleccionada] =
     useState<FilaHistorialDisciplinario | null>(null);
-  const [errorDisc, setErrorDisc] = useState(false);
+  const [dataFiltrada, setDataFiltrada] = useState<
+    FilaHistorialDisciplinario[]
+  >([]);
+
+  const {
+    historialDisciplinario,
+    cargandoDisciplinario,
+    errorDisciplinario,
+    reintentarDisciplinario,
+  } = useHistorialDisciplinario();
 
   useEffect(() => {
-    cargarData();
-  }, []);
-
-  const cargarData = async () => {
-    setErrorDisc(false);
-    try {
-      const inicio = Date.now();
-
-      const res = await fetch("/api/estudiantes/obtenerFaltas");
-
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}`);
-      }
-
-      const data = await res.json();
-      const filas = (data.AccionesEstudiantiles as accionesEstudiantiles[]).map(
-        mapearHistorialDisciplinario,
-      );
-      setData(filas);
-
-      const transcurrido = Date.now() - inicio;
-      const restante = 1000 - transcurrido;
-      if (restante > 0) {
-        await new Promise((resolve) => setTimeout(resolve, restante));
-      }
-    } catch (error) {
-      setErrorDisc(true);
-    } finally {
-      setCargando(false);
-    }
-  };
+    setDataFiltrada(historialDisciplinario);
+  }, [historialDisciplinario]);
 
   const handleCambiarRegistros = (cantidad: number) => {
     setRegistrosPorPagina(cantidad);
@@ -95,21 +47,40 @@ export default function HistorialDisciplinario() {
 
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
-  const datosPaginados = data.slice(indexInicio, indexFin);
+  const datosPaginados = dataFiltrada.slice(indexInicio, indexFin);
 
-  if (cargando) return <Loading />;
+  const tieneData = historialDisciplinario.length > 0;
+
+  if (cargandoDisciplinario) return <Loading />;
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
       <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] mb-3.75">
-        <h2 className="font-bold text-lg">Historial Disciplinario</h2>
-        {cargando ? (
+        <Titulo titulo="Historial Disciplinario" alineado={3} />
+        <div className="mt-2.5">
+          <Buscador
+            datos={historialDisciplinario}
+            campos={["tipo", "periodo"]}
+            placeholder="Buscar..."
+            onResultado={(resultado) => {
+              setDataFiltrada(resultado);
+              setPaginaActual(1);
+            }}
+          />
+        </div>
+
+        {cargandoDisciplinario ? (
           <Loading />
-        ) : errorDisc ? (
+        ) : errorDisciplinario ? (
           <Vacio
             titulo="Ocurrio un error"
             descripcion="No se pudo cargar la información"
-            onReintentar={cargarData}
+            onReintentar={reintentarDisciplinario}
+          />
+        ) : !tieneData ? (
+          <Vacio
+            titulo="No hay Información"
+            descripcion="No existe Historial Disciplinario"
           />
         ) : (
           <Tabla
@@ -142,7 +113,7 @@ export default function HistorialDisciplinario() {
                 render: (item) => (
                   <button
                     onClick={() => setFilaSeleccionada(item)}
-                    className="truncate max-w-50 text-left text-[#008237] hover:underline cursor-pointer"
+                    className="truncate max-w-50 text-left text-[#007BFF] hover:underline cursor-pointer"
                     title="Click para ver el detalle completo"
                   >
                     Ver más
@@ -154,7 +125,7 @@ export default function HistorialDisciplinario() {
         )}
 
         <Paginacion
-          totalRegistros={data.length}
+          totalRegistros={historialDisciplinario.length}
           registrosPorPagina={registrosPorPagina}
           paginaActual={paginaActual}
           onCambiarPagina={setPaginaActual}
@@ -172,11 +143,11 @@ export default function HistorialDisciplinario() {
           <p className="text-sm text-gray-500">
             {filaSeleccionada.fecha} · {filaSeleccionada.tipo}
           </p>
-          <p className="text-gray-700 whitespace-pre-line">
+          <p className="text-[#666666] whitespace-pre-line">
             <strong>Descripción: </strong>
             {filaSeleccionada.descripcionDetallada}
           </p>
-          <p className="text-gray-700 whitespace-pre-line flex flex-col">
+          <p className="text-[#666666] whitespace-pre-line flex flex-col">
             <span>
               <strong>Estado:</strong> {filaSeleccionada.estado}
             </span>

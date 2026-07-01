@@ -31,13 +31,13 @@ export function CardInfo({ queja, onClick }: QuejaCardProps) {
         </span>
       </div>
 
-      <h3 className="mt-2 font-semibold text-[rgb(41,94,34)]">
-        {queja.asunto}
-      </h3>
+      <h3 className="mt-2 font-semibold text-[#048047]">{queja.asunto}</h3>
 
-      <p className="mt-1 line-clamp-2 text-sm text-gray-600">{queja.mensaje}</p>
+      <p className="mt-1 line-clamp-2 text-sm text-[#555555]">
+        {queja.mensaje}
+      </p>
 
-      <p className="mt-2 text-xs text-gray-400">{fecha}</p>
+      <p className="mt-2 text-xs text-[#999999]">{fecha}</p>
     </button>
   );
 }

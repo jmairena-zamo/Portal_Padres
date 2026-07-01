@@ -54,9 +54,9 @@ export default function ResumenEstudiante() {
       {/* fila 1 */}
       <div className="flex flex-wrap gap-4 w-full max-[800px]:flex-col">
         {/* card info estudiante */}
-        <div className="flex-[1_1_300px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+        <div className="flex-[1_1_300px] bg-[#ffffff] text-[#173426] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
           <h3 className="text-center font-semibold">INFORMACIÓN ESTUDIANTE</h3>
-          <hr />
+          <hr className="my-2" />
           <br />
           <div className="flex justify-center">
             <Image
@@ -73,17 +73,23 @@ export default function ResumenEstudiante() {
             />
           </div>
           <br />
-          <h4>Estudiante: {estudiante?.Nombre}</h4>
-          <h4>Codigo Estudiante: {estudiante?.CodigoEstudiante}</h4>
-          <h4>Carrera: {estudiante?.Carrera}</h4>
+          <h4>
+            <strong>Estudiante:</strong> {estudiante?.Nombre}
+          </h4>
+          <h4>
+            <strong>Codigo Estudiante:</strong> {estudiante?.CodigoEstudiante}
+          </h4>
+          <h4>
+            <strong>Carrera:</strong> {estudiante?.Carrera}
+          </h4>
         </div>
 
         {/* graphics */}
         <div className="flex flex-col justify-center gap-4 flex-[2_1_400px] max-[800px]:flex-[1_1_auto]">
           {/* promedio global */}
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="flex-[1_1_200px] min-h-45 bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-              <h3 className="text-[14px] font-semibold">PROMEDIO GLOBAL</h3>
+            <div className="flex-[1_1_200px] min-h-45 bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+              <h3 className="font-semibold text-[#173426]">PROMEDIO GLOBAL</h3>
               <hr className="my-2" />
               <div className="flex-1 flex items-center justify-center gap-3">
                 <RadialBarChart
@@ -101,17 +107,17 @@ export default function ResumenEstudiante() {
                     domain={[0, 100]}
                     tick={false}
                   />
-                  <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
+                  <RadialBar dataKey="value" cornerRadius={10} fill="#048047" />
                 </RadialBarChart>
-                <span className="font-bold text-[24px] text-[#008237]">
+                <span className="font-bold text-[24px] text-[#048047]">
                   {promedio}%
                 </span>
               </div>
             </div>
 
             {/* último periodo */}
-            <div className="flex-[1_1_200px] min-h-45 bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-              <h3 className="text-[14px] font-semibold">
+            <div className="flex-[1_1_200px] min-h-45 bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+              <h3 className="font-semibold text-[#173426]">
                 PROMEDIO ÚLTIMO PERIODO
               </h3>
               <hr className="my-2" />
@@ -131,9 +137,9 @@ export default function ResumenEstudiante() {
                     domain={[0, 100]}
                     tick={false}
                   />
-                  <RadialBar dataKey="value" cornerRadius={10} fill="#008237" />
+                  <RadialBar dataKey="value" cornerRadius={10} fill="#048047" />
                 </RadialBarChart>
-                <span className="font-bold text-[24px] text-[#008237]">
+                <span className="font-bold text-[24px] text-[#048047]">
                   {promedio}%
                 </span>
               </div>
@@ -141,17 +147,17 @@ export default function ResumenEstudiante() {
           </div>
 
           {/* porcentaje carrera */}
-          <div className="flex-[0.5_1_150px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
-            <h3 className="text-[14px] font-semibold">PORCENTAJE CARRERA</h3>
+          <div className="flex-[0.5_1_150px] bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+            <h3 className="font-semibold text-[#173426]">PORCENTAJE CARRERA</h3>
             <hr className="my-2" />
             <div className="flex-1 flex flex-col items-center justify-center gap-2 px-2">
               <div className="w-full h-3 bg-[#e5e7eb] rounded-[10px] overflow-hidden">
                 <div
-                  className="h-full bg-[#008237] rounded-[10px] transition-[width] duration-400 ease-in-out"
+                  className="h-full bg-[#048047] rounded-[10px] transition-[width] duration-400 ease-in-out"
                   style={{ width: `${porcentaje}%` }}
                 />
               </div>
-              <span className="text-[20px] font-bold text-[#008237]">
+              <span className="text-[20px] font-bold text-[#048047]">
                 {porcentaje}%
               </span>
             </div>
@@ -162,8 +168,10 @@ export default function ResumenEstudiante() {
       {/* fila 2 */}
       <div className="flex flex-wrap gap-4 w-full max-[420px]:flex-col">
         {/* causales de sanción */}
-        <div className="flex-[1_1_300px] bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-          <h3 className="text-center font-semibold">CAUSALES DE SANCIÓN</h3>
+        <div className="flex-[1_1_300px] bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+          <h3 className="text-center font-semibold text-[#173426]">
+            CAUSALES DE SANCIÓN
+          </h3>
           <hr className="my-2" />
           <div className="grid grid-cols-2 gap-3 mt-4 max-[420px]:grid-cols-1">
             <CardCausal
@@ -194,27 +202,27 @@ export default function ResumenEstudiante() {
         </div>
 
         {/* stats */}
-        <div className="flex-[1_1_200px] bg-white p-4 rounded-lg shadow-md">
-          <h3 className="text-center font-semibold text-gray-800">
+        <div className="flex-[1_1_200px] bg-[#ffffff] p-4 rounded-lg shadow-md">
+          <h3 className="text-center font-semibold text-[#173426]">
             DATOS ACADÉMICOS AL ÚLTIMO PERIODO
           </h3>
           <hr className="my-2" />
 
-          <div className="grid grid-cols-3 gap-2 mt-4">
+          <div className="grid grid-cols-3 gap-2 mt-4 text-[#30545b]">
             <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
-              <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
+              <p className="text-[10px]  font-medium leading-tight">
                 POSICIÓN CLASE
               </p>
               <p className="text-[15px] font-bold mt-1">238/275</p>
             </div>
             <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
-              <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
+              <p className="text-[10px] font-medium leading-tight">
                 POSICIÓN CARRERA
               </p>
               <p className="text-[15px] font-bold mt-1">35/40</p>
             </div>
             <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
-              <p className="text-[10px] text-[#6b7280] font-medium leading-tight">
+              <p className="text-[10px] font-medium leading-tight">
                 POSICIÓN PAÍS
               </p>
               <p className="text-[15px] font-bold mt-1">34/36</p>
@@ -224,30 +232,28 @@ export default function ResumenEstudiante() {
           {/* Categorías disciplinarias */}
           <div className="flex flex-col justify-center mt-8">
             <div className="flex items-center justify-between text-sm">
-              <span>CAT. DISCIPLINARIA</span>
-              <span className="font-bold text-[14px] px-2 py-0.5 rounded-full bg-green-100 text-[#008237]">
+              <span className="text-[#30545b]">
+                <strong>CAT. DISCIPLINARIA</strong>
+              </span>
+              <span className="font-bold text-[14px] px-2 py-0.5 rounded-full border border-[#43C302] text-[#30545b]">
                 {categoriaDisc}
               </span>
             </div>
-            {/* <div className="flex items-center justify-between text-sm">
-              <span>CAT. DISCIPLINARIA HISTÓRICA</span>
-              <span className="font-bold text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
-                REGULAR
-              </span>
-            </div> */}
           </div>
         </div>
       </div>
       {/* fila 3 */}
-      <div className="bg-white p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
-        <h3 className="text-center font-semibold">CÁPSULAS INFORMATIVAS</h3>
+      <div className="bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+        <h3 className="text-center font-semibold text-[#173426]">
+          CÁPSULAS INFORMATIVAS
+        </h3>
 
         <hr className="mt-2" />
 
         <div className="flex flex-col border-b border-gray-200 mt-5 max-[420px]:flex-wrap">
           <div className="mb-3">
             <button
-              className="bg-[#008237] h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
+              className="bg-[#173426] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setDecanatura(!decanatura)}
             >
               <FaUniversity />
@@ -266,7 +272,7 @@ export default function ResumenEstudiante() {
           </div>
           <div className="mb-3">
             <button
-              className="bg-blue-600 h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
+              className="bg-[#048047] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setClaseAH(!claseAH)}
             >
               {/* <FaChevronDown
@@ -286,7 +292,7 @@ export default function ResumenEstudiante() {
 
           <div>
             <button
-              className="bg-gray-600 h-10 w-full rounded-t-[5px] text-[white] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
+              className="bg-[#74bdca] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setTecnologias(!tecnologias)}
             >
               {/* <FaChevronDown

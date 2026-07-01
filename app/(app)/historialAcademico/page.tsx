@@ -10,13 +10,14 @@ import {
   Loading,
   Paginacion,
   Tabla,
+  Titulo,
   Vacio,
 } from "@/app/components/ui";
 import {
   CursoHistorial,
   FilaHistorial,
 } from "@/app/respuestasAPI/historialAcademico";
-import { useEstudiante } from "@/app/hooks/useEstudiante";
+import { useHistorialAcademico } from "@/app/hooks/useHistorialAcademico";
 
 export default function HistorialAcademico() {
   const [paginaActual, setPaginaActual] = useState(1);
@@ -25,10 +26,10 @@ export default function HistorialAcademico() {
 
   const {
     historialAcademico,
-    cargandoHistorialAca,
-    errorHistorialAca,
-    reintentarHistorialAca,
-  } = useEstudiante();
+    cargandoHistorialAcademico,
+    errorHistorialAcademico,
+    reintentarHistorialAcademico,
+  } = useHistorialAcademico();
 
   useEffect(() => {
     setDataFiltrada(historialAcademico);
@@ -45,28 +46,32 @@ export default function HistorialAcademico() {
 
   const tieneData = historialAcademico.length > 0;
 
-  if (cargandoHistorialAca) return <Loading />;
+  if (cargandoHistorialAcademico) return <Loading />;
+
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
       <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-[5px] mb-3.75">
-        <h2 className="font-bold text-lg">Historial Academico</h2>
-        <Buscador
-          datos={historialAcademico}
-          campos={["clase", "anio", "periodo", "codigo"]}
-          placeholder="Buscar..."
-          onResultado={(resultados) => {
-            setDataFiltrada(resultados);
-            setPaginaActual(1);
-          }}
-        />
-        {cargandoHistorialAca ? (
+        <Titulo titulo="Historial Academico" alineado={3} />
+        <div className="mt-2.5">
+          <Buscador
+            datos={historialAcademico}
+            campos={["clase", "anio", "periodo", "codigo"]}
+            placeholder="Buscar..."
+            onResultado={(resultados) => {
+              setDataFiltrada(resultados);
+              setPaginaActual(1);
+            }}
+          />
+        </div>
+
+        {cargandoHistorialAcademico ? (
           <Loading />
-        ) : errorHistorialAca ? (
+        ) : errorHistorialAcademico ? (
           <Vacio
             titulo="Ocurrio un error"
             descripcion="No se pudo cargar la información"
-            onReintentar={reintentarHistorialAca}
+            onReintentar={reintentarHistorialAcademico}
           />
         ) : !tieneData ? (
           <Vacio
@@ -79,7 +84,7 @@ export default function HistorialAcademico() {
               datos={datosPaginados}
               keyExtractor={(item) => item.id}
               claseFilaExtra={(item) =>
-                parseFloat(item.nota) < 60 ? "bg-red-400" : ""
+                parseFloat(item.nota) < 60 ? "bg-red-300" : ""
               }
               columnas={[
                 { header: "Código", accessor: "codigo" },

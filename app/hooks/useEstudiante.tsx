@@ -2,16 +2,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { infoEstudiante } from "../respuestasAPI/infoEstudiante";
-import {
-  CursoHistorial,
-  FilaHistorial,
-  mapearCurso,
-} from "../respuestasAPI/historialAcademico";
-import {
-  FilaCuenta,
-  mapearMovimiento,
-  MovimientoCuenta,
-} from "../respuestasAPI/estadoCuenta";
 
 interface Hijo {
   bannerID: number;
@@ -30,19 +20,7 @@ interface EstudianteContextType {
   hijoActivo: Hijo | null;
   setHijoActivo: React.Dispatch<React.SetStateAction<Hijo | null>>;
 
-  historialAcademico: FilaHistorial[];
-  cargandoHistorialAca: boolean;
-  errorHistorialAca: boolean;
-
-  estadoCuenta: FilaCuenta[];
-  cargandoEstadoCuenta: boolean;
-  errorEstadoCuenta: boolean;
-  balance: number;
-
   cargarEstudiante: () => Promise<void>;
-  reintentarHistorialAca: () => void;
-  reintentarEstadoCuenta: () => void;
-  // cargarEstadoCuenta: () => Promise<void>;
 }
 
 const EstudianteContext = createContext<EstudianteContextType | null>(null);
@@ -63,23 +41,6 @@ export const EstudianteProvider = ({
   const [hijos, setHijos] = useState<Hijo[]>([]);
   const [hijoActivo, setHijoActivo] = useState<Hijo | null>(null);
 
-  // Constantes Historial Academico
-  const [historialAcademico, setHistorialAcademico] = useState<FilaHistorial[]>(
-    [],
-  );
-  const [cargandoHistorialAca, setCargandoHistorialAca] =
-    useState<boolean>(true);
-  const [errorHistorialAca, setErrorHistorialAca] = useState<boolean>(false);
-  const [intentoHistorialAca, setIntentoHistorialAca] = useState(0);
-
-  // Constantes Estado de Cuenta
-  const [estadoCuenta, setEstadoCuenta] = useState<FilaCuenta[]>([]);
-  const [cargandoEstadoCuenta, setCargandoEstadoCuenta] =
-    useState<boolean>(true);
-  const [errorEstadoCuenta, setErrorEstadoCuenta] = useState<boolean>(false);
-  const [intentoEstadoCuenta, setIntentoEstadoCuenta] = useState(0);
-  const [balance, setBalance] = useState(0);
-
   useEffect(() => {
     const hijosMock = [
       { bannerID: 1, Nombre: "Carlos Martínez" },
@@ -97,20 +58,13 @@ export const EstudianteProvider = ({
   useEffect(() => {
     if (!hijoActivo) return;
     cargarEstudiante();
-    cargarHistorialAca();
-    cargarEstadoCuenta();
-  }, [hijoActivo, intentoHistorialAca, intentoEstadoCuenta]);
-
-  const reintentarHistorialAca = () =>
-    setIntentoHistorialAca((prev) => prev + 1);
-
-  const reintentarEstadoCuenta = () =>
-    setIntentoEstadoCuenta((prev) => prev + 1);
+  }, [hijoActivo]);
 
   const cargarEstudiante = async () => {
     setCargando(true);
     try {
       const inicio = Date.now();
+      // Se tiene que enviar el bannerID del hijo en la url
       const [resFoto, resFaltas, resInfo] = await Promise.all([
         fetch("/api/estudiantes/obtenerFoto"),
         fetch("/api/estudiantes/obtenerFaltas"),
@@ -143,60 +97,6 @@ export const EstudianteProvider = ({
     }
   };
 
-  const cargarHistorialAca = async () => {
-    setCargandoHistorialAca(true);
-    setErrorHistorialAca(false);
-    try {
-      const inicio = Date.now();
-      const res = await fetch(`/api/estudiantes/obtenerHistorialAcademico`);
-
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-
-      const data = await res.json();
-      const filas = (data.response as CursoHistorial[]).map(mapearCurso);
-      setHistorialAcademico(filas);
-
-      const transcurrido = Date.now() - inicio;
-      const restante = 1000 - transcurrido;
-      if (restante > 0) await new Promise((r) => setTimeout(r, restante));
-    } catch (error) {
-      console.error("Error cargando historial:", error);
-      setErrorHistorialAca(true);
-    } finally {
-      setCargandoHistorialAca(false);
-    }
-  };
-
-  const cargarEstadoCuenta = async () => {
-    setCargandoEstadoCuenta(true);
-    setErrorEstadoCuenta(false);
-    try {
-      const inicio = Date.now();
-      const res = await fetch("/api/estudiantes/obtenerEstadoCuenta");
-
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}`);
-      }
-
-      const data = await res.json();
-      const filas = (data.response.details as MovimientoCuenta[])
-        .map(mapearMovimiento)
-        .sort((a, b) => a.id - b.id);
-      setEstadoCuenta(filas);
-      setBalance(data.response.balance);
-      const transcurrido = Date.now() - inicio;
-      const restante = 1000 - transcurrido;
-      if (restante > 0) {
-        await new Promise((resolve) => setTimeout(resolve, restante));
-      }
-    } catch (error) {
-      console.log("Error de conexión. Intenta de nuevo.");
-      setErrorEstadoCuenta(true);
-    } finally {
-      setCargandoEstadoCuenta(false);
-    }
-  };
-
   return (
     <EstudianteContext.Provider
       value={{
@@ -211,18 +111,7 @@ export const EstudianteProvider = ({
         hijoActivo,
         setHijoActivo,
 
-        historialAcademico,
-        cargandoHistorialAca,
-        errorHistorialAca,
-
-        estadoCuenta,
-        cargandoEstadoCuenta,
-        errorEstadoCuenta,
-        balance,
-
         cargarEstudiante,
-        reintentarHistorialAca,
-        reintentarEstadoCuenta,
       }}
     >
       {children}

@@ -48,7 +48,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
     <header
       className={[
         "shadow-[0_3px_5px_rgba(0,0,0,0.4)] fixed top-0 right-0 h-13.75 z-98",
-        "bg-white flex justify-center items-center transition-transform duration-500 ease-in-out",
+        "bg-[#ffffff] flex justify-center items-center transition-transform duration-500 ease-in-out",
         // desktop: left depende del estado colapsado
         colapsado ? "left-15" : "left-62.5",
         // mobile: siempre full width con padding para el hamburger
@@ -78,7 +78,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
               <button
                 onClick={() => setDropdownAbierto((prev) => !prev)}
                 className={[
-                  "bg-transparent border-none font-bold flex items-center gap-1.5 max-[420px]:hidden",
+                  "bg-transparent border-none font-bold text-[#173426] flex items-center gap-1.5 max-[420px]:hidden",
                   tieneVariosHijos && "cursor-pointer",
                 ]
                   .filter(Boolean)

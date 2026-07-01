@@ -35,8 +35,8 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
   // Aplica la clase activa si la ruta actual coincide con el path del link
   const linkClass = (path: string) =>
     pathname === path
-      ? "font-bold bg-white text-[rgb(40,100,48)] px-2.5 py-[5px] w-full rounded-[5px] flex items-end gap-2 text-xs no-underline"
-      : "font-normal text-[#e5e5e5] px-2.5 py-[5px] flex items-end gap-2 text-xs no-underline";
+      ? "font-bold bg-[#FFF4E5] text-[rgb(40,100,48)] px-2.5 py-[5px] w-full rounded-[5px] flex items-end gap-2 text-xs no-underline"
+      : "font-normal text-[#FFF4E5] px-2.5 py-[5px] flex items-end gap-2 text-xs no-underline";
 
   // Alterna el submenú abierto; si se presiona el mismo, lo cierra
   const gestionSubmenu = (idMenu: number) => {
@@ -68,7 +68,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
         aria-label="Abrir menú"
         className={[
           "hidden fixed top-3.5 left-3.5 z-200",
-          "bg-[#008237] border-none rounded-md px-2.5 py-2 cursor-pointer",
+          "bg-[#048047] border-none rounded-md px-2.5 py-2 cursor-pointer",
           "flex-col gap-1.25 shadow-[0_2px_6px_rgba(0,0,0,0.3)]",
           "max-[800px]:flex",
           // estilos de las líneas del hamburger via [&>span]
@@ -99,7 +99,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
       {/* Sidebar */}
       <div
         className={[
-          "bg-[#008237] h-screen fixed left-0 top-0",
+          "bg-[#048047] h-screen fixed left-0 top-0",
           "shadow-[3px_3px_5px_rgba(0,0,0,0.4)]",
           "flex flex-col items-center justify-between",
           // ancho según estado
@@ -125,7 +125,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
           <button
             onClick={onToggle}
             aria-label="Colapsar menú"
-            className="flex bg-transparent border-none text-white cursor-pointer p-1.25 rounded-[5px] hover:bg-white/15 transition-colors duration-200"
+            className="flex bg-transparent border-none text-[#FFF4E5] cursor-pointer p-1.25 rounded-[5px] hover:bg-white/15 transition-colors duration-200"
           >
             <FaBars size={25} />
           </button>
@@ -140,7 +140,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
               colapsado ? "h-auto py-2 px-0" : "h-30",
             ].join(" ")}
           >
-            <div className="flex flex-col justify-center items-center rounded-[5px] h-full text-white">
+            <div className="flex flex-col justify-center items-center rounded-[5px] h-full text-[#FFF4E5]">
               <Image
                 src={imagen}
                 alt="Logo Zamorano"
@@ -162,10 +162,10 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
           {/* Navegación */}
           <nav
             className={[
-              "flex flex-col gap-2 border-t border-white pt-2.5 px-2.5",
+              "flex flex-col text-[#FFF4E5] gap-2 border-t border-[#FFF4E5] pt-2.5 px-2.5",
               "flex-1 overflow-y-auto w-full box-border", // ← flex-1 reemplaza max-h-[57vh]
               "[&::-webkit-scrollbar]:w-1.5",
-              "[&::-webkit-scrollbar-thumb]:bg-white [&::-webkit-scrollbar-thumb]:rounded-[20px]",
+              "[&::-webkit-scrollbar-thumb]:bg-[#FFF4E5] [&::-webkit-scrollbar-thumb]:rounded-[20px]",
               colapsado ? "items-center px-0" : "items-start",
             ].join(" ")}
           >
@@ -185,7 +185,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                         title={colapsado ? menu.opcion : ""}
                         className={[
                           "w-full bg-transparent border-none cursor-pointer",
-                          "flex items-center gap-2 font-normal text-[#e5e5e5]",
+                          "flex items-center gap-2 font-normal text-[#FFF4E5]",
                           "px-2.5 py-1.25 text-xs",
                           colapsado && "justify-center px-0 w-10",
                         ]
@@ -247,7 +247,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
         {/* Logout */}
         <div
           className={[
-            "text-white flex items-end border-t border-white pt-3.75 pb-3.75 w-[90%]",
+            "text-[#FFF4E5] flex items-end border-t border-[#FFF4E5] pt-3.75 pb-3.75 w-[90%]",
             colapsado ? "justify-center px-0" : "justify-center gap-5",
           ].join(" ")}
         >
@@ -255,8 +255,8 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
             onClick={handleLogout}
             title={colapsado ? "Cerrar Sesión" : ""}
             className={[
-              "flex items-end gap-2 p-1.25 bg-transparent border-none text-white cursor-pointer",
-              "hover:bg-white hover:text-[rgb(40,100,48)] hover:w-full hover:px-2.5",
+              "flex items-end gap-2 p-1.25 bg-transparent border-none text-[#FFF4E5] cursor-pointer",
+              "hover:bg-[#FFF4E5] hover:text-[rgb(40,100,48)] hover:w-full hover:px-2.5",
               "hover:justify-center hover:rounded-[5px] hover:font-bold",
               "transition-all duration-200",
               colapsado && "justify-center px-0",

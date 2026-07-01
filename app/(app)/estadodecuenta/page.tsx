@@ -9,9 +9,10 @@ import {
   Loading,
   Paginacion,
   Tabla,
+  Titulo,
   Vacio,
 } from "@/app/components/ui";
-import { useEstudiante } from "@/app/hooks/useEstudiante";
+import { useEstadoCuenta } from "@/app/hooks/useEstadoCuenta";
 import {
   FilaCuenta,
   mapearMovimiento,
@@ -30,43 +31,7 @@ export default function EstadoCuenta() {
     errorEstadoCuenta,
     reintentarEstadoCuenta,
     balance,
-  } = useEstudiante();
-
-  // useEffect(() => {
-  //   cargarDatos();
-  // }, []);
-
-  // // Obtener datos y mapearlos
-  // const cargarDatos = async () => {
-  //   setCargando(true);
-  //   setErrorEC(false);
-  //   try {
-  //     const inicio = Date.now();
-  //     const res = await fetch("/api/estudiantes/obtenerEstadoCuenta");
-
-  //     if (!res.ok) {
-  //       throw new Error(`Error ${res.status}`);
-  //     }
-
-  //     const data = await res.json();
-  //     const filas = (data.response.details as MovimientoCuenta[])
-  //       .map(mapearMovimiento)
-  //       .sort((a, b) => a.id - b.id);
-  //     setData(filas);
-  //     setDataFiltrada(filas);
-  //     setBalance(data.response.balance);
-  //     const transcurrido = Date.now() - inicio;
-  //     const restante = 1000 - transcurrido;
-  //     if (restante > 0) {
-  //       await new Promise((resolve) => setTimeout(resolve, restante));
-  //     }
-  //   } catch (error) {
-  //     console.log("Error de conexión. Intenta de nuevo.");
-  //     setErrorEC(true);
-  //   } finally {
-  //     setCargando(false);
-  //   }
-  // };
+  } = useEstadoCuenta();
 
   const handleCambiarRegistros = (cantidad: number) => {
     setRegistrosPorPagina(cantidad);
@@ -83,16 +48,19 @@ export default function EstadoCuenta() {
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       {/*< InformacionEstudiante />*/}
       <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-[5px] mb-3.75">
-        <h2 className="font-bold text-lg">Estado de Cuenta</h2>
-        <Buscador
-          datos={estadoCuenta}
-          placeholder="Buscar..."
-          campos={["tipo", "categoria", "descripcion"]}
-          onResultado={(resultados) => {
-            setDataFiltrada(resultados);
-            setPaginaActual(1);
-          }}
-        />
+        <Titulo titulo="Estado de Cuenta" alineado={3} />
+        <div className="mt-2.5">
+          <Buscador
+            datos={estadoCuenta}
+            placeholder="Buscar..."
+            campos={["tipo", "categoria", "descripcion"]}
+            onResultado={(resultados) => {
+              setDataFiltrada(resultados);
+              setPaginaActual(1);
+            }}
+          />
+        </div>
+
         {cargandoEstadoCuenta ? (
           <Loading />
         ) : errorEstadoCuenta ? (
@@ -118,7 +86,9 @@ export default function EstadoCuenta() {
               ]}
             />
 
-            <h2 className="font-bold text-lg mt-3.75">Balance: {balance}</h2>
+            <h2 className="font-bold text-[16px] text-[#555555] mt-3.75">
+              Balance: {balance}
+            </h2>
 
             <Paginacion
               totalRegistros={estadoCuenta.length}
