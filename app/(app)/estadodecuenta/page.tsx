@@ -86,7 +86,7 @@ export default function EstadoCuenta() {
               ]}
             />
 
-            <h2 className="font-bold text-[16px] text-[#555555] mt-3.75">
+            <h2 className="font-bold text-[16px] text-[#173426] mt-3.75 mb-3.75 ml-3.5">
               Balance: {balance}
             </h2>
 

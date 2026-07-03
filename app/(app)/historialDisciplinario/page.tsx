@@ -4,7 +4,7 @@
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Buscador,
   Loading,
@@ -19,6 +19,7 @@ import {
 } from "@/app/respuestasAPI/faltas";
 import ModalForm from "@/app/components/modals/ModalForm";
 import { useHistorialDisciplinario } from "@/app/hooks/useHistorialDisciplinario";
+import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 export default function HistorialDisciplinario() {
   const [paginaActual, setPaginaActual] = useState(1);
@@ -28,6 +29,7 @@ export default function HistorialDisciplinario() {
   const [dataFiltrada, setDataFiltrada] = useState<
     FilaHistorialDisciplinario[]
   >([]);
+  const { faltasTotales } = useEstudiante();
 
   const {
     historialDisciplinario,
@@ -55,7 +57,7 @@ export default function HistorialDisciplinario() {
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
-      <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] mb-3.75">
+      <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] ">
         <Titulo titulo="Historial Disciplinario" alineado={3} />
         <div className="mt-2.5">
           <Buscador
@@ -124,6 +126,9 @@ export default function HistorialDisciplinario() {
           />
         )}
 
+        <h2 className="font-bold text-[16px] text-[#173426] mt-3.75 mb-3.75 ml-3.5">
+          Faltas Totales: {faltasTotales}
+        </h2>
         <Paginacion
           totalRegistros={historialDisciplinario.length}
           registrosPorPagina={registrosPorPagina}
