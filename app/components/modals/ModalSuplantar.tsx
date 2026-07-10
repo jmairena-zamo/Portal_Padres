@@ -33,10 +33,10 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
   const [todosEstudiantes] = useState(estudiantesIniciales);
   const [estudiantesFiltrados, setEstudiantesFiltrados] =
     useState(estudiantesIniciales);
-  const { setHijoActivo, foto } = useEstudiante();
+  const { seleccionarEstudiante, foto } = useEstudiante();
 
   //registra el ingreso con el bannerID del estudiante
-  const seleccionarEstudiante = async (estudiante: {
+  const seleccionarEstudiantea = async (estudiante: {
     bannerID: number;
     Nombre: string;
   }) => {
@@ -45,7 +45,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ bannerID: estudiante.bannerID }), // reemplaza con el real cuando se tengan los datos
     });
-    setHijoActivo(estudiante);
+    seleccionarEstudiante(estudiante);
     OnClose();
   };
 
@@ -106,7 +106,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
               </div>
 
               {/* botón */}
-              <BtnPrimario onClick={() => seleccionarEstudiante(u)}>
+              <BtnPrimario onClick={() => seleccionarEstudiantea(u)}>
                 Ver
               </BtnPrimario>
             </div>

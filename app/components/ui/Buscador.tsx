@@ -7,12 +7,17 @@ import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 
 interface BuscadorProps<T> {
-  datos: T[];
-  campos: (keyof T)[];
+  datos?: T[];
+  campos?: (keyof T)[];
   placeholder?: string;
   // Se ejecuta cada que cambia el resultado del filtro
   // Recibe el arreglo filtrado, o completo si query esta vacio
-  onResultado: (resultados: T[]) => void;
+  // Solo se aplica si se mandan datos
+  onResultado?: (resultados: T[]) => void;
+
+  // Se ejecuta despues de los 500ms
+  // dispara el fetch para buscar
+  onQueryChange?: (query: string) => void;
 }
 
 // Este componente recibe los datos en donde se buscara y que campo especifico(columna) es el que se buscara
@@ -22,6 +27,7 @@ export default function Buscador<T>({
   campos,
   placeholder = "Buscar...",
   onResultado,
+  onQueryChange,
 }: BuscadorProps<T>) {
   const [query, setQuery] = useState("");
   const [queryDelay, setQueryDelay] = useState("");
@@ -37,8 +43,16 @@ export default function Buscador<T>({
     return () => clearTimeout(timeoutId);
   }, [query]);
 
-  // Se ejecuta cada vez que queryDelay o datos cambian
+  // Modo servidor del buscador
+  // No busca local, y le manda el texto al padre
   useEffect(() => {
+    onQueryChange?.(queryDelay.trim());
+  }, [queryDelay]);
+
+  // Se ejecuta cada vez que queryDelay, datos u onResultado cambian
+  useEffect(() => {
+    if (!datos || !campos || !onResultado) return;
+
     // Si query esta vacio devuelve todos los datos
     if (!queryDelay.trim()) {
       onResultado(datos);
@@ -57,6 +71,7 @@ export default function Buscador<T>({
       }),
     );
 
+    // Opcional: Una pequeña verificación para no avisar al padre si el resultado es idéntico en longitud y contenido
     onResultado(filtrados);
   }, [queryDelay, datos]);
 
@@ -81,6 +96,7 @@ export default function Buscador<T>({
       {/* Botón limpiar */}
       {query && (
         <button
+          type="button"
           className="absolute right-2 bg-transparent border-none cursor-pointer 
                    text-[13px] text-gray-500 leading-none p-0 
                    hover:text-[#005221] transition-colors duration-200"

@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-export async function GET(request: NextRequest) {
-  const id = request.nextUrl.searchParams.get("id");
-  const token = request.nextUrl.searchParams.get("token");
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+
+  const id = body.id;
+  const token = body.token;
 
   if (!id) {
     return NextResponse.json({ error: "Datos no válidos" }, { status: 500 });

@@ -64,6 +64,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
     <>
       {/* Botón hamburguesa — visible solo en <800px */}
       <button
+        type="button"
         onClick={() => setSidebarAbierto((v) => !v)}
         aria-label="Abrir menú"
         className={[
@@ -90,9 +91,11 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
 
       {/* Overlay oscuro en móvil */}
       {sidebarAbierto && (
-        <div
-          className="fixed inset-0 bg-black/45 z-99"
+        <button
+          type="button"
+          aria-label="Cerrar menú lateral"
           onClick={cerrarSidebar}
+          className="fixed inset-0 bg-black/45 z-99"
         />
       )}
 
@@ -123,6 +126,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
           ].join(" ")}
         >
           <button
+            type="button"
             onClick={onToggle}
             aria-label="Colapsar menú"
             className="flex bg-transparent border-none text-[#FFF4E5] cursor-pointer p-1.25 rounded-[5px] hover:bg-white/15 transition-colors duration-200"
@@ -181,6 +185,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                     <>
                       {/* Menú con submenús */}
                       <button
+                        type="button"
                         onClick={() => gestionSubmenu(menu.iD_Menu)}
                         title={colapsado ? menu.opcion : ""}
                         className={[
@@ -252,6 +257,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
           ].join(" ")}
         >
           <button
+            type="button"
             onClick={handleLogout}
             title={colapsado ? "Cerrar Sesión" : ""}
             className={[

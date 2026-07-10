@@ -208,6 +208,7 @@ export async function POST(request: NextRequest) {
       id: usuario.iD_UserEmail,
       email: usuario.correoElectronico,
       iD_Rol: usuario.iD_Rol,
+      bannerID: bannerID,
     };
 
     // Registrar ingreso inicial al sistema

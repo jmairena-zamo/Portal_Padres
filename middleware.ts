@@ -43,6 +43,8 @@ export async function middleware(request: NextRequest) {
 
   const permiso = rutaspermitidas.includes(path);
 
+  console.log({ path, idrol, rutaspermitidas });
+
   if (!permiso)
     return NextResponse.redirect(new URL("/noautorizado", request.url));
 

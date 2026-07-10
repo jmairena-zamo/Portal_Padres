@@ -3,7 +3,7 @@
 // Para confirmación: pasar children con un <p> y txtConfirmar="Aceptar"
 // Para formulario: pasar children con los campos del form
 
-import { BtnPrimario, BtnPeligro } from "../ui";
+import { BtnPrimario, BtnPeligro } from "../ui/Boton";
 
 interface Props {
   titulo: string; // Encabezado del modal

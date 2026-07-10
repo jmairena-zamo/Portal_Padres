@@ -7,7 +7,7 @@
 import Image from "next/image";
 import user from "../../img/logo-user.png";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
-import { Titulo } from "../ui";
+import { Titulo } from "@/app/components/ui/Titulo";
 
 export const InformacionEstudiante = () => {
   const { foto, estudiante } = useEstudiante();

@@ -4,7 +4,7 @@
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Buscador,
   Loading,
@@ -16,13 +16,21 @@ import {
 import {
   CursoHistorial,
   FilaHistorial,
-} from "@/app/respuestasAPI/historialAcademico";
+} from "@/app/interfaces/historialAcademico";
 import { useHistorialAcademico } from "@/app/hooks/useHistorialAcademico";
+
+const CAMPOS_BUSQUEDA: (keyof FilaHistorial)[] = [
+  "clase",
+  "anio",
+  "periodo",
+  "codigo",
+];
 
 export default function HistorialAcademico() {
   const [paginaActual, setPaginaActual] = useState(1);
   const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
   const [dataFiltrada, setDataFiltrada] = useState<FilaHistorial[]>([]);
+  const [busquedaActiva, setBusquedaActiva] = useState(false);
 
   const {
     historialAcademico,
@@ -31,9 +39,13 @@ export default function HistorialAcademico() {
     reintentarHistorialAcademico,
   } = useHistorialAcademico();
 
-  useEffect(() => {
-    setDataFiltrada(historialAcademico);
-  }, [historialAcademico]);
+  const handleResultadoBusqueda = useCallback((resultados: FilaHistorial[]) => {
+    setDataFiltrada(resultados);
+    setBusquedaActiva(true);
+    setPaginaActual(1);
+  }, []);
+
+  const datosAMostrar = busquedaActiva ? dataFiltrada : historialAcademico;
 
   const handleCambiarRegistros = (cantidad: number) => {
     setRegistrosPorPagina(cantidad);
@@ -56,12 +68,9 @@ export default function HistorialAcademico() {
         <div className="mt-2.5">
           <Buscador
             datos={historialAcademico}
-            campos={["clase", "anio", "periodo", "codigo"]}
+            campos={CAMPOS_BUSQUEDA}
             placeholder="Buscar..."
-            onResultado={(resultados) => {
-              setDataFiltrada(resultados);
-              setPaginaActual(1);
-            }}
+            onResultado={handleResultadoBusqueda}
           />
         </div>
 
@@ -71,7 +80,7 @@ export default function HistorialAcademico() {
           <Vacio
             titulo="Ocurrio un error"
             descripcion="No se pudo cargar la información"
-            onReintentar={reintentarHistorialAcademico}
+            onReintentar={() => reintentarHistorialAcademico}
           />
         ) : !tieneData ? (
           <Vacio
@@ -97,7 +106,7 @@ export default function HistorialAcademico() {
             />
 
             <Paginacion
-              totalRegistros={historialAcademico.length}
+              totalRegistros={datosAMostrar.length}
               registrosPorPagina={registrosPorPagina}
               paginaActual={paginaActual}
               onCambiarPagina={setPaginaActual}

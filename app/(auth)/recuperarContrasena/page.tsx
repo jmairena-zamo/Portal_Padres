@@ -15,6 +15,7 @@ import {
   BtnOutline,
 } from "@/app/components/ui/";
 import router from "next/router";
+import Link from "next/link";
 
 export default function RecuperarContrasena() {
   const [esValidoCorreo, setEsValidoCorreo] = useState(true);
@@ -111,9 +112,9 @@ export default function RecuperarContrasena() {
         )}
 
         <BtnOutline type="button">
-          <a href="/" className="block text-center">
+          <Link href="/" className="block text-center">
             Volver al login
-          </a>
+          </Link>
         </BtnOutline>
       </div>
     </div>

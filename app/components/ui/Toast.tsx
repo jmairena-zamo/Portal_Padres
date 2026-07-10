@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FaCheckCircle, FaTimesCircle, FaTimes } from "react-icons/fa";
 
 interface ToastProps {
@@ -18,9 +18,14 @@ const slideInStyle: React.CSSProperties = {
 // Notificación temporal que se cierra automáticamente en 2 segundos
 export default function Toast({ mensaje, tipo, onClose }: ToastProps) {
   // Cierra la notificación luego de 2 segundos
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose();
+      onCloseRef.current();
     }, 2000);
 
     return () => clearTimeout(timer);
@@ -42,10 +47,10 @@ export default function Toast({ mensaje, tipo, onClose }: ToastProps) {
         style={slideInStyle}
         className={[
           // posición y layout
-          "fixed bottom-6 right-6 z-[9999]",
+          "fixed bottom-6 right-6 z-9999",
           "flex items-center gap-3",
           // tamaño y forma
-          "min-w-[280px] max-w-[400px]",
+          "min-w-70 max-w-100",
           "px-3 py-2 rounded-lg",
           // sombra
           "shadow-[0_4px_12px_rgba(0,0,0,0.15)]",
@@ -65,7 +70,9 @@ export default function Toast({ mensaje, tipo, onClose }: ToastProps) {
 
         {/* botón cerrar manual */}
         <button
+          type="button"
           onClick={onClose}
+          aria-label="Cerrar modal"
           className="shrink-0 bg-transparent border-none cursor-pointer text-inherit p-0 opacity-70 hover:opacity-100"
         >
           <FaTimes size={14} />

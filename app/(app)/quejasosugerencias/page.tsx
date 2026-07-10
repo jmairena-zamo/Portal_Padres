@@ -18,6 +18,7 @@ import {
   ComboBoxFiltro,
   Input,
   Label,
+  Paginacion,
   SpanError,
   TextArea,
   Titulo,
@@ -26,7 +27,15 @@ import {
 import { Queja, useQueja } from "@/app/hooks/useQueja";
 import ModalForm from "@/app/components/modals/ModalForm";
 
+const opcionesTipo = [
+  { value: "QUEJA", label: "Quejas" },
+  { value: "SUGERENCIA", label: "Sugerencias" },
+];
+
 export default function QuejasSugerencias() {
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
+
   const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
 
   // Almacena los valores de los campos del formulario
@@ -61,14 +70,15 @@ export default function QuejasSugerencias() {
     "todos",
   );
 
-  const opcionesTipo = [
-    { value: "QUEJA", label: "Quejas" },
-    { value: "SUGERENCIA", label: "Sugerencias" },
-  ];
+  const [busquedaActiva, setBusquedaActiva] = useState(false);
 
-  useEffect(() => {
-    setResultadoBusqueda(quejas);
-  }, [quejas]);
+  const handleResultadoBusqueda = (resultados: Queja[]) => {
+    setResultadoBusqueda(resultados);
+    setBusquedaActiva(true);
+    setPaginaActual(1);
+  };
+
+  const dataAMostrar = busquedaActiva ? resultadoBusqueda : quejas;
 
   const quejasFiltradas = useMemo(() => {
     let resultado = resultadoBusqueda;
@@ -187,6 +197,15 @@ export default function QuejasSugerencias() {
     }
   };
 
+  const handleCambiarRegistros = (cantidad: number) => {
+    setRegistrosPorPagina(cantidad);
+    setPaginaActual(1);
+  };
+
+  const indexInicio = (paginaActual - 1) * registrosPorPagina;
+  const indexFin = indexInicio + registrosPorPagina;
+  const datosPaginados = quejasFiltradas.slice(indexInicio, indexFin);
+
   const tieneQuejas = quejasFiltradas.length > 0;
 
   if (cargandoQS || cargando) return <Loading />;
@@ -223,9 +242,7 @@ export default function QuejasSugerencias() {
                 datos={quejas}
                 campos={["asunto", "mensaje"]}
                 placeholder="Buscar Queja..."
-                onResultado={(resultados) => {
-                  setResultadoBusqueda(resultados);
-                }}
+                onResultado={handleResultadoBusqueda}
               />
             </div>
             <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
@@ -254,7 +271,7 @@ export default function QuejasSugerencias() {
               descripcion="No tienes quejas o sugerencias registradas"
             />
           ) : (
-            quejasFiltradas.map((queja) => (
+            datosPaginados.map((queja) => (
               <CardInfo
                 key={queja.iD_QuejaSugerencia}
                 queja={queja}
@@ -262,6 +279,13 @@ export default function QuejasSugerencias() {
               />
             ))
           )}
+          <Paginacion
+            totalRegistros={dataAMostrar.length}
+            registrosPorPagina={registrosPorPagina}
+            paginaActual={paginaActual}
+            onCambiarPagina={setPaginaActual}
+            onCambiarRegistrosPorPagina={handleCambiarRegistros}
+          />
         </div>
       )}
       {quejaSeleccionada && (
@@ -309,8 +333,9 @@ export default function QuejasSugerencias() {
             </h3>
             <div className="mx-auto mt-5 flex w-full max-w-150 flex-col gap-2.5 text-left">
               <div className="flex flex-col">
-                <Label nombre="Teléfono:" />
+                <Label nombre="Teléfono:" htmlFor="telefono" />
                 <Input
+                  id="telefono"
                   name="telefono"
                   type="text"
                   esValido={esValidoTelefono}
@@ -325,11 +350,12 @@ export default function QuejasSugerencias() {
                 />
               </div>
               <div className="flex flex-col">
-                <Label nombre="Opción" />
+                <Label nombre="Opción" htmlFor="quejasugerencia" />
                 <hr />
                 <div className="flex flex-col">
                   <label>
                     <input
+                      id="quejasugerencia"
                       type="radio"
                       name="tipo"
                       value="queja"
@@ -341,6 +367,7 @@ export default function QuejasSugerencias() {
                   </label>
                   <label>
                     <input
+                      id="quejasugerencia"
                       type="radio"
                       name="tipo"
                       value="sugerencia"
@@ -357,8 +384,9 @@ export default function QuejasSugerencias() {
                 />
               </div>
               <div className="flex flex-col">
-                <Label nombre="Asunto:" />
+                <Label nombre="Asunto:" htmlFor="asunto" />
                 <TextArea
+                  id="asunto"
                   name="asunto"
                   placeholder="Ingrese Asunto"
                   esValido={esValidoAsunto}
@@ -372,8 +400,9 @@ export default function QuejasSugerencias() {
                 />
               </div>
               <div className="flex flex-col">
-                <Label nombre="Mensaje" />
+                <Label nombre="Mensaje" htmlFor="asunto" />
                 <TextArea
+                  id="mensaje"
                   name="mensaje"
                   placeholder="Ingrese su Comentario..."
                   esValido={esValidoMensaje}

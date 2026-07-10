@@ -21,11 +21,15 @@ export function useAdminPermisos(
 
   const abrirPermisos = (item: Menu | SubMenu) => {
     setItemPermisos(item);
-    setRolesTemp(
-      item.rolesAsignados
-        .filter((r) => r.habilitado === 1)
-        .map((r) => r.rol_ID),
-    );
+    const rolesHabilitados: number[] = [];
+
+    for (const rol of item.rolesAsignados) {
+      if (rol.habilitado === 1) {
+        rolesHabilitados.push(rol.rol_ID);
+      }
+    }
+
+    setRolesTemp(rolesHabilitados);
     setModalPermisos(true);
   };
 
@@ -53,6 +57,7 @@ export function useAdminPermisos(
 
     const esMenu = "iD_Menu" in itemPermisos;
     const rolesConRegistro = itemPermisos.rolesAsignados;
+    const rolesTempSet = new Set(rolesTemp);
 
     const activar = rolesTemp.filter((idRol) => {
       const registro = rolesConRegistro.find((r) => r.rol_ID === idRol);
@@ -60,7 +65,7 @@ export function useAdminPermisos(
     });
 
     const desactivar = rolesConRegistro.filter(
-      (r) => r.habilitado === 1 && !rolesTemp.includes(r.rol_ID),
+      (r) => r.habilitado === 1 && !rolesTempSet.has(r.rol_ID),
     );
 
     const nuevos = activar.filter(
@@ -79,10 +84,12 @@ export function useAdminPermisos(
       const menuPadre = menus.find((m) => m.iD_Menu === sub.menu_ID);
 
       if (menuPadre) {
+        const rolesPadreMap = new Map(
+          menuPadre.rolesAsignados.map((r) => [r.rol_ID, r]),
+        );
+
         for (const idRol of activar) {
-          const rolenPadre = menuPadre.rolesAsignados.find(
-            (r) => r.rol_ID === idRol,
-          );
+          const rolenPadre = rolesPadreMap.get(idRol);
 
           if (!rolenPadre) {
             activarPadre.push(
@@ -117,12 +124,13 @@ export function useAdminPermisos(
 
     if (esMenu) {
       const menu = itemPermisos as Menu;
+      const rolesDesactivarSet = new Set(desactivar.map((r) => r.rol_ID));
 
-      for (const rolDesactivar of desactivar) {
-        for (const sub of menu.submenus ?? []) {
-          const rolenHijo = sub.rolesAsignados.find(
-            (r) => r.rol_ID === rolDesactivar.rol_ID,
-          );
+      for (const sub of menu.submenus ?? []) {
+        const rolesMap = new Map(sub.rolesAsignados.map((r) => [r.rol_ID, r]));
+
+        for (const rolID of rolesDesactivarSet) {
+          const rolenHijo = rolesMap.get(rolID);
 
           if (rolenHijo && rolenHijo.habilitado === 1) {
             desactivarHijos.push(
@@ -132,7 +140,7 @@ export function useAdminPermisos(
                 body: JSON.stringify({
                   iD_Menu_Rol: rolenHijo.iD_Menu_Rol,
                   habilitado: 0,
-                  rol_ID: rolDesactivar.rol_ID,
+                  rol_ID: rolID,
                 }),
               }),
             );

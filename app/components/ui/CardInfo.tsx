@@ -16,6 +16,7 @@ export function CardInfo({ queja, onClick }: QuejaCardProps) {
 
   return (
     <button
+      type="button"
       onClick={onClick}
       className="w-full rounded-[5px] border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:shadow-md cursor-pointer mt-2"
     >

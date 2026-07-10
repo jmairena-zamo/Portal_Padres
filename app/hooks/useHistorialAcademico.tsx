@@ -1,56 +1,33 @@
-import { useEffect, useState } from "react";
+// Creado por Diego Castro
+// Estado para obtener el Historial Academico
+
+import useSWR from "swr";
 import {
   CursoHistorial,
   FilaHistorial,
   mapearCurso,
-} from "../respuestasAPI/historialAcademico";
+} from "../interfaces/historialAcademico";
 import { useEstudiante } from "./useEstudiante";
+
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Error ${res.status}`);
+  const data = await res.json();
+  return (data.response as CursoHistorial[]).map(mapearCurso);
+};
 
 export function useHistorialAcademico() {
   const { hijoActivo } = useEstudiante();
-  const [historialAcademico, setHistorialAcademico] = useState<FilaHistorial[]>(
-    [],
+
+  const { data, error, isLoading, mutate } = useSWR<FilaHistorial[]>(
+    hijoActivo ? "/api/estudiantes/obtenerHistorialAcademico" : null,
+    fetcher,
   );
-  const [cargandoHistorialAcademico, setCargandoHistorialAcademico] =
-    useState<boolean>(true);
-  const [errorHistorialAcademico, setErrorHistorialAcademico] =
-    useState<boolean>(false);
-  const [intentoHistorialAcademico, setIntentoHistorialAcademico] = useState(0);
-
-  const cargarHistorialAcademico = async () => {
-    setCargandoHistorialAcademico(true);
-    setErrorHistorialAcademico(false);
-    const inicio = Date.now();
-    try {
-      const res = await fetch(`/api/estudiantes/obtenerHistorialAcademico`);
-
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-
-      const data = await res.json();
-      const filas = (data.response as CursoHistorial[]).map(mapearCurso);
-      setHistorialAcademico(filas);
-    } catch (error) {
-      console.error("Error cargando historial:", error);
-      setErrorHistorialAcademico(true);
-    } finally {
-      const transcurrido = Date.now() - inicio;
-      const restante = Math.max(0, 400 - transcurrido);
-      setTimeout(() => setCargandoHistorialAcademico(false), restante);
-    }
-  };
-
-  useEffect(() => {
-    if (!hijoActivo) return;
-    cargarHistorialAcademico();
-  }, [hijoActivo, intentoHistorialAcademico]);
-
-  const reintentarHistorialAcademico = () =>
-    setIntentoHistorialAcademico((prev) => prev + 1);
 
   return {
-    historialAcademico,
-    cargandoHistorialAcademico,
-    errorHistorialAcademico,
-    reintentarHistorialAcademico,
+    historialAcademico: data ?? [],
+    cargandoHistorialAcademico: isLoading,
+    errorHistorialAcademico: !!error,
+    reintentarHistorialAcademico: mutate(),
   };
 }

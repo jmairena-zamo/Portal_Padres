@@ -17,7 +17,7 @@ import {
   FilaCuenta,
   mapearMovimiento,
   MovimientoCuenta,
-} from "@/app/respuestasAPI/estadoCuenta";
+} from "@/app/interfaces/estadoCuenta";
 import { useEffect, useState } from "react";
 
 export default function EstadoCuenta() {

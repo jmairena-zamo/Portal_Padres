@@ -11,9 +11,9 @@ import { Sidebar } from "../components/layout/Sidebar";
 import { useEffect, useState } from "react";
 import ModalSuplantar from "../components/modals/ModalSuplantar";
 import { MenuProvider } from "../hooks/useMenu";
-import { Loading } from "../components/ui";
 import { useRol } from "../hooks/useRol";
 import { EstudianteProvider } from "../hooks/useEstudiante";
+import Loading from "@/app/components/ui/Loading";
 
 export default function AppLayout({
   children,
@@ -27,7 +27,7 @@ export default function AppLayout({
   // Si el rol corresponde a administrador (idRol = 2), se muestra el modal
   useEffect(() => {
     esAdmin && setShowModal(true);
-  }, [esAdmin]);
+  }, []);
 
   // Mientras se valida la sesión, se muestra pantalla de carga
   if (cargando) return <Loading />;

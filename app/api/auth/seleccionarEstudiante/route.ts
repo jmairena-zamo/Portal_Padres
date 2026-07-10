@@ -16,8 +16,17 @@ export async function POST(request: NextRequest) {
 
   const usuario = JSON.parse(session.value);
   const { bannerID } = await request.json();
+  usuario.bannerID = bannerID;
+
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set("session", JSON.stringify(usuario), {
+    httpOnly: true,
+    secure: true,
+    maxAge: 60 * 30,
+    path: "/",
+  });
 
   await registrarIngreso(usuario.id, bannerID, usuario.email);
 
-  return NextResponse.json({ ok: true });
+  return response;
 }

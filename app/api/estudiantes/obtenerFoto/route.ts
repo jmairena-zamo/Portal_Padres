@@ -1,5 +1,9 @@
+// Creado por Diego Castro
+// Obtener el base64 de la foto del estudiante
+
 import { NextRequest, NextResponse } from "next/server";
 
+// Respuesta que devuelve el API
 const FotoResponse = {
   status: 200,
   message: "Proceso exitoso",
@@ -11,8 +15,18 @@ const FotoResponse = {
 };
 
 export async function GET(request: NextRequest) {
-  const data = FotoResponse;
-  const fotoBase64 = data?.response?.frontImage ?? null;
+  const session = request.cookies.get("session");
+
+  if (!session) {
+    return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
+  }
+
+  const data = JSON.parse(session.value);
+
+  const bannerID = data.bannerID;
+
+  const dataF = FotoResponse;
+  const fotoBase64 = dataF?.response?.frontImage ?? null;
 
   if (!fotoBase64) {
     return new NextResponse("Foto no disponible", { status: 404 });

@@ -1,7 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { infoEstudiante } from "../respuestasAPI/infoEstudiante";
+import React, {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { infoEstudiante } from "../interfaces/infoEstudiante";
 
 interface Hijo {
   bannerID: number;
@@ -18,7 +25,7 @@ interface EstudianteContextType {
 
   hijos: Hijo[];
   hijoActivo: Hijo | null;
-  setHijoActivo: React.Dispatch<React.SetStateAction<Hijo | null>>;
+  seleccionarEstudiante: (hijo: Hijo) => Promise<void>;
 
   cargarEstudiante: () => Promise<void>;
 }
@@ -60,20 +67,30 @@ export const EstudianteProvider = ({
     cargarEstudiante();
   }, [hijoActivo]);
 
-  const cargarEstudiante = async () => {
+  const seleccionarEstudiante = async (hijo: Hijo) => {
+    await fetch("/api/auth/seleccionarEstudiante", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bannerID: hijo.bannerID }),
+    });
+    setHijoActivo(hijo);
+  };
+
+  const cargarEstudiante = useCallback(async () => {
     setCargando(true);
     try {
       const inicio = Date.now();
-      // Se tiene que enviar el bannerID del hijo en la url
       const [resFoto, resFaltas, resInfo] = await Promise.all([
         fetch("/api/estudiantes/obtenerFoto"),
         fetch("/api/estudiantes/obtenerFaltas"),
         fetch("/api/estudiantes/obtenerInfoGen"),
       ]);
 
-      const dataFoto = await resFoto.json();
-      const dataFaltas = await resFaltas.json();
-      const dataInfo = await resInfo.json();
+      const [dataFoto, dataFaltas, dataInfo] = await Promise.all([
+        resFoto.json(),
+        resFaltas.json(),
+        resInfo.json(),
+      ]);
 
       setFoto(dataFoto.foto ?? null);
       setFaltasTotales(dataFaltas.Tfaltas);
@@ -95,32 +112,41 @@ export const EstudianteProvider = ({
     } finally {
       setCargando(false);
     }
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      cargando,
+      foto,
+      faltasTotales,
+      faltasTotalesAnio,
+      categoriaDisc,
+      estudiante,
+      hijoActivo,
+      hijos,
+      seleccionarEstudiante,
+      cargarEstudiante,
+    }),
+    [
+      foto,
+      faltasTotales,
+      faltasTotalesAnio,
+      categoriaDisc,
+      estudiante,
+      hijoActivo,
+      hijos,
+    ],
+  );
 
   return (
-    <EstudianteContext.Provider
-      value={{
-        cargando,
-        foto,
-        faltasTotales,
-        faltasTotalesAnio,
-        categoriaDisc,
-        estudiante,
-
-        hijos,
-        hijoActivo,
-        setHijoActivo,
-
-        cargarEstudiante,
-      }}
-    >
+    <EstudianteContext.Provider value={value}>
       {children}
     </EstudianteContext.Provider>
   );
 };
 
 export const useEstudiante = () => {
-  const context = useContext(EstudianteContext);
+  const context = use(EstudianteContext);
 
   if (!context) {
     throw new Error("useFotoEstudiante debe usarse dentro de FotoProvider");

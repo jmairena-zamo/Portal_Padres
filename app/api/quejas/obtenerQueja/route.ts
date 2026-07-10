@@ -1,4 +1,4 @@
-import { infoEstudiante } from "./../../../respuestasAPI/infoEstudiante";
+import { infoEstudiante } from "../../../interfaces/infoEstudiante";
 import { API_URL } from "@/app/config/api";
 import { NextRequest, NextResponse } from "next/server";
 

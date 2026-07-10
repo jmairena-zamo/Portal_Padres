@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 interface SesionUsuario {
   id: number;
@@ -21,7 +28,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [sesion, setSesion] = useState<SesionUsuario | null>(null);
   const [cargando, setCargando] = useState(true);
 
-  const cargarSesion = async () => {
+  const cargarSesion = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/session");
       if (!res.ok) {
@@ -36,7 +43,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setCargando(false);
     }
-  };
+  }, []);
 
   const cerrarSesion = () => {
     setSesion(null);
@@ -47,17 +54,23 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     cargarSesion();
   }, []);
 
+  const value = useMemo(
+    () => ({
+      sesion,
+      cargando,
+      recargarSesion: cargarSesion,
+      cerrarSesion,
+    }),
+    [sesion, cargando],
+  );
+
   return (
-    <SessionContext.Provider
-      value={{ sesion, cargando, recargarSesion: cargarSesion, cerrarSesion }}
-    >
-      {children}
-    </SessionContext.Provider>
+    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
   );
 }
 
 export function useSession() {
-  const context = useContext(SessionContext);
+  const context = use(SessionContext);
   if (context === undefined) {
     throw new Error("useSession debe usarse dentro de un SessionProvider");
   }

@@ -59,13 +59,18 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
   };
 
   try {
+    // Obtener ID de menus permitidos al rol
     const resRol = await fetch(`${API_URL}/menurol/ListarPorRol/${idRol}`);
     if (!resRol.ok) return [];
 
     const dataRol = await resRol.json();
-    const menuIDs: number[] = dataRol.response
-      .filter((item: any) => item.habilitado === 1)
-      .map((item: any) => item.menu_ID);
+    const menuIDs: number[] = [];
+
+    for (const item of dataRol.response || []) {
+      if (item.habilitado === 1) {
+        menuIDs.push(item.menu_ID);
+      }
+    }
 
     const menus = await Promise.all(
       menuIDs.map(async (id) => {
@@ -77,10 +82,17 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
     );
 
     // Filtra menús habilitados y obtiene sus rutas
-    const rutasMenus = menus
-      .filter((m) => m !== null && m.habilitado === 1)
-      .map((m) => rutasPorNombre[m.opcion.toUpperCase()])
-      .filter(Boolean);
+    const rutasMenus: string[] = [];
+
+    for (const m of menus) {
+      if (!m || m.habilitado !== 1) continue;
+
+      const ruta = rutasPorNombre[m.opcion.toUpperCase()];
+
+      if (ruta) {
+        rutasMenus.push(ruta);
+      }
+    }
 
     const resSubRol = await fetch(
       `${API_URL}/submenurol/ListarPorRol/${idRol}`,
@@ -90,11 +102,15 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
 
     if (resSubRol.ok) {
       const dataSubRol = await resSubRol.json();
-      const subMenuIDs: number[] = dataSubRol.response
-        .filter((item: any) => item.habilitado === 1)
-        .map((item: any) => item.subMenu_ID);
+      const subMenuIDs: number[] = [];
 
-      const submenus = await Promise.all(
+      for (const item of dataSubRol.response || []) {
+        if (item.habilitado === 1) {
+          subMenuIDs.push(item.subMenu_ID);
+        }
+      }
+
+      const submenusRaw = await Promise.all(
         subMenuIDs.map(async (id) => {
           const res = await fetch(`${API_URL}/submenu/Listar/${id}`);
           if (!res.ok) return null;
@@ -103,22 +119,30 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
         }),
       );
 
-      // Construye rutas de submenús concatenando la ruta padre con la opción del submenú
-      rutasSubmenus = submenus
-        .filter((s) => s !== null && s.habilitado === 1)
-        .map((s) => {
-          const rutaPadre =
-            rutasPorNombre[
-              menus.find((m) => m?.iD_Menu === s.menu_ID)?.opcion.toUpperCase()
-            ];
-          if (!rutaPadre) return null;
-          return `${rutaPadre}/${s.opcion.toLowerCase().replace(/\s+/g, "")}`;
-        })
-        .filter(Boolean) as string[];
+      const submenus = submenusRaw.filter((s) => s !== null && s !== undefined);
+
+      const menusMap = new Map(
+        menus.filter((m) => m !== null).map((m) => [m.iD_Menu, m]),
+      );
+
+      for (const s of submenus) {
+        if (!s || s.habilitado !== 1) continue;
+
+        const menuPadre = menusMap.get(s.menu_ID);
+        if (!menuPadre) continue;
+
+        const rutaPadre = rutasPorNombre[menuPadre.opcion.toUpperCase()];
+        if (!rutaPadre) continue;
+
+        rutasSubmenus.push(
+          `${rutaPadre}/${s.opcion.toLowerCase().replace(/\s+/g, "")}`,
+        );
+      }
     }
 
     return [...rutasMenus, ...rutasSubmenus];
-  } catch {
+  } catch (err) {
+    console.error("Error en getRutasPermitidas", err);
     return [];
   }
 };

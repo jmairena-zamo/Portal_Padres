@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { loginSchema, LoginFormData } from "../../utils/validations";
 import { BtnPrimario, Input, Label, SpanError } from "@/app/components/ui";
 import { useSession } from "@/app/hooks/useSession";
+import Link from "next/link";
 
 export default function Login() {
   const [esValidoCorreo, setEsValidoCorreo] = useState(true);
@@ -142,7 +143,7 @@ export default function Login() {
           >
             {/* correo */}
             <div className="flex flex-col">
-              <Label nombre="Correo Electrónico:" />
+              <Label nombre="Correo Electrónico:" htmlFor="correo" />
               <Input
                 id="correo"
                 type="text"
@@ -161,8 +162,9 @@ export default function Login() {
 
             {/* contraseña */}
             <div className="flex flex-col">
-              <Label nombre="Contraseña:" />
+              <Label nombre="Contraseña:" htmlFor="contrasena" />
               <Input
+                id="contrasena"
                 type="password"
                 name="contrasena"
                 esValido={esValidoPass}
@@ -182,12 +184,12 @@ export default function Login() {
               Ingresar
             </BtnPrimario>
 
-            <a
+            <Link
               href="/recuperarContrasena"
               className="text-center text-[13px] text-blue-600 hover:cursor-pointer"
             >
               ¿Has olvidado tu contraseña?
-            </a>
+            </Link>
 
             {/* error servidor */}
             <SpanError visible={!!errorServidor} mensaje={errorServidor} />

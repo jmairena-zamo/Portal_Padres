@@ -9,7 +9,7 @@ import user from "../../img/logo-user.png";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import { BtnPrimario } from "../ui";
+import { BtnPrimario } from "@/app/components/ui/Boton";
 import { useRol } from "@/app/hooks/useRol";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 
@@ -19,11 +19,10 @@ interface Props {
 }
 
 export const Navbar = ({ colapsado, onSuplantar }: Props) => {
-  const { hijos, hijoActivo, setHijoActivo } = useEstudiante();
+  const { hijos, hijoActivo, seleccionarEstudiante, foto } = useEstudiante();
 
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { foto } = useEstudiante();
   const { rol, cargando } = useRol();
   const esAdmin = rol === 2;
   const tieneVariosHijos = !esAdmin && hijos.length > 1;
@@ -39,8 +38,8 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
     return () => document.removeEventListener("mousedown", handler);
   }, [hijoActivo]);
 
-  const seleccionarHijo = (hijo: (typeof hijos)[0]) => {
-    setHijoActivo(hijo);
+  const seleccionarHijoAc = async (hijo: (typeof hijos)[0]) => {
+    await seleccionarEstudiante(hijo);
     setDropdownAbierto(false);
   };
 
@@ -76,6 +75,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
             {/* Botón nombre + chevron — oculto en <420px */}
             {hijoActivo && (
               <button
+                type="button"
                 onClick={() => setDropdownAbierto((prev) => !prev)}
                 className={[
                   "bg-transparent border-none font-bold text-[#173426] flex items-center gap-1.5 max-[420px]:hidden",
@@ -128,19 +128,21 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
                             "
               >
                 {hijos.map((hijo) => (
-                  <li
-                    key={hijo.bannerID}
-                    onClick={() => seleccionarHijo(hijo)}
-                    className={[
-                      "px-4 py-2.5 cursor-pointer text-[0.9rem] text-[#374151]",
-                      "transition-colors duration-150 hover:bg-[#f3f4f6]",
-                      hijoActivo?.bannerID === hijo.bannerID &&
-                        "font-semibold text-[#005221]",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    {hijo.Nombre}
+                  <li key={hijo.bannerID}>
+                    <button
+                      type="button"
+                      onClick={() => seleccionarHijoAc(hijo)}
+                      aria-pressed={hijoActivo?.bannerID === hijo.bannerID}
+                      className={[
+                        "w-full px-4 py-2.5 text-left text-[0.9rem] text-[#374151]",
+                        "transition-colors duration-150 hover:bg-[#f3f4f6]",
+                        hijoActivo?.bannerID === hijo.bannerID
+                          ? "font-semibold text-[#005221]"
+                          : "",
+                      ].join(" ")}
+                    >
+                      {hijo.Nombre}
+                    </button>
                   </li>
                 ))}
               </ul>

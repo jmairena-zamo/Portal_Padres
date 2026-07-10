@@ -4,9 +4,10 @@
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Buscador,
+  ComboBoxFiltro,
   Loading,
   Paginacion,
   Tabla,
@@ -16,10 +17,20 @@ import {
 import {
   accionesEstudiantiles,
   FilaHistorialDisciplinario,
-} from "@/app/respuestasAPI/faltas";
+} from "@/app/interfaces/faltas";
 import ModalForm from "@/app/components/modals/ModalForm";
 import { useHistorialDisciplinario } from "@/app/hooks/useHistorialDisciplinario";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
+
+const opcionesTipo = [
+  { value: "Eliminada", label: "ELIMINADA" },
+  { value: "Aprobada", label: "APROBADA" },
+];
+
+const CAMPOS_BUSQUEDA: (keyof FilaHistorialDisciplinario)[] = [
+  "tipo",
+  "periodo",
+];
 
 export default function HistorialDisciplinario() {
   const [paginaActual, setPaginaActual] = useState(1);
@@ -30,6 +41,7 @@ export default function HistorialDisciplinario() {
     FilaHistorialDisciplinario[]
   >([]);
   const { faltasTotales } = useEstudiante();
+  const [busquedaActiva, setBusquedaActiva] = useState(false);
 
   const {
     historialDisciplinario,
@@ -38,18 +50,39 @@ export default function HistorialDisciplinario() {
     reintentarDisciplinario,
   } = useHistorialDisciplinario();
 
-  useEffect(() => {
-    setDataFiltrada(historialDisciplinario);
-  }, [historialDisciplinario]);
+  const handleResultadosBusqueda = useCallback(
+    (resultados: FilaHistorialDisciplinario[]) => {
+      setDataFiltrada(resultados);
+      setBusquedaActiva(true);
+      setPaginaActual(1);
+    },
+    [],
+  );
+
+  const datoAMostrar = busquedaActiva ? dataFiltrada : historialDisciplinario;
 
   const handleCambiarRegistros = (cantidad: number) => {
     setRegistrosPorPagina(cantidad);
     setPaginaActual(1);
   };
 
+  const [estadoFiltro, setEstadoFiltro] = useState<number | string | "todos">(
+    "todos",
+  );
+
+  const DiscFiltrada = useMemo(() => {
+    let resultado = dataFiltrada;
+
+    if (estadoFiltro !== "todos") {
+      resultado = resultado.filter((q) => q.estado === estadoFiltro);
+    }
+
+    return resultado;
+  }, [dataFiltrada, estadoFiltro]);
+
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
-  const datosPaginados = dataFiltrada.slice(indexInicio, indexFin);
+  const datosPaginados = DiscFiltrada.slice(indexInicio, indexFin);
 
   const tieneData = historialDisciplinario.length > 0;
 
@@ -59,16 +92,27 @@ export default function HistorialDisciplinario() {
       <InformacionEstudiante />
       <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] ">
         <Titulo titulo="Historial Disciplinario" alineado={3} />
-        <div className="mt-2.5">
-          <Buscador
-            datos={historialDisciplinario}
-            campos={["tipo", "periodo"]}
-            placeholder="Buscar..."
-            onResultado={(resultado) => {
-              setDataFiltrada(resultado);
-              setPaginaActual(1);
-            }}
-          />
+        <div className="mt-2.5"></div>
+        <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
+          <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
+            <Buscador
+              datos={historialDisciplinario}
+              campos={CAMPOS_BUSQUEDA}
+              placeholder="Buscar..."
+              onResultado={handleResultadosBusqueda}
+            />
+          </div>
+          <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
+            <h4>Estado:</h4>
+            <ComboBoxFiltro
+              valor={estadoFiltro}
+              placeholder="Todos"
+              opciones={opcionesTipo}
+              onChange={(value) => {
+                setEstadoFiltro(value);
+              }}
+            />
+          </div>
         </div>
 
         {cargandoDisciplinario ? (
@@ -77,7 +121,9 @@ export default function HistorialDisciplinario() {
           <Vacio
             titulo="Ocurrio un error"
             descripcion="No se pudo cargar la información"
-            onReintentar={reintentarDisciplinario}
+            onReintentar={() => {
+              reintentarDisciplinario;
+            }}
           />
         ) : !tieneData ? (
           <Vacio
@@ -114,6 +160,7 @@ export default function HistorialDisciplinario() {
                 accessor: "descripcionDetallada",
                 render: (item) => (
                   <button
+                    type="button"
                     onClick={() => setFilaSeleccionada(item)}
                     className="truncate max-w-50 text-left text-[#007BFF] hover:underline cursor-pointer"
                     title="Click para ver el detalle completo"
@@ -130,7 +177,7 @@ export default function HistorialDisciplinario() {
           Faltas Totales: {faltasTotales}
         </h2>
         <Paginacion
-          totalRegistros={historialDisciplinario.length}
+          totalRegistros={datoAMostrar.length}
           registrosPorPagina={registrosPorPagina}
           paginaActual={paginaActual}
           onCambiarPagina={setPaginaActual}

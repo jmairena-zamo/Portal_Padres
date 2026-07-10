@@ -47,7 +47,7 @@ export default function ResumenEstudiante() {
 
   const data = [{ id: 1, name: "promedio", value: promedio }];
 
-  if (cargando) return <Loading />;
+  // if (cargando) return <Loading />;
 
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
@@ -253,6 +253,7 @@ export default function ResumenEstudiante() {
         <div className="flex flex-col border-b border-gray-200 mt-5 max-[420px]:flex-wrap">
           <div className="mb-3">
             <button
+              type="button"
               className="bg-[#173426] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setDecanatura(!decanatura)}
             >
@@ -272,6 +273,7 @@ export default function ResumenEstudiante() {
           </div>
           <div className="mb-3">
             <button
+              type="button"
               className="bg-[#048047] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setClaseAH(!claseAH)}
             >
@@ -292,6 +294,7 @@ export default function ResumenEstudiante() {
 
           <div>
             <button
+              type="button"
               className="bg-[#74bdca] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setTecnologias(!tecnologias)}
             >

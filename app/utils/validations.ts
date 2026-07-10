@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const loginSchema = z.object({
   correo: z
-    .string()
     .email("El correo no es válido")
     .trim()
     .refine((val) => !/[<>{}[\]\\]/.test(val), {
@@ -16,12 +15,12 @@ export const loginSchema = z.object({
 });
 
 export const recuperarContrasenaSchema = z.object({
-  correo: z.string().email().trim(),
+  correo: z.email().trim(),
 });
 
 export const nuevaContrasenaSchema = z.object({
   id_useremail: z.number(),
-  correoElectronico: z.string().email().trim(),
+  correoElectronico: z.email().trim(),
   contrasena: z
     .string()
     .min(8, "La contraseña debe tener un mínimo de 8 caracteres")

@@ -25,7 +25,7 @@ interface SelectorIconosProps {
 }
 
 // Lista de iconos disponibles para seleccionar
-export const iconOptions = [
+const iconOptions = [
   { name: "FaHome", component: FaHome },
   { name: "FaUser", component: FaUser },
   { name: "FaCog", component: FaCog },
@@ -58,6 +58,7 @@ export default function SelectorIconos({
           <button
             key={icon.name}
             type="button"
+            aria-label="iconoLista"
             onClick={() => onSelect(icon.name)}
             className={[
               "flex justify-center items-center rounded-lg p-2 cursor-pointer text-[18px] transition-colors",

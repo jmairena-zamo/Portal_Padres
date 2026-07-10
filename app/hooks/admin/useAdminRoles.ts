@@ -1,7 +1,7 @@
 // Creado por Diego Castro
 // Estados para la administración de roles
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Rol } from "@/app/interfaces/menus";
 import { rolData, rolSchema } from "@/app/utils/validations";
 
@@ -88,7 +88,7 @@ export function useAdminRoles(
     setModoRol("editar");
   };
 
-  const editarRol = async () => {
+  const editarRol = useCallback(async () => {
     if (!rolSeleccionado || !formDataRol.rol.trim()) return;
 
     const res = await fetch("/api/roles/actualizarRoles", {
@@ -110,7 +110,7 @@ export function useAdminRoles(
     setRolSeleccionado(null);
     setModalRol(false);
     await cargarRoles();
-  };
+  }, []);
 
   const pedirConfirmacionEliminar = (rol: Rol) => {
     setConfirmModalRol({ visible: true, rol });

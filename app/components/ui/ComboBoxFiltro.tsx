@@ -1,7 +1,7 @@
 //Componente creado por Diego Castro
 //Componente para filtrar por medio de un ComboBox real
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 interface Opcion {
   value: number | string;
@@ -15,30 +15,41 @@ interface Props {
   placeholder?: string;
 }
 
+function calcularLabel(
+  valor: number | string | "todos",
+  opciones: Opcion[],
+): string {
+  if (valor === "todos" || valor === undefined || valor === "") return "";
+  const seleccionada = opciones.find(
+    (o) => o.value.toString() === valor.toString(),
+  );
+  return seleccionada ? seleccionada.label : "";
+}
+
 export default function ComboBoxFiltro({
   opciones,
   valor,
   onChange,
   placeholder = "Todos",
 }: Props) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(() =>
+    calcularLabel(valor, opciones),
+  );
   const [abierto, setAbierto] = useState(false);
   const blurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sincroniza el texto mostrado con el "valor" real (id) que viene del padre.
-  useEffect(() => {
-    if (valor === "todos" || valor === undefined || valor === "") {
-      setInputValue("");
-      return;
-    }
-    const seleccionada = opciones.find(
-      (o) => o.value.toString() === valor.toString(),
-    );
-    setInputValue(seleccionada ? seleccionada.label : "");
-  }, [valor, opciones]);
+  // Guarda el ultimo "valor"/"opciones" que ya procesamos, para detectar cambios
+  // del prop durante el render (sin useEffect).
+  const prevValorRef = useRef(valor);
+  const prevOpcionesRef = useRef(opciones);
 
-  // Mientras el usuario escribe, solo filtramos la lista visualmente.
-  // NO se llama a onChange aquí.
+  if (prevValorRef.current !== valor || prevOpcionesRef.current !== opciones) {
+    prevValorRef.current = valor;
+    prevOpcionesRef.current = opciones;
+    setInputValue(calcularLabel(valor, opciones));
+  }
+
+  // Mientras el usuario escribe, solo filtra la lista visualmente.
   const opcionesFiltradas = opciones.filter((o) =>
     o.label.toLowerCase().includes(inputValue.toLowerCase()),
   );
@@ -72,38 +83,38 @@ export default function ComboBoxFiltro({
           setAbierto(true);
         }}
         onBlur={() => {
-          // Delay para permitir que el click en un <li> se registre
-          // antes de cerrar el dropdown.
           blurTimeout.current = setTimeout(() => {
             setAbierto(false);
             const seleccionada = opciones.find((o) => o.label === inputValue);
             if (!seleccionada) {
-              const actual = opciones.find(
-                (o) => o.value.toString() === valor.toString(),
-              );
-              setInputValue(actual ? actual.label : "");
+              setInputValue(calcularLabel(valor, opciones));
             }
           }, 150);
         }}
       />
       {abierto && (
         <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto w-full">
-          <li
-            className="px-2 py-1 cursor-pointer hover:bg-gray-100"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={seleccionarTodos}
-          >
-            {placeholder}
+          <li>
+            <button
+              type="button"
+              className="px-2 py-1 cursor-pointer hover:bg-gray-100"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={seleccionarTodos}
+            >
+              {placeholder}
+            </button>
           </li>
           {opcionesFiltradas.length > 0 ? (
             opcionesFiltradas.map((opcion) => (
-              <li
-                key={opcion.value}
-                className="px-2 py-1 cursor-pointer hover:bg-gray-100"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => seleccionarOpcion(opcion)}
-              >
-                {opcion.label}
+              <li key={opcion.value}>
+                <button
+                  type="button"
+                  className="px-2 py-1 cursor-pointer hover:bg-gray-100 w-full text-left"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => seleccionarOpcion(opcion)}
+                >
+                  {opcion.label}
+                </button>
               </li>
             ))
           ) : (

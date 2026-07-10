@@ -38,7 +38,7 @@ export default function Paginacion({
     >
       {/* info: selector + conteo */}
       <div
-        className="flex items-center gap-[18px] flex-wrap
+        className="flex items-center gap-4.5 flex-wrap
                 max-[800px]:justify-center max-[800px]:text-center
                 max-[420px]:flex-col max-[420px]:gap-2.5"
       >
@@ -49,6 +49,7 @@ export default function Paginacion({
         >
           <span>Filas por página:</span>
           <select
+            aria-label="Cantidad de registros por página"
             value={registrosPorPagina}
             onChange={(e) => {
               onCambiarRegistrosPorPagina(Number(e.target.value));
@@ -87,6 +88,7 @@ export default function Paginacion({
       >
         {/* anterior */}
         <button
+          type="button"
           onClick={() => onCambiarPagina(paginaActual - 1)}
           disabled={paginaActual === 1}
           className="px-3 py-1.5 rounded-md border border-[#43C302]
@@ -101,6 +103,7 @@ export default function Paginacion({
         {/* números de página */}
         {paginasVisibles.map((pagina) => (
           <button
+            type="button"
             key={pagina}
             onClick={() => onCambiarPagina(pagina)}
             className={[
@@ -117,6 +120,7 @@ export default function Paginacion({
 
         {/* siguiente */}
         <button
+          type="button"
           onClick={() => onCambiarPagina(paginaActual + 1)}
           disabled={paginaActual === totalPaginas}
           className="px-3 py-1.5 rounded-md border border-[#43C302]
