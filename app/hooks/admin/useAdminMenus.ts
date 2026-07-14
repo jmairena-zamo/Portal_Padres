@@ -1,7 +1,7 @@
 // Creado por Diego Castro
 // Estados para la administración de menus
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Menu, SubMenu } from "@/app/interfaces/menus";
 import { menuData, subMenuData, menuSchema } from "@/app/utils/validations";
 import { useMenu } from "@/app/hooks/useMenu";
@@ -98,78 +98,84 @@ export function useAdminMenus(
   };
 
   //----HABILITAR Y DESHABILITAR-----------------------------------------------
-  const Habilitar = async (menu: Menu) => {
-    const nuevoHabilitado = menu.habilitado === 1 ? 0 : 1;
+  const Habilitar = useCallback(
+    async (menu: Menu) => {
+      const nuevoHabilitado = menu.habilitado === 1 ? 0 : 1;
 
-    const promesas: Promise<Response>[] = [
-      fetch("/api/menu/actualizarMenu", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...menu, habilitado: nuevoHabilitado }),
-      }),
-    ];
+      const promesas: Promise<Response>[] = [
+        fetch("/api/menu/actualizarMenu", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...menu, habilitado: nuevoHabilitado }),
+        }),
+      ];
 
-    if (menu.submenus?.length > 0) {
-      for (const sub of menu.submenus) {
-        promesas.push(
-          fetch("/api/menu/actualizarSubMenu", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...sub, habilitado: nuevoHabilitado }),
-          }),
-        );
+      if (menu.submenus?.length > 0) {
+        for (const sub of menu.submenus) {
+          promesas.push(
+            fetch("/api/menu/actualizarSubMenu", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...sub, habilitado: nuevoHabilitado }),
+            }),
+          );
+        }
       }
-    }
 
-    const res = await Promise.all(promesas);
+      const res = await Promise.all(promesas);
 
-    if (res.every((r) => r.ok)) {
-      mostrarExito(
-        `${menu.opcion} ${nuevoHabilitado === 1 ? "habilitado" : "deshabilitado"}`,
-      );
-    } else {
-      mostrarError(`Error al actualizar ${menu.opcion}`);
-    }
-    await cargarDatos();
-    await cargarMenus();
-  };
-
-  const HabilitarSUB = async (submenu: SubMenu) => {
-    const nuevoHabilitado = submenu.habilitado === 1 ? 0 : 1;
-
-    const promesas: Promise<Response>[] = [
-      fetch("/api/menu/actualizarSubMenu", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...submenu, habilitado: nuevoHabilitado }),
-      }),
-    ];
-
-    if (nuevoHabilitado === 1) {
-      const menuPadre = menus.find((m) => m.iD_Menu === submenu.menu_ID);
-      if (menuPadre && menuPadre.habilitado === 0) {
-        promesas.push(
-          fetch("/api/menu/actualizarMenu", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...menuPadre, habilitado: 1 }),
-          }),
+      if (res.every((r) => r.ok)) {
+        mostrarExito(
+          `${menu.opcion} ${nuevoHabilitado === 1 ? "habilitado" : "deshabilitado"}`,
         );
+      } else {
+        mostrarError(`Error al actualizar ${menu.opcion}`);
       }
-    }
+      await cargarDatos();
+      await cargarMenus();
+    },
+    [mostrarExito, mostrarError, cargarMenus],
+  );
 
-    const resultados = await Promise.all(promesas);
+  const HabilitarSUB = useCallback(
+    async (submenu: SubMenu) => {
+      const nuevoHabilitado = submenu.habilitado === 1 ? 0 : 1;
 
-    if (resultados.every((r) => r.ok)) {
-      mostrarExito(
-        `${submenu.opcion} ${nuevoHabilitado === 1 ? "habilitado" : "deshabilitado"}`,
-      );
-    } else {
-      mostrarError(`Error al actualizar ${submenu.opcion}`);
-    }
-    await cargarDatos();
-    await cargarMenus();
-  };
+      const promesas: Promise<Response>[] = [
+        fetch("/api/menu/actualizarSubMenu", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...submenu, habilitado: nuevoHabilitado }),
+        }),
+      ];
+
+      if (nuevoHabilitado === 1) {
+        const menuPadre = menus.find((m) => m.iD_Menu === submenu.menu_ID);
+        if (menuPadre && menuPadre.habilitado === 0) {
+          promesas.push(
+            fetch("/api/menu/actualizarMenu", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...menuPadre, habilitado: 1 }),
+            }),
+          );
+        }
+      }
+
+      const resultados = await Promise.all(promesas);
+
+      if (resultados.every((r) => r.ok)) {
+        mostrarExito(
+          `${submenu.opcion} ${nuevoHabilitado === 1 ? "habilitado" : "deshabilitado"}`,
+        );
+      } else {
+        mostrarError(`Error al actualizar ${submenu.opcion}`);
+      }
+      await cargarDatos();
+      await cargarMenus();
+    },
+    [menus, mostrarExito, mostrarError, cargarMenus],
+  );
 
   //----Cambio de posición-------------------------------------------------------
   const cambiarPosicion = async (menu: Menu, nuevaPosicion: number) => {

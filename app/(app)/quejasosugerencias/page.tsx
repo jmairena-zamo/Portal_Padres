@@ -5,7 +5,7 @@
 
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { quejaData, quejaSchema } from "@/app/utils/validations";
 import Loading from "@/app/components/ui/Loading";
 import { useToast } from "@/app/hooks/useToast";
@@ -33,8 +33,8 @@ const opcionesTipo = [
 ];
 
 export default function QuejasSugerencias() {
-  const [paginaActual, setPaginaActual] = useState(1);
-  const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
+  // const [paginaActual, setPaginaActual] = useState(1);
+  // const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
 
   const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
 
@@ -66,33 +66,87 @@ export default function QuejasSugerencias() {
 
   const [resultadoBusqueda, setResultadoBusqueda] = useState<Queja[]>(quejas);
 
-  const [tipoFiltro, setTipoFiltro] = useState<number | string | "todos">(
-    "todos",
+  // const [tipoFiltro, setTipoFiltro] = useState<number | string | "todos">(
+  //   "todos",
+  // );
+
+  // const [busquedaActiva, setBusquedaActiva] = useState(false);
+
+  const [paginacion, setPaginacion] = useState({
+    paginaActual: 1,
+    registrosPorPagina: 10,
+    tipoFiltro: "todos" as number | string | "todos",
+  });
+  const [busqueda, setBusqueda] = useState({
+    dataFiltrada: [] as Queja[],
+    busquedaActiva: false,
+  });
+
+  const handleResultadoBusqueda = useCallback((resultados: Queja[]) => {
+    setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
+    setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
+  }, []);
+
+  const handleCambiarTipoFiltro = useCallback(
+    (value: number | string | "todos") => {
+      setPaginacion((prev) => ({
+        ...prev,
+        tipoFiltro: value,
+        paginaActual: 1,
+      }));
+    },
+    [],
   );
 
-  const [busquedaActiva, setBusquedaActiva] = useState(false);
+  const handleCambiarRegistros = useCallback((cantidad: number) => {
+    setPaginacion((prev) => ({
+      ...prev,
+      registrosPorPagina: cantidad,
+      paginaActual: 1,
+    }));
+  }, []);
 
-  const handleResultadoBusqueda = (resultados: Queja[]) => {
-    setResultadoBusqueda(resultados);
-    setBusquedaActiva(true);
-    setPaginaActual(1);
-  };
+  const handleCambiarPagina = useCallback((pagina: number) => {
+    setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
+  }, []);
 
-  const dataAMostrar = busquedaActiva ? resultadoBusqueda : quejas;
+  const { paginaActual, registrosPorPagina, tipoFiltro } = paginacion;
+  const { dataFiltrada, busquedaActiva } = busqueda;
 
-  const quejasFiltradas = useMemo(() => {
-    let resultado = resultadoBusqueda;
+  // const handleResultadoBusqueda = (resultados: Queja[]) => {
+  //   setResultadoBusqueda(resultados);
+  //   setBusquedaActiva(true);
+  //   setPaginaActual(1);
+  // };
 
-    if (tipoFiltro !== "todos") {
-      resultado = resultado.filter((q) => q.tipo === tipoFiltro);
+  const dataBase = busquedaActiva ? dataFiltrada : quejas;
+
+  const dataAMostrar = useMemo(() => {
+    if (tipoFiltro === "todos") {
+      return dataBase;
     }
+    return dataBase
+      .filter((item) => item.tipo === tipoFiltro)
+      .sort(
+        (a, b) =>
+          new Date(b.fechaCreacion).getTime() -
+          new Date(a.fechaCreacion).getTime(),
+      );
+  }, [dataBase, tipoFiltro]);
 
-    return [...resultado].sort(
-      (a, b) =>
-        new Date(b.fechaCreacion).getTime() -
-        new Date(a.fechaCreacion).getTime(),
-    );
-  }, [resultadoBusqueda, tipoFiltro]);
+  // const quejasFiltradas = useMemo(() => {
+  //   let resultado = resultadoBusqueda;
+
+  //   if (tipoFiltro !== "todos") {
+  //     resultado = resultado.filter((q) => q.tipo === tipoFiltro);
+  //   }
+
+  //   return [...resultado].sort(
+  //     (a, b) =>
+  //       new Date(b.fechaCreacion).getTime() -
+  //       new Date(a.fechaCreacion).getTime(),
+  //   );
+  // }, [resultadoBusqueda, tipoFiltro]);
 
   // * Maneja los cambios en los inputs y textareas del formulario.
   //  * Actualiza el estado `formData` de manera dinámica y limpia el estado de error
@@ -197,16 +251,16 @@ export default function QuejasSugerencias() {
     }
   };
 
-  const handleCambiarRegistros = (cantidad: number) => {
-    setRegistrosPorPagina(cantidad);
-    setPaginaActual(1);
-  };
+  // const handleCambiarRegistros = (cantidad: number) => {
+  //   setRegistrosPorPagina(cantidad);
+  //   setPaginaActual(1);
+  // };
 
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
-  const datosPaginados = quejasFiltradas.slice(indexInicio, indexFin);
+  const datosPaginados = dataAMostrar.slice(indexInicio, indexFin);
 
-  const tieneQuejas = quejasFiltradas.length > 0;
+  const tieneQuejas = quejas.length > 0;
 
   if (cargandoQS || cargando) return <Loading />;
 
@@ -251,9 +305,7 @@ export default function QuejasSugerencias() {
                 valor={tipoFiltro}
                 placeholder="Todos los Tipos"
                 opciones={opcionesTipo}
-                onChange={(value) => {
-                  setTipoFiltro(value);
-                }}
+                onChange={handleCambiarTipoFiltro}
               />
             </div>
           </div>
@@ -283,7 +335,7 @@ export default function QuejasSugerencias() {
             totalRegistros={dataAMostrar.length}
             registrosPorPagina={registrosPorPagina}
             paginaActual={paginaActual}
-            onCambiarPagina={setPaginaActual}
+            onCambiarPagina={handleCambiarPagina}
             onCambiarRegistrosPorPagina={handleCambiarRegistros}
           />
         </div>

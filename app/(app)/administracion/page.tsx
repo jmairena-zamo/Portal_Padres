@@ -10,7 +10,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaChevronDown, FaChevronRight, FaEdit, FaTrash } from "react-icons/fa";
 import { useToast } from "@/app/hooks/useToast";
 import { Menu, Rol } from "@/app/interfaces/menus";
@@ -45,20 +45,30 @@ import { useAdminPermisos } from "@/app/hooks/admin/useAdminPermisos";
 
 export default function Administracion() {
   //----PAGINACIÓN-----------------------------------------------------------
-  const [paginaActualMenus, setPaginaActualMenus] = useState(1);
+  // const [paginaActualMenus, setPaginaActualMenus] = useState(1);
   const [paginaActualRoles, setPaginaActualRoles] = useState(1);
-  const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
 
   //----FILTROS--------------------------------------------------------------
-  const [rolFiltro, setRolFiltro] = useState<number | string | "todos">(
-    "todos",
-  );
+  // const [rolFiltro, setRolFiltro] = useState<number | string | "todos">(
+  //   "todos",
+  // );
   const [menusFiltradosBuscador, setMenusFiltradosBuscador] = useState<Menu[]>(
     [],
   );
   const [rolesFiltradosBuscador, setRolesFiltradosBuscador] = useState<Rol[]>(
     [],
   );
+
+  const [busqueda, setBusqueda] = useState({
+    dataFiltrada: [] as Menu[],
+    busquedaActiva: false,
+  });
+
+  const [paginacion, setPaginacion] = useState({
+    paginaActual: 1,
+    registrosPorPagina: 10,
+    rolFiltro: "todos" as number | string | "todos",
+  });
 
   //----TOAST Y TAB----------------------------------------------------------
   const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
@@ -184,15 +194,64 @@ export default function Administracion() {
         ),
   );
 
-  const handleCambiarRegistros = (cantidad: number) => {
-    setRegistrosPorPagina(cantidad);
-    setPaginaActualMenus(1);
-    setPaginaActualRoles(1);
-  };
+  // const handleCambiarRegistros = (cantidad: number) => {
+  //   setRegistrosPorPagina(cantidad);
+  //   setPaginaActualMenus(1);
+  //   setPaginaActualRoles(1);
+  // };
 
-  const indexInicioMenus = (paginaActualMenus - 1) * registrosPorPagina;
+  const handleResultadoBusqueda = useCallback((resultados: Menu[]) => {
+    setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
+    setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
+  }, []);
+
+  const handleCambiarRolFiltro = useCallback(
+    (value: number | string | "todos") => {
+      setPaginacion((prev) => ({
+        ...prev,
+        rolFiltro: value,
+        paginaActual: 1,
+      }));
+    },
+    [],
+  );
+
+  const handleCambiarRegistros = useCallback((cantidad: number) => {
+    setPaginacion((prev) => ({
+      ...prev,
+      registrosPorPagina: cantidad,
+      paginaActual: 1,
+    }));
+  }, []);
+
+  const handleCambiarPagina = useCallback((pagina: number) => {
+    setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
+  }, []);
+
+  const { paginaActual, registrosPorPagina, rolFiltro } = paginacion;
+  const { dataFiltrada, busquedaActiva } = busqueda;
+
+  const datosBase = busquedaActiva ? dataFiltrada : menus;
+
+  // ✅ Ahora sí se aplica el filtro de rol sobre los datos base
+  const datosAMostrar =
+    rolFiltro === "todos"
+      ? datosBase
+      : datosBase.filter(
+          (menu) =>
+            menu.rolesAsignados.some(
+              (r) => r.rol_ID === rolFiltro && r.habilitado === 1,
+            ) ||
+            menu.submenus?.some((sub) =>
+              sub.rolesAsignados.some(
+                (r) => r.rol_ID === rolFiltro && r.habilitado === 1,
+              ),
+            ),
+        );
+
+  const indexInicioMenus = (paginaActual - 1) * registrosPorPagina;
   const indexFinMenus = indexInicioMenus + registrosPorPagina;
-  const datosPaginadosMenus = menuFiltrados.slice(
+  const datosPaginadosMenus = datosAMostrar.slice(
     indexInicioMenus,
     indexFinMenus,
   );
@@ -264,10 +323,7 @@ export default function Administracion() {
                 datos={menus}
                 campos={["opcion"]}
                 placeholder="Buscar Menu..."
-                onResultado={(resultados) => {
-                  setMenusFiltradosBuscador(resultados);
-                  setPaginaActualMenus(1);
-                }}
+                onResultado={handleResultadoBusqueda}
               />
             </div>
             <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
@@ -279,10 +335,7 @@ export default function Administracion() {
                   value: rol.iD_Rol,
                   label: rol.rol,
                 }))}
-                onChange={(value) => {
-                  setRolFiltro(value);
-                  setPaginaActualMenus(1);
-                }}
+                onChange={handleCambiarRolFiltro}
               />
             </div>
           </div>
@@ -534,10 +587,10 @@ export default function Administracion() {
               )}
 
               <Paginacion
-                totalRegistros={menus.length}
+                totalRegistros={datosAMostrar.length}
                 registrosPorPagina={registrosPorPagina}
-                paginaActual={paginaActualMenus}
-                onCambiarPagina={setPaginaActualMenus}
+                paginaActual={paginaActual}
+                onCambiarPagina={handleCambiarPagina}
                 onCambiarRegistrosPorPagina={handleCambiarRegistros}
               />
             </div>

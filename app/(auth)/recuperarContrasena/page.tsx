@@ -107,15 +107,14 @@ export default function RecuperarContrasena() {
           </BtnPrimario>
         </form>
 
-        {mensaje && (
-          <p className="mt-4 text-green-600 text-center">{mensaje}</p>
-        )}
-
         <BtnOutline type="button">
           <Link href="/" className="block text-center">
             Volver al login
           </Link>
         </BtnOutline>
+        {mensaje && (
+          <p className="mt-4 text-green-600 text-center">{mensaje}</p>
+        )}
       </div>
     </div>
   );

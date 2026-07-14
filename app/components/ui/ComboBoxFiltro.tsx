@@ -1,5 +1,6 @@
 //Componente creado por Diego Castro
 //Componente para filtrar por medio de un ComboBox real
+"use client";
 
 import { useRef, useState } from "react";
 
@@ -13,6 +14,12 @@ interface Props {
   valor: number | string | "todos";
   onChange: (value: number | string | "todos") => void;
   placeholder?: string;
+}
+
+interface ComboState {
+  inputValue: string;
+  prevValor: number | string | "todos";
+  prevOpciones: Opcion[];
 }
 
 function calcularLabel(
@@ -32,22 +39,25 @@ export default function ComboBoxFiltro({
   onChange,
   placeholder = "Todos",
 }: Props) {
-  const [inputValue, setInputValue] = useState(() =>
-    calcularLabel(valor, opciones),
-  );
+  const [combo, setCombo] = useState<ComboState>(() => ({
+    inputValue: calcularLabel(valor, opciones),
+    prevValor: valor,
+    prevOpciones: opciones,
+  }));
   const [abierto, setAbierto] = useState(false);
   const blurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Guarda el ultimo "valor"/"opciones" que ya procesamos, para detectar cambios
-  // del prop durante el render (sin useEffect).
-  const prevValorRef = useRef(valor);
-  const prevOpcionesRef = useRef(opciones);
-
-  if (prevValorRef.current !== valor || prevOpcionesRef.current !== opciones) {
-    prevValorRef.current = valor;
-    prevOpcionesRef.current = opciones;
-    setInputValue(calcularLabel(valor, opciones));
+  // Ajuste de estado derivado del prop durante el render: una sola
+  // llamada a setCombo, sin efectos secundarios anidados.
+  if (combo.prevValor !== valor || combo.prevOpciones !== opciones) {
+    setCombo({
+      inputValue: calcularLabel(valor, opciones),
+      prevValor: valor,
+      prevOpciones: opciones,
+    });
   }
+
+  const { inputValue } = combo;
 
   // Mientras el usuario escribe, solo filtra la lista visualmente.
   const opcionesFiltradas = opciones.filter((o) =>
@@ -55,13 +65,13 @@ export default function ComboBoxFiltro({
   );
 
   const seleccionarOpcion = (opcion: Opcion) => {
-    setInputValue(opcion.label);
+    setCombo((prev) => ({ ...prev, inputValue: opcion.label }));
     onChange(opcion.value);
     setAbierto(false);
   };
 
   const seleccionarTodos = () => {
-    setInputValue("");
+    setCombo((prev) => ({ ...prev, inputValue: "" }));
     onChange("todos");
     setAbierto(false);
   };
@@ -79,16 +89,22 @@ export default function ComboBoxFiltro({
           setAbierto(true);
         }}
         onChange={(e) => {
-          setInputValue(e.target.value);
+          const nuevoValor = e.target.value;
+          setCombo((prev) => ({ ...prev, inputValue: nuevoValor }));
           setAbierto(true);
         }}
         onBlur={() => {
           blurTimeout.current = setTimeout(() => {
             setAbierto(false);
-            const seleccionada = opciones.find((o) => o.label === inputValue);
-            if (!seleccionada) {
-              setInputValue(calcularLabel(valor, opciones));
-            }
+            setCombo((prev) => {
+              const seleccionada = opciones.find(
+                (o) => o.label === prev.inputValue,
+              );
+              if (!seleccionada) {
+                return { ...prev, inputValue: calcularLabel(valor, opciones) };
+              }
+              return prev;
+            });
           }, 150);
         }}
       />

@@ -20,7 +20,7 @@ export function useAdminPermisos(
   const [guardandoPermisos, setGuardandoPermisos] = useState(false);
 
   const abrirPermisos = (item: Menu | SubMenu) => {
-    setItemPermisos(item);
+    setItemPermisos;
     const rolesHabilitados: number[] = [];
 
     for (const rol of item.rolesAsignados) {

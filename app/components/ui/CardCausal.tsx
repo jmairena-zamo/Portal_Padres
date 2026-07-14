@@ -16,7 +16,7 @@ export default function CardCausal({
   color,
 }: CardCausalProps) {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-[#F6F6F6]">
+    <div className="flex items-center gap-3 p-3 bg-linear-to-r from-green-50 via-white to-green-50 shadow-md rounded-lg border border-green-100">
       {/* Icono con fondo circular */}
       <div
         className="w-8 h-8 flex items-center justify-center rounded-full"

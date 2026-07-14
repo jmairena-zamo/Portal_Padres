@@ -50,7 +50,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-white flex flex-col">
+    <div className="fixed inset-0 bg-linear-to-r from-green-50 via-white to-green-50 flex flex-col">
       {/* logo */}
       <div className="flex items-center justify-center h-22.5 border-b border-gray-200 px-4 shrink-0">
         <Image src={logozamorano} alt="Logo Zamorano" width={280} height={60} />
@@ -75,9 +75,7 @@ export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
               datos={todosEstudiantes}
               campos={["Nombre"]}
               placeholder="Buscar estudiante..."
-              onResultado={(resultados) => {
-                setEstudiantesFiltrados(resultados);
-              }}
+              onResultado={setEstudiantesFiltrados}
             />
           </div>
           {estudiantesFiltrados.map((u, index) => (

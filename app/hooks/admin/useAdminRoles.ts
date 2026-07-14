@@ -82,7 +82,7 @@ export function useAdminRoles(
 
   // Precarga el formulario con los datos del rol y abre el modal en modo editar.
   const abrirEditarRol = (rol: Rol) => {
-    setRolSeleccionado(rol);
+    setRolSeleccionado;
     setFormDataRol({ rol: rol.rol });
     setModalRol(true);
     setModoRol("editar");

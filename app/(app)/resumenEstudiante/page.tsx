@@ -209,19 +209,19 @@ export default function ResumenEstudiante() {
           <hr className="my-2" />
 
           <div className="grid grid-cols-3 gap-2 mt-4 text-[#30545b]">
-            <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
+            <div className="text-center bg-linear-to-r from-green-50 via-white to-green-50 shadow-md rounded-lg border border-green-100 p-2">
               <p className="text-[10px]  font-medium leading-tight">
                 POSICIÓN CLASE
               </p>
               <p className="text-[15px] font-bold mt-1">238/275</p>
             </div>
-            <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
+            <div className="text-center bg-linear-to-r from-green-50 via-white to-green-50 shadow-md rounded-lg border border-green-100 p-2">
               <p className="text-[10px] font-medium leading-tight">
                 POSICIÓN CARRERA
               </p>
               <p className="text-[15px] font-bold mt-1">35/40</p>
             </div>
-            <div className="text-center bg-[#F6F6F6] rounded-[5px] p-2">
+            <div className="text-center bg-linear-to-r from-green-50 via-white to-green-50 shadow-md rounded-lg border border-green-100 p-2">
               <p className="text-[10px] font-medium leading-tight">
                 POSICIÓN PAÍS
               </p>

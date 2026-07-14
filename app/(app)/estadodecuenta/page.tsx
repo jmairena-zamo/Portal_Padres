@@ -18,12 +18,21 @@ import {
   mapearMovimiento,
   MovimientoCuenta,
 } from "@/app/interfaces/estadoCuenta";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function EstadoCuenta() {
   const [paginaActual, setPaginaActual] = useState(1);
   const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
   const [dataFiltrada, setDataFiltrada] = useState<FilaCuenta[]>([]);
+
+  const [paginacion, setPaginacion] = useState({
+    paginaActual: 1,
+    registrosPorPagina: 10,
+  });
+  const [busqueda, setBusqueda] = useState({
+    dataFiltrada: [] as FilaCuenta[],
+    busquedaActiva: false,
+  });
 
   const {
     estadoCuenta,
@@ -33,10 +42,23 @@ export default function EstadoCuenta() {
     balance,
   } = useEstadoCuenta();
 
-  const handleCambiarRegistros = (cantidad: number) => {
-    setRegistrosPorPagina(cantidad);
-    setPaginaActual(1);
-  };
+  // const handleCambiarRegistros = (cantidad: number) => {
+  //   setRegistrosPorPagina(cantidad);
+  //   setPaginaActual(1);
+  // };
+
+  const handleResultadoBusqueda = useCallback((resultados: FilaCuenta[]) => {
+    setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
+    setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
+  }, []);
+
+  const handleCambiarRegistros = useCallback((cantidad: number) => {
+    setPaginacion({ registrosPorPagina: cantidad, paginaActual: 1 });
+  }, []);
+
+  const handleCambiarPagina = useCallback((pagina: number) => {
+    setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
+  }, []);
 
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
@@ -54,10 +76,7 @@ export default function EstadoCuenta() {
             datos={estadoCuenta}
             placeholder="Buscar..."
             campos={["tipo", "categoria", "descripcion"]}
-            onResultado={(resultados) => {
-              setDataFiltrada(resultados);
-              setPaginaActual(1);
-            }}
+            onResultado={handleResultadoBusqueda}
           />
         </div>
 
@@ -94,7 +113,7 @@ export default function EstadoCuenta() {
               totalRegistros={estadoCuenta.length}
               registrosPorPagina={registrosPorPagina}
               paginaActual={paginaActual}
-              onCambiarPagina={setPaginaActual}
+              onCambiarPagina={handleCambiarPagina}
               onCambiarRegistrosPorPagina={handleCambiarRegistros}
             />
           </>

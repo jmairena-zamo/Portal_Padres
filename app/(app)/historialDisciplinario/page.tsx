@@ -33,15 +33,25 @@ const CAMPOS_BUSQUEDA: (keyof FilaHistorialDisciplinario)[] = [
 ];
 
 export default function HistorialDisciplinario() {
-  const [paginaActual, setPaginaActual] = useState(1);
-  const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
+  // const [paginaActual, setPaginaActual] = useState(1);
+  // const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
   const [filaSeleccionada, setFilaSeleccionada] =
     useState<FilaHistorialDisciplinario | null>(null);
-  const [dataFiltrada, setDataFiltrada] = useState<
-    FilaHistorialDisciplinario[]
-  >([]);
+  // const [dataFiltrada, setDataFiltrada] = useState<
+  //   FilaHistorialDisciplinario[]
+  // >([]);
   const { faltasTotales } = useEstudiante();
-  const [busquedaActiva, setBusquedaActiva] = useState(false);
+  // const [busquedaActiva, setBusquedaActiva] = useState(false);
+
+  const [paginacion, setPaginacion] = useState({
+    paginaActual: 1,
+    registrosPorPagina: 10,
+    estadoFiltro: "todos" as number | string | "todos",
+  });
+  const [busqueda, setBusqueda] = useState({
+    dataFiltrada: [] as FilaHistorialDisciplinario[],
+    busquedaActiva: false,
+  });
 
   const {
     historialDisciplinario,
@@ -50,39 +60,68 @@ export default function HistorialDisciplinario() {
     reintentarDisciplinario,
   } = useHistorialDisciplinario();
 
-  const handleResultadosBusqueda = useCallback(
+  const handleResultadoBusqueda = useCallback(
     (resultados: FilaHistorialDisciplinario[]) => {
-      setDataFiltrada(resultados);
-      setBusquedaActiva(true);
-      setPaginaActual(1);
+      setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
+      setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
     },
     [],
   );
 
-  const datoAMostrar = busquedaActiva ? dataFiltrada : historialDisciplinario;
-
-  const handleCambiarRegistros = (cantidad: number) => {
-    setRegistrosPorPagina(cantidad);
-    setPaginaActual(1);
-  };
-
-  const [estadoFiltro, setEstadoFiltro] = useState<number | string | "todos">(
-    "todos",
+  const handleCambiarEstadoFiltro = useCallback(
+    (value: number | string | "todos") => {
+      setPaginacion((prev) => ({
+        ...prev,
+        estadoFiltro: value,
+        paginaActual: 1,
+      }));
+    },
+    [],
   );
 
-  const DiscFiltrada = useMemo(() => {
-    let resultado = dataFiltrada;
+  const handleCambiarRegistros = useCallback((cantidad: number) => {
+    setPaginacion((prev) => ({
+      ...prev,
+      registrosPorPagina: cantidad,
+      paginaActual: 1,
+    }));
+  }, []);
 
-    if (estadoFiltro !== "todos") {
-      resultado = resultado.filter((q) => q.estado === estadoFiltro);
+  const handleCambiarPagina = useCallback((pagina: number) => {
+    setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
+  }, []);
+
+  const { paginaActual, registrosPorPagina, estadoFiltro } = paginacion;
+  const { dataFiltrada, busquedaActiva } = busqueda;
+
+  const datosBase = busquedaActiva ? dataFiltrada : historialDisciplinario;
+
+  const datosAMostrar = useMemo(() => {
+    if (estadoFiltro === "todos") {
+      return datosBase;
     }
+    return datosBase.filter((item) => item.estado === estadoFiltro);
+  }, [datosBase, estadoFiltro]);
 
-    return resultado;
-  }, [dataFiltrada, estadoFiltro]);
+  // const handleResultadosBusqueda = useCallback(
+  //   (resultados: FilaHistorialDisciplinario[]) => {
+  //     setDataFiltrada(resultados);
+  //     setBusquedaActiva(true);
+  //     setPaginaActual(1);
+  //   },
+  //   [],
+  // );
+
+  // const datoAMostrar = busquedaActiva ? dataFiltrada : historialDisciplinario;
+
+  // const handleCambiarRegistros = (cantidad: number) => {
+  //   setRegistrosPorPagina(cantidad);
+  //   setPaginaActual(1);
+  // };
 
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
-  const datosPaginados = DiscFiltrada.slice(indexInicio, indexFin);
+  const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
   const tieneData = historialDisciplinario.length > 0;
 
@@ -99,7 +138,7 @@ export default function HistorialDisciplinario() {
               datos={historialDisciplinario}
               campos={CAMPOS_BUSQUEDA}
               placeholder="Buscar..."
-              onResultado={handleResultadosBusqueda}
+              onResultado={handleResultadoBusqueda}
             />
           </div>
           <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
@@ -108,9 +147,7 @@ export default function HistorialDisciplinario() {
               valor={estadoFiltro}
               placeholder="Todos"
               opciones={opcionesTipo}
-              onChange={(value) => {
-                setEstadoFiltro(value);
-              }}
+              onChange={handleCambiarEstadoFiltro}
             />
           </div>
         </div>
@@ -177,10 +214,10 @@ export default function HistorialDisciplinario() {
           Faltas Totales: {faltasTotales}
         </h2>
         <Paginacion
-          totalRegistros={datoAMostrar.length}
+          totalRegistros={datosAMostrar.length}
           registrosPorPagina={registrosPorPagina}
           paginaActual={paginaActual}
-          onCambiarPagina={setPaginaActual}
+          onCambiarPagina={handleCambiarPagina}
           onCambiarRegistrosPorPagina={handleCambiarRegistros}
         />
       </div>

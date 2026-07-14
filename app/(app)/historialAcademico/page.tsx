@@ -27,10 +27,14 @@ const CAMPOS_BUSQUEDA: (keyof FilaHistorial)[] = [
 ];
 
 export default function HistorialAcademico() {
-  const [paginaActual, setPaginaActual] = useState(1);
-  const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
-  const [dataFiltrada, setDataFiltrada] = useState<FilaHistorial[]>([]);
-  const [busquedaActiva, setBusquedaActiva] = useState(false);
+  const [paginacion, setPaginacion] = useState({
+    paginaActual: 1,
+    registrosPorPagina: 10,
+  });
+  const [busqueda, setBusqueda] = useState({
+    dataFiltrada: [] as FilaHistorial[],
+    busquedaActiva: false,
+  });
 
   const {
     historialAcademico,
@@ -40,21 +44,26 @@ export default function HistorialAcademico() {
   } = useHistorialAcademico();
 
   const handleResultadoBusqueda = useCallback((resultados: FilaHistorial[]) => {
-    setDataFiltrada(resultados);
-    setBusquedaActiva(true);
-    setPaginaActual(1);
+    setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
+    setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
   }, []);
+
+  const handleCambiarRegistros = useCallback((cantidad: number) => {
+    setPaginacion({ registrosPorPagina: cantidad, paginaActual: 1 });
+  }, []);
+
+  const handleCambiarPagina = useCallback((pagina: number) => {
+    setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
+  }, []);
+
+  const { paginaActual, registrosPorPagina } = paginacion;
+  const { dataFiltrada, busquedaActiva } = busqueda;
 
   const datosAMostrar = busquedaActiva ? dataFiltrada : historialAcademico;
 
-  const handleCambiarRegistros = (cantidad: number) => {
-    setRegistrosPorPagina(cantidad);
-    setPaginaActual(1);
-  };
-
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
-  const datosPaginados = dataFiltrada.slice(indexInicio, indexFin);
+  const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
   const tieneData = historialAcademico.length > 0;
 
@@ -109,7 +118,7 @@ export default function HistorialAcademico() {
               totalRegistros={datosAMostrar.length}
               registrosPorPagina={registrosPorPagina}
               paginaActual={paginaActual}
-              onCambiarPagina={setPaginaActual}
+              onCambiarPagina={handleCambiarPagina}
               onCambiarRegistrosPorPagina={handleCambiarRegistros}
             />
           </>
