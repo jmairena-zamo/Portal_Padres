@@ -1,8 +1,12 @@
+// Creado por Diego Castro
+// Componente para cambiar la contraseña del usuario
+
 import { NextRequest, NextResponse } from "next/server";
 import { nuevaContrasenaSchema } from "@/app/utils/validations";
 import { API_URL } from "@/app/config/api";
 
 export async function PUT(request: NextRequest) {
+  // Validar los datos de entrada
   const body = await request.json();
 
   const parsed = nuevaContrasenaSchema.safeParse(body);
@@ -10,6 +14,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
   }
 
+  // Extraer los datos validados
   const {
     id_useremail,
     correoElectronico,
@@ -30,6 +35,7 @@ export async function PUT(request: NextRequest) {
       }),
     });
 
+    // Manejo de errores en la respuesta del servidor
     if (!tokenRes.ok) {
       return NextResponse.json(
         { error: "Link inválido o expirado" },
@@ -65,6 +71,7 @@ export async function PUT(request: NextRequest) {
       body: JSON.stringify({ token: token }),
     });
 
+    // Retornar una respuesta exitosa
     return NextResponse.json({
       message: "Contraseña actualizada correctamente",
     });

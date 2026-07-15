@@ -73,7 +73,7 @@ export const EstudianteProvider = ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ bannerID: hijo.bannerID }),
     });
-    setHijoActivo;
+    setHijoActivo(hijo);
   };
 
   const cargarEstudiante = useCallback(async () => {

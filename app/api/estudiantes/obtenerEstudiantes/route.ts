@@ -1,3 +1,8 @@
+// Creado por Diego Castro
+// Componente para obtener la lista de estudiantes del padre
+// Actualmente solo se realiza una simulación de la lista de estudiantes,
+// ya que no se tiene acceso a la API para obtener la lista real de estudiantes.
+
 import { listaEstudiantes } from "./../../../interfaces/infoEstudiante";
 import { NextRequest, NextResponse } from "next/server";
 

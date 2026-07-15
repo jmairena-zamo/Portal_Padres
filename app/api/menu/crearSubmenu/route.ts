@@ -1,3 +1,6 @@
+// Creado por Diego Castro
+// Crea un nuevo submenu en la base de datos
+
 import { API_URL } from "@/app/config/api";
 import { subMenuSchema } from "@/app/utils/validations";
 import { NextResponse, NextRequest } from "next/server";
@@ -33,6 +36,7 @@ export async function POST(request: NextRequest) {
 
   const { opcion, posicion } = parsed.data;
 
+  // Crear el submenu en la base de datos
   const res = await fetch(`${API_URL}/submenu/Crear`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

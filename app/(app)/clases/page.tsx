@@ -1,17 +1,19 @@
 //Creado por Diego Castro
 //Pagina donde se mostraran las clases que lleva un estudiante en el periodo actual
+//Se mostrara la informacion de cada clase, como el codigo, nombre de la materia, seccion, periodo y nota
 
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useEffect, useState } from "react";
 import { Loading, Tabla, Titulo, Vacio } from "@/app/components/ui";
 import { useClasesPeriodo } from "@/app/hooks/useClasesPeriodo";
 
 export default function Clases() {
+  // Estado para manejar la información de las clases del periodo actual
   const { clasesPeriodo, cargandoClases, errorClases, reintentarClase } =
     useClasesPeriodo();
 
+  // Constante para saber si contiene data, de lo contrario mostrar mensaje de vacío
   const tieneData = clasesPeriodo.length > 0;
 
   if (cargandoClases) return <Loading />;
@@ -24,6 +26,7 @@ export default function Clases() {
           titulo={`Información academica, Año ${new Date().getFullYear()}, Periodo Actual`}
           alineado={3}
         />
+        {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
         {cargandoClases ? (
           <Loading />
         ) : errorClases ? (
@@ -34,8 +37,8 @@ export default function Clases() {
           />
         ) : !tieneData ? (
           <Vacio
-            titulo="No hay información."
-            descripcion="No existe información de clases."
+            titulo="No hay datos disponibles"
+            descripcion="No se encontraron registros de Clases para mostrar"
           />
         ) : (
           <Tabla

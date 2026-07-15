@@ -1,9 +1,11 @@
+// Creado por Diego Castro
+// Retorna los menús y submenús habilitados para el rol del usuario en sesión.
+// Se utiliza para crear el sidebar dinamico
+
 import { API_URL } from "@/app/config/api";
 import { NextRequest, NextResponse } from "next/server";
 
 //GET /api/menu/obtenerMenu
-//Retorna los menús y submenús habilitados para el rol del usuario en sesión.
-//Se utiliza para crear el sidebar dinamico
 export async function GET(request: NextRequest) {
   const session = request.cookies.get("session");
 
@@ -27,6 +29,7 @@ export async function GET(request: NextRequest) {
     // Extraer solo los IDs que estén habilitados
     const menuIDs: number[] = [];
 
+    // Extraer solo los IDs de menús habilitados
     for (const item of dataMenuRol.response || []) {
       if (item.habilitado === 1) {
         menuIDs.push(item.menu_ID);
@@ -35,6 +38,7 @@ export async function GET(request: NextRequest) {
 
     const submenuIDsSet = new Set<number>();
 
+    // Extraer solo los IDs de submenús habilitados
     for (const item of dataSubMenuRol.response || []) {
       if (item.habilitado === 1) {
         submenuIDsSet.add(item.subMenu_ID);
@@ -57,9 +61,7 @@ export async function GET(request: NextRequest) {
         }
         const dataSub = await resSub.json();
 
-        // Solo submenús que estén en la lista de habilitados para el rol
-        // const submenuIDsSet = new Set(submenuIDs);
-
+        // Filtrar los submenús que estén habilitados y que pertenezcan al rol
         const submenus = (dataSub.response || []).filter(
           (sub: any) =>
             submenuIDsSet.has(sub.iD_SubMenu) && sub.habilitado === 1,

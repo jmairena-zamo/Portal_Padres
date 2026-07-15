@@ -1,11 +1,10 @@
-//Creado por Dieg Castro
+// Creado por Dieg Castro
+// Retorna todos los menús con sus roles asignados
+// y submenús (cada uno con sus propios roles).
 
 import { API_URL } from "@/app/config/api";
 import { NextResponse, NextRequest } from "next/server";
 
-//GET /api/menus/adminMenuRol
-//Retorna todos los menús con sus roles asignados
-// y submenús (cada uno con sus propios roles).
 export async function GET() {
   try {
     // Obtener lista base de menús y roles en paralelo
@@ -44,6 +43,7 @@ export async function GET() {
           }),
         );
 
+        // Devolver el menú con sus roles asignados y submenús
         return {
           ...menu,
           rolesAsignados: dataMenuRol.response || [],

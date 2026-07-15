@@ -1,3 +1,8 @@
+// Creado por Diego Castro
+// Componente para obtener el estado de cuenta del estudiante
+// Actualmente solo se realiza una simulación del estado de cuenta,
+// ya que no se tiene acceso a la API para obtener el estado de cuenta real del estudiante.
+
 import { EstadoCuenta } from "@/app/interfaces/estadoCuenta";
 import { NextRequest, NextResponse } from "next/server";
 

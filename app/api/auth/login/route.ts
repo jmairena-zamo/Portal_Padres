@@ -64,6 +64,7 @@ async function actualizarHabilitado(
   }
 }
 
+// Registra un intento fallido de login para el correo dado.
 function registrarIntento(correo: string): number {
   const ahora = Date.now();
   const registro = intentosFallidos.get(correo);

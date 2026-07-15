@@ -9,6 +9,7 @@ import {
 } from "../interfaces/historialAcademico";
 import { useEstudiante } from "./useEstudiante";
 
+// Función para obtener el historial académico desde la API
 const fetcher = async (url: string) => {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Error ${res.status}`);

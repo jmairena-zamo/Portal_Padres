@@ -1,3 +1,6 @@
+// Creado por Diego Castro
+// Componente para enviar correo de recuperación de contraseña
+
 import { NextResponse, NextRequest } from "next/server";
 import { Resend } from "resend";
 import { recuperarContrasenaSchema } from "@/app/utils/validations";
@@ -8,6 +11,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Endpoint para enviar correo de recuperación de contraseña
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const parsed = recuperarContrasenaSchema.safeParse(body);
@@ -40,8 +44,8 @@ export async function POST(request: NextRequest) {
 
     const id = data.response.iD_UserEmail;
     const token = crypto.randomUUID();
-    //const expiracion = Date.now() + 30 * 60 * 1000;
 
+    // Guardar el token en la base de datos
     const tokenRes = await fetch(`${API_URL}/tokensrecuperacion/Crear`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -51,6 +55,7 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    // Manejo de errores en la respuesta del servidor
     if (!tokenRes.ok) {
       const errorBody = await tokenRes.text();
       console.error("Token error:", tokenRes.status, errorBody);
@@ -62,6 +67,7 @@ export async function POST(request: NextRequest) {
 
     const linkReset = `http://localhost:3000/cambiarContrasena?token=${token}&id=${id}`;
 
+    // Enviar correo de recuperación de contraseña
     enviarCorreoRecuperarCon({
       nombreUsuario: saveData.email,
       urlCambioContrasena: linkReset,

@@ -1,5 +1,7 @@
+// Creado por Diego Castro
+// Activa o desactiva un rol en un submenu
+
 import { API_URL } from "@/app/config/api";
-// import { invalidarCacheRol } from "@/app/services/menu";
 import { NextRequest, NextResponse } from "next/server";
 
 //POST /api/menu/asignarSubMenuRol

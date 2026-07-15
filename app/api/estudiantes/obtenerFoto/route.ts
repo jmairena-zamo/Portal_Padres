@@ -1,5 +1,6 @@
 // Creado por Diego Castro
 // Obtener el base64 de la foto del estudiante
+// Actualmente solo se realiza una simulación de la foto,
 
 import { NextRequest, NextResponse } from "next/server";
 

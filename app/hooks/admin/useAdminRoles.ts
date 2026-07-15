@@ -19,6 +19,7 @@ export function useAdminRoles(
   const [rolSeleccionado, setRolSeleccionado] = useState<Rol | null>(null);
   const [formDataRol, setFormDataRol] = useState<rolData>({ rol: "" });
   const [esValidoRol, setEsValidoRol] = useState(true);
+  const [errorRoles, setErrorRoles] = useState<boolean>(false);
 
   //----MODAL DE CONFIRMACIÓN-------------------------------------------------
   const [confirmModalRol, setConfirmModalRol] = useState<{
@@ -28,6 +29,7 @@ export function useAdminRoles(
 
   //----Carga----------------------------------------------------------------
   const cargarRoles = async () => {
+    setErrorRoles(false);
     try {
       const res = await fetch("/api/menu/adminMenuRol");
       const data = await res.json();
@@ -35,6 +37,7 @@ export function useAdminRoles(
       return data.roles as Rol[];
     } catch {
       mostrarError("Error de conexión. Intenta de nuevo.");
+      setErrorRoles(true);
       return [];
     }
   };
@@ -82,7 +85,7 @@ export function useAdminRoles(
 
   // Precarga el formulario con los datos del rol y abre el modal en modo editar.
   const abrirEditarRol = (rol: Rol) => {
-    setRolSeleccionado;
+    setRolSeleccionado(rol);
     setFormDataRol({ rol: rol.rol });
     setModalRol(true);
     setModoRol("editar");
@@ -157,5 +160,6 @@ export function useAdminRoles(
     editarRol,
     pedirConfirmacionEliminar,
     confirmarEliminar,
+    errorRoles,
   };
 }

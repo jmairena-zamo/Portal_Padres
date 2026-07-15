@@ -55,8 +55,10 @@ export default function CambiarContrasena() {
       return;
     }
 
+    // Controlador para abortar la solicitud si el componente se desmonta
     const controller = new AbortController();
 
+    // Función para validar el enlace con el servidor
     const validarLink = async () => {
       try {
         const res = await fetch(`/api/user/obtenerUsuario`, {

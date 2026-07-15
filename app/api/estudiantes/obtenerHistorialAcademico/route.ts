@@ -1,5 +1,7 @@
 // Creado por Diego Castro
 // Obtener la información del historial academico del estudiante
+// Actualmente solo se realiza una simulación del historial academico,
+// ya que no se tiene acceso a la API para obtener el historial academico real del estudiante.
 
 import { HistorialAcademico } from "@/app/interfaces/historialAcademico";
 import { NextRequest, NextResponse } from "next/server";

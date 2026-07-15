@@ -1,5 +1,7 @@
 // Creado por Diego Castro
 // Obtener información general del estudiante (nombre, carrera, codiig, etc)
+// Actualmente solo se realiza una simulación de la información general del estudiante,
+// ya que no se tiene acceso a la API para obtener la información general real del estudiante.
 
 import { inforEstudiante } from "@/app/interfaces/infoEstudiante";
 import { NextRequest, NextResponse } from "next/server";

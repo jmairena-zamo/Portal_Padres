@@ -1,3 +1,8 @@
+// Creado por Diego Castro
+// Componente para obtener las faltas del estudiante
+// Actualmente solo se realiza una simulación de las faltas,
+// ya que no se tiene acceso a la API para obtener las faltas reales del estudiante.
+
 import { FaltasEstudiante } from "@/app/interfaces/faltas";
 import { NextRequest, NextResponse } from "next/server";
 

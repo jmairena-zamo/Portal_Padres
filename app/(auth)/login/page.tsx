@@ -1,3 +1,8 @@
+// Creado por Diego Castro
+// Página de login del portal
+// Se encarga de mostrar el formulario de login y manejar la validación de los campos,
+// así como la comunicación con la API para autenticar al usuario.
+
 "use client";
 
 import zamorano from "../../img/Logo-Universidad-Zamorano.png";
@@ -19,6 +24,7 @@ export default function Login() {
 
   const router = useRouter();
 
+  // Estado para manejar los datos del formulario de login
   const [form, setForm] = useState<LoginFormData>({
     correo: "",
     contrasena: "",
@@ -32,11 +38,13 @@ export default function Login() {
     if (name === "contrasena" && !esValidoPass) setEsValidoPass(true);
   };
 
+  // Valida el campo de correo electrónico usando el esquema de validación
   const validationCorreo = () => {
     const result = loginSchema.shape.correo.safeParse(form.correo);
     setEsValidoCorreo(result.success);
   };
 
+  // Valida el campo de contraseña usando el esquema de validación
   const validationPass = () => {
     const result = loginSchema.shape.contrasena.safeParse(form.contrasena);
     if (!result.success) {

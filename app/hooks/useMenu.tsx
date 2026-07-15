@@ -1,4 +1,4 @@
-//Creado por Diego Castro
+// Creado por Diego Castro
 
 "use client";
 

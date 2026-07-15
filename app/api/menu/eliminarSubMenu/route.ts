@@ -1,4 +1,5 @@
-//Creado pr Diego Castro
+// Creado pr Diego Castro
+// Elimina un submenu de la base de datos
 
 import { API_URL } from "@/app/config/api";
 import { NextResponse, NextRequest } from "next/server";
@@ -20,6 +21,7 @@ export async function DELETE(request: NextRequest) {
 
   const { iD_SubMenu } = body;
 
+  // Eliminar el submenu en la base de datos
   const res = await fetch(`${API_URL}/submenu/Eliminar`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },

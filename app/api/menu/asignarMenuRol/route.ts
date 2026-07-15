@@ -1,10 +1,9 @@
+// Creado por Diego Castro
+// Activa o desactiva un rol en un menu
+
 import { API_URL } from "@/app/config/api";
-// import { invalidarCacheRol } from "@/app/services/menu";
 import { NextRequest, NextResponse } from "next/server";
 
-//POST /api/menu/asignarMenuRol
-//Asigna un rol a un menu
-//Crea el registro en la tabla Tbl_Menu_Rol
 export async function POST(request: NextRequest) {
   //Requiere sesion activa; Se obtiene la sesion activa
   const session = request.cookies.get("session");
@@ -18,6 +17,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
 
+  // Se hace el llamado al endpoint de asignar rol a menu
   const res = await fetch(`${API_URL}/menurol/Crear`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

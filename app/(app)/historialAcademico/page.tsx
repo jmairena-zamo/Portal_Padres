@@ -1,10 +1,11 @@
 // Creado por Diego Castro
 // Pagina de historial academico
+// Se mostrara la informacion de cada clase, como el codigo, nombre de la materia, seccion, periodo y nota
 
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Buscador,
   Loading,
@@ -13,12 +14,10 @@ import {
   Titulo,
   Vacio,
 } from "@/app/components/ui";
-import {
-  CursoHistorial,
-  FilaHistorial,
-} from "@/app/interfaces/historialAcademico";
+import { FilaHistorial } from "@/app/interfaces/historialAcademico";
 import { useHistorialAcademico } from "@/app/hooks/useHistorialAcademico";
 
+// Campos que se pueden buscar en el historial academico
 const CAMPOS_BUSQUEDA: (keyof FilaHistorial)[] = [
   "clase",
   "anio",
@@ -27,15 +26,19 @@ const CAMPOS_BUSQUEDA: (keyof FilaHistorial)[] = [
 ];
 
 export default function HistorialAcademico() {
+  // Estado para manejar la paginación (qué página y cuántos registros mostrar)
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
     registrosPorPagina: 10,
   });
+
+  // Estado para manejar la búsqueda (si está activa y qué datos mostrar)
   const [busqueda, setBusqueda] = useState({
     dataFiltrada: [] as FilaHistorial[],
     busquedaActiva: false,
   });
 
+  // Hook que trae la información del historial academico
   const {
     historialAcademico,
     cargandoHistorialAcademico,
@@ -43,28 +46,34 @@ export default function HistorialAcademico() {
     reintentarHistorialAcademico,
   } = useHistorialAcademico();
 
+  // Función que se ejecuta cuando se hace una búsqueda
   const handleResultadoBusqueda = useCallback((resultados: FilaHistorial[]) => {
     setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
     setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
   }, []);
 
+  // Función para cambiar cuántos registros se muestran por página
   const handleCambiarRegistros = useCallback((cantidad: number) => {
     setPaginacion({ registrosPorPagina: cantidad, paginaActual: 1 });
   }, []);
 
+  // Función para cambiar de página
   const handleCambiarPagina = useCallback((pagina: number) => {
     setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
   }, []);
 
+  // Extraemos valores actuales de paginación y búsqueda
   const { paginaActual, registrosPorPagina } = paginacion;
   const { dataFiltrada, busquedaActiva } = busqueda;
 
   const datosAMostrar = busquedaActiva ? dataFiltrada : historialAcademico;
 
+  // Calculamos los índices para la paginación de datos
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
   const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
+  // Verificamos si hay datos para mostrar
   const tieneData = historialAcademico.length > 0;
 
   if (cargandoHistorialAcademico) return <Loading />;
@@ -83,6 +92,7 @@ export default function HistorialAcademico() {
           />
         </div>
 
+        {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
         {cargandoHistorialAcademico ? (
           <Loading />
         ) : errorHistorialAcademico ? (
@@ -93,8 +103,8 @@ export default function HistorialAcademico() {
           />
         ) : !tieneData ? (
           <Vacio
-            titulo="No hay Información"
-            descripcion="No existe Historial Academico"
+            titulo="No hay datos disponibles"
+            descripcion="No se encontraron registros de Historial Academico para mostrar"
           />
         ) : (
           <>

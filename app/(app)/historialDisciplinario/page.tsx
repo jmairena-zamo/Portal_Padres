@@ -1,10 +1,11 @@
-//Creado por Diego Castro
-//Pagina donde se mostrara el historial acdemico del estudiante
+// Creado por Diego Castro
+// Pagina donde se mostrara el historial disciplinario del estudiante
+// Se mostrara la informacion de cada falta, como el tipo, fecha, periodo, descripcion corta, reportada por, numero de faltas y estado
 
 "use client";
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Buscador,
   ComboBoxFiltro,
@@ -14,45 +15,42 @@ import {
   Titulo,
   Vacio,
 } from "@/app/components/ui";
-import {
-  accionesEstudiantiles,
-  FilaHistorialDisciplinario,
-} from "@/app/interfaces/faltas";
+import { FilaHistorialDisciplinario } from "@/app/interfaces/faltas";
 import ModalForm from "@/app/components/modals/ModalForm";
 import { useHistorialDisciplinario } from "@/app/hooks/useHistorialDisciplinario";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 
-const opcionesTipo = [
+// Opciones para el filtro de estado
+const opcionesEstado = [
   { value: "Eliminada", label: "ELIMINADA" },
   { value: "Aprobada", label: "APROBADA" },
 ];
 
+// Constante para definir los campos que se pueden buscar en el historial disciplinario
 const CAMPOS_BUSQUEDA: (keyof FilaHistorialDisciplinario)[] = [
   "tipo",
   "periodo",
 ];
 
 export default function HistorialDisciplinario() {
-  // const [paginaActual, setPaginaActual] = useState(1);
-  // const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
   const [filaSeleccionada, setFilaSeleccionada] =
     useState<FilaHistorialDisciplinario | null>(null);
-  // const [dataFiltrada, setDataFiltrada] = useState<
-  //   FilaHistorialDisciplinario[]
-  // >([]);
   const { faltasTotales } = useEstudiante();
-  // const [busquedaActiva, setBusquedaActiva] = useState(false);
 
+  // Estado para manejar la paginación (qué página y cuántos registros mostrar)
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
     registrosPorPagina: 10,
     estadoFiltro: "todos" as number | string | "todos",
   });
+
+  // Estado para manejar la búsqueda (si está activa y qué datos mostrar)
   const [busqueda, setBusqueda] = useState({
     dataFiltrada: [] as FilaHistorialDisciplinario[],
     busquedaActiva: false,
   });
 
+  // Hook que trae la información del historial disciplinario
   const {
     historialDisciplinario,
     cargandoDisciplinario,
@@ -60,6 +58,7 @@ export default function HistorialDisciplinario() {
     reintentarDisciplinario,
   } = useHistorialDisciplinario();
 
+  // Función que se ejecuta cuando se hace una búsqueda
   const handleResultadoBusqueda = useCallback(
     (resultados: FilaHistorialDisciplinario[]) => {
       setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
@@ -68,6 +67,7 @@ export default function HistorialDisciplinario() {
     [],
   );
 
+  // Función para cambiar el filtro de estado
   const handleCambiarEstadoFiltro = useCallback(
     (value: number | string | "todos") => {
       setPaginacion((prev) => ({
@@ -79,6 +79,7 @@ export default function HistorialDisciplinario() {
     [],
   );
 
+  // Función para cambiar cuántos registros se muestran por página
   const handleCambiarRegistros = useCallback((cantidad: number) => {
     setPaginacion((prev) => ({
       ...prev,
@@ -87,15 +88,19 @@ export default function HistorialDisciplinario() {
     }));
   }, []);
 
+  // Función para cambiar de página
   const handleCambiarPagina = useCallback((pagina: number) => {
     setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
   }, []);
 
+  // Extraemos valores actuales de paginación y búsqueda
   const { paginaActual, registrosPorPagina, estadoFiltro } = paginacion;
   const { dataFiltrada, busquedaActiva } = busqueda;
 
+  // Filtramos los datos según el estado seleccionado y si hay búsqueda activa
   const datosBase = busquedaActiva ? dataFiltrada : historialDisciplinario;
 
+  // Filtramos los datos según el estado seleccionado
   const datosAMostrar = useMemo(() => {
     if (estadoFiltro === "todos") {
       return datosBase;
@@ -103,26 +108,12 @@ export default function HistorialDisciplinario() {
     return datosBase.filter((item) => item.estado === estadoFiltro);
   }, [datosBase, estadoFiltro]);
 
-  // const handleResultadosBusqueda = useCallback(
-  //   (resultados: FilaHistorialDisciplinario[]) => {
-  //     setDataFiltrada(resultados);
-  //     setBusquedaActiva(true);
-  //     setPaginaActual(1);
-  //   },
-  //   [],
-  // );
-
-  // const datoAMostrar = busquedaActiva ? dataFiltrada : historialDisciplinario;
-
-  // const handleCambiarRegistros = (cantidad: number) => {
-  //   setRegistrosPorPagina(cantidad);
-  //   setPaginaActual(1);
-  // };
-
+  // Calculamos los índices para la paginación de datos
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
   const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
+  // Verificamos si hay datos para mostrar
   const tieneData = historialDisciplinario.length > 0;
 
   if (cargandoDisciplinario) return <Loading />;
@@ -146,12 +137,13 @@ export default function HistorialDisciplinario() {
             <ComboBoxFiltro
               valor={estadoFiltro}
               placeholder="Todos"
-              opciones={opcionesTipo}
+              opciones={opcionesEstado}
               onChange={handleCambiarEstadoFiltro}
             />
           </div>
         </div>
 
+        {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
         {cargandoDisciplinario ? (
           <Loading />
         ) : errorDisciplinario ? (
@@ -164,8 +156,8 @@ export default function HistorialDisciplinario() {
           />
         ) : !tieneData ? (
           <Vacio
-            titulo="No hay Información"
-            descripcion="No existe Historial Disciplinario"
+            titulo="No hay datos disponibles"
+            descripcion="No se encontraron registros de Historial Disciplinario para mostrar"
           />
         ) : (
           <Tabla

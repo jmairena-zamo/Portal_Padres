@@ -14,6 +14,7 @@ interface EstadoCuentaResponse {
   balance: number;
 }
 
+// Función para obtener el estado de cuenta desde la API
 const fetcher = async (url: string): Promise<EstadoCuentaResponse> => {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Error ${res.status}`);

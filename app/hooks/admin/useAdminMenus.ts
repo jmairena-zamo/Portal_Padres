@@ -102,6 +102,7 @@ export function useAdminMenus(
     async (menu: Menu) => {
       const nuevoHabilitado = menu.habilitado === 1 ? 0 : 1;
 
+      // Se crean promesas para actualizar el menú y sus submenús (si los tiene) en paralelo
       const promesas: Promise<Response>[] = [
         fetch("/api/menu/actualizarMenu", {
           method: "PUT",
@@ -124,6 +125,7 @@ export function useAdminMenus(
 
       const res = await Promise.all(promesas);
 
+      // Se verifica si todas las promesas se resolvieron correctamente
       if (res.every((r) => r.ok)) {
         mostrarExito(
           `${menu.opcion} ${nuevoHabilitado === 1 ? "habilitado" : "deshabilitado"}`,

@@ -1,4 +1,5 @@
-//Creado por Diego Castro
+// Creado por Diego Castro
+// Actualiza los datos de un submenu existente
 
 import { API_URL } from "@/app/config/api";
 import { NextResponse, NextRequest } from "next/server";

@@ -7,14 +7,13 @@
 import { useState } from "react";
 import logozamorano from "../../img/Logo-Universidad-Zamorano.png";
 import Image from "next/image";
-import { loginSchema, LoginFormData } from "../../utils/validations";
+import { loginSchema } from "../../utils/validations";
 import {
   BtnPrimario,
   Input,
   SpanError,
   BtnOutline,
 } from "@/app/components/ui/";
-import router from "next/router";
 import Link from "next/link";
 
 export default function RecuperarContrasena() {
@@ -32,13 +31,13 @@ export default function RecuperarContrasena() {
     }
   };
 
-  // Validar el correo
+  // Valida el campo de correo electrónico usando el esquema de validación
   const validationCorreo = () => {
     const result = loginSchema.shape.correo.safeParse(correo);
     setEsValidoCorreo(result.success);
   };
 
-  // Enviar correo
+  // Valida todo el form antes de llamar a la API
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCargando(true);

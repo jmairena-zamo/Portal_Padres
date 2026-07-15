@@ -1,4 +1,5 @@
-//Creado por Diego Castro
+// Creado por Diego Castro
+// Crea un nuevo menu en la base de datos
 
 import { API_URL } from "@/app/config/api";
 import { menuSchema } from "@/app/utils/validations";
@@ -28,6 +29,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = menuSchema.safeParse(datosParseados);
 
+  // Si la validación falla, se devuelve un error con el mensaje de Zod
   if (!parsed.success) {
     console.log("Error Zod:", parsed.error);
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
@@ -35,6 +37,7 @@ export async function POST(request: NextRequest) {
 
   const { opcion, posicion, icono } = parsed.data;
 
+  // Crear el menu en la base de datos
   const res = await fetch(`${API_URL}/menu/Crear`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

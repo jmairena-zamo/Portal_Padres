@@ -45,25 +45,19 @@ import { useAdminPermisos } from "@/app/hooks/admin/useAdminPermisos";
 
 export default function Administracion() {
   //----PAGINACIÓN-----------------------------------------------------------
-  // const [paginaActualMenus, setPaginaActualMenus] = useState(1);
   const [paginaActualRoles, setPaginaActualRoles] = useState(1);
 
-  //----FILTROS--------------------------------------------------------------
-  // const [rolFiltro, setRolFiltro] = useState<number | string | "todos">(
-  //   "todos",
-  // );
   const [menusFiltradosBuscador, setMenusFiltradosBuscador] = useState<Menu[]>(
     [],
   );
-  const [rolesFiltradosBuscador, setRolesFiltradosBuscador] = useState<Rol[]>(
-    [],
-  );
 
+  // Estado para manejar la búsqueda (si está activa y qué datos mostrar)
   const [busqueda, setBusqueda] = useState({
     dataFiltrada: [] as Menu[],
     busquedaActiva: false,
   });
 
+  // Estado para manejar la paginación (qué página y cuántos registros mostrar)
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
     registrosPorPagina: 10,
@@ -76,6 +70,8 @@ export default function Administracion() {
 
   //----DATOS PRINCIPALES----------------------------------------------------
   const adminRoles = useAdminRoles(mostrarExito, mostrarError);
+
+  // Hook para administrar roles, menús y permisos
   const {
     roles,
     cargarRoles,
@@ -96,6 +92,7 @@ export default function Administracion() {
     editarRol,
     pedirConfirmacionEliminar,
     confirmarEliminar,
+    errorRoles,
   } = adminRoles;
 
   const adminMenus = useAdminMenus(mostrarExito, mostrarError);
@@ -194,17 +191,13 @@ export default function Administracion() {
         ),
   );
 
-  // const handleCambiarRegistros = (cantidad: number) => {
-  //   setRegistrosPorPagina(cantidad);
-  //   setPaginaActualMenus(1);
-  //   setPaginaActualRoles(1);
-  // };
-
+  // Función que se ejecuta cuando se hace una búsqueda
   const handleResultadoBusqueda = useCallback((resultados: Menu[]) => {
     setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
     setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
   }, []);
 
+  // Funcion para cambiar el filtro de rol
   const handleCambiarRolFiltro = useCallback(
     (value: number | string | "todos") => {
       setPaginacion((prev) => ({
@@ -216,6 +209,7 @@ export default function Administracion() {
     [],
   );
 
+  // Funciones para cambiar la paginación
   const handleCambiarRegistros = useCallback((cantidad: number) => {
     setPaginacion((prev) => ({
       ...prev,
@@ -224,16 +218,19 @@ export default function Administracion() {
     }));
   }, []);
 
+  // funcion para cambiar la pagina actual
   const handleCambiarPagina = useCallback((pagina: number) => {
     setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
   }, []);
 
+  // Extraemos valores actuales de paginación y búsqueda
   const { paginaActual, registrosPorPagina, rolFiltro } = paginacion;
   const { dataFiltrada, busquedaActiva } = busqueda;
 
+  // Si hay búsqueda activa, mostramos los resultados filtrados; si no, todos los menús
   const datosBase = busquedaActiva ? dataFiltrada : menus;
 
-  // ✅ Ahora sí se aplica el filtro de rol sobre los datos base
+  // Se aplica el filtro de rol sobre los datos base
   const datosAMostrar =
     rolFiltro === "todos"
       ? datosBase
@@ -249,6 +246,7 @@ export default function Administracion() {
             ),
         );
 
+  // Calculamos los índices para la paginación de menús y roles
   const indexInicioMenus = (paginaActual - 1) * registrosPorPagina;
   const indexFinMenus = indexInicioMenus + registrosPorPagina;
   const datosPaginadosMenus = datosAMostrar.slice(
@@ -343,16 +341,16 @@ export default function Administracion() {
             <Loading />
           ) : (
             <div className="w-full max-[800px]:overflow-x-auto">
-              {!tieneMenus ? (
+              {errorMenus ? (
                 <Vacio
-                  titulo="No hay Menus"
-                  descripcion="No se encontraron menus con ese nombre."
-                />
-              ) : errorMenus ? (
-                <Vacio
-                  titulo="Ocurrio un error"
+                  titulo="Ocurrio un Error."
                   descripcion="No se pudieron cargar los menus."
                   onReintentar={cargarDatos}
+                />
+              ) : !tieneMenus ? (
+                <Vacio
+                  titulo="No hay datos disponibles"
+                  descripcion="No se encontraron registros de Menus para mostrar"
                 />
               ) : (
                 <Tabla
@@ -475,6 +473,7 @@ export default function Administracion() {
                       render: (menu) => (
                         // Chevron indica si el menú tiene submenús y si están expandidos
                         <button
+                          type="button"
                           className="bg-transparent border-none cursor-pointer font-bold flex items-center gap-1.5"
                           onClick={() => gestionSubmenu(menu.iD_Menu)}
                         >
@@ -806,7 +805,13 @@ export default function Administracion() {
             <Loading />
           ) : (
             <div className="w-full max-[800px]:overflow-x-auto">
-              {!tieneRoles ? (
+              {errorRoles ? (
+                <Vacio
+                  titulo="Ocurrio un Error."
+                  descripcion="No se pudo cargar la información de roles."
+                  onReintentar={cargarRoles}
+                />
+              ) : !tieneRoles ? (
                 <Vacio
                   titulo="No hay Roles"
                   descripcion="No se encontraron roles"

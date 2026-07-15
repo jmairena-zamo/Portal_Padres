@@ -27,15 +27,13 @@ import {
 import { Queja, useQueja } from "@/app/hooks/useQueja";
 import ModalForm from "@/app/components/modals/ModalForm";
 
+// Opciones para el filtro de tipo de queja/sugerencia
 const opcionesTipo = [
   { value: "QUEJA", label: "Quejas" },
   { value: "SUGERENCIA", label: "Sugerencias" },
 ];
 
 export default function QuejasSugerencias() {
-  // const [paginaActual, setPaginaActual] = useState(1);
-  // const [registrosPorPagina, setRegistrosPorPagina] = useState(10);
-
   const { toast, mostrarExito, mostrarError, cerrarToast } = useToast();
 
   // Almacena los valores de los campos del formulario
@@ -64,29 +62,26 @@ export default function QuejasSugerencias() {
     null,
   );
 
-  const [resultadoBusqueda, setResultadoBusqueda] = useState<Queja[]>(quejas);
-
-  // const [tipoFiltro, setTipoFiltro] = useState<number | string | "todos">(
-  //   "todos",
-  // );
-
-  // const [busquedaActiva, setBusquedaActiva] = useState(false);
-
+  // Estado para manejar la paginación (qué página y cuántos registros mostrar)
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
     registrosPorPagina: 10,
     tipoFiltro: "todos" as number | string | "todos",
   });
+
+  // Estado para manejar la búsqueda (si está activa y qué datos mostrar)
   const [busqueda, setBusqueda] = useState({
     dataFiltrada: [] as Queja[],
     busquedaActiva: false,
   });
 
+  // Función que se ejecuta cuando se hace una búsqueda
   const handleResultadoBusqueda = useCallback((resultados: Queja[]) => {
     setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
     setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
   }, []);
 
+  // Función para cambiar el filtro de tipo
   const handleCambiarTipoFiltro = useCallback(
     (value: number | string | "todos") => {
       setPaginacion((prev) => ({
@@ -98,6 +93,7 @@ export default function QuejasSugerencias() {
     [],
   );
 
+  // Función para cambiar cuántos registros se muestran por página
   const handleCambiarRegistros = useCallback((cantidad: number) => {
     setPaginacion((prev) => ({
       ...prev,
@@ -106,21 +102,19 @@ export default function QuejasSugerencias() {
     }));
   }, []);
 
+  // Función para cambiar de página
   const handleCambiarPagina = useCallback((pagina: number) => {
     setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
   }, []);
 
+  // Extraemos valores actuales de paginación y búsqueda
   const { paginaActual, registrosPorPagina, tipoFiltro } = paginacion;
   const { dataFiltrada, busquedaActiva } = busqueda;
 
-  // const handleResultadoBusqueda = (resultados: Queja[]) => {
-  //   setResultadoBusqueda(resultados);
-  //   setBusquedaActiva(true);
-  //   setPaginaActual(1);
-  // };
-
+  // Filtramos los datos según el tipo seleccionado y si hay búsqueda activa
   const dataBase = busquedaActiva ? dataFiltrada : quejas;
 
+  // Filtramos los datos según el tipo seleccionado
   const dataAMostrar = useMemo(() => {
     if (tipoFiltro === "todos") {
       return dataBase;
@@ -133,20 +127,6 @@ export default function QuejasSugerencias() {
           new Date(a.fechaCreacion).getTime(),
       );
   }, [dataBase, tipoFiltro]);
-
-  // const quejasFiltradas = useMemo(() => {
-  //   let resultado = resultadoBusqueda;
-
-  //   if (tipoFiltro !== "todos") {
-  //     resultado = resultado.filter((q) => q.tipo === tipoFiltro);
-  //   }
-
-  //   return [...resultado].sort(
-  //     (a, b) =>
-  //       new Date(b.fechaCreacion).getTime() -
-  //       new Date(a.fechaCreacion).getTime(),
-  //   );
-  // }, [resultadoBusqueda, tipoFiltro]);
 
   // * Maneja los cambios en los inputs y textareas del formulario.
   //  * Actualiza el estado `formData` de manera dinámica y limpia el estado de error
@@ -251,15 +231,12 @@ export default function QuejasSugerencias() {
     }
   };
 
-  // const handleCambiarRegistros = (cantidad: number) => {
-  //   setRegistrosPorPagina(cantidad);
-  //   setPaginaActual(1);
-  // };
-
+  // Calculamos los índices para la paginación de datos
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
   const datosPaginados = dataAMostrar.slice(indexInicio, indexFin);
 
+  // Constante para saber si contiene data, de lo contrario mostrar mensaje de vacío
   const tieneQuejas = quejas.length > 0;
 
   if (cargandoQS || cargando) return <Loading />;
@@ -287,6 +264,7 @@ export default function QuejasSugerencias() {
           Crear Queja o Sugerencia
         </BtnTab>
       </div>
+      {/* Renderizamos la sección de ver quejas/sugerencias si la pestaña activa es "ver" */}
       {tabActiva === "ver" && (
         <div className="bg-white rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
           <Titulo titulo="Quejas y Sugerencias" alineado={3} />
@@ -309,6 +287,7 @@ export default function QuejasSugerencias() {
               />
             </div>
           </div>
+          {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
           {cargandoQS ? (
             <Loading />
           ) : errorQS ? (

@@ -1,10 +1,13 @@
+// Creado por Diego Castro
+// Inserta una nueva queja o sugerencia en la base de datos
+
 import { NextRequest, NextResponse } from "next/server";
 import { quejaSchema } from "@/app/utils/validations";
 import { API_URL } from "@/app/config/api";
 
 export async function POST(request: NextRequest) {
+  // Obtener los datos del body de la solicitud
   const body = await request.json();
-
   const parsed = quejaSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -13,6 +16,7 @@ export async function POST(request: NextRequest) {
 
   const { telefono, tipo, asunto, mensaje } = parsed.data;
 
+  // Obtener la sesión activa del usuario
   const session = request.cookies.get("session");
 
   if (!session) {
@@ -23,6 +27,7 @@ export async function POST(request: NextRequest) {
   const ID_UserEmail = usuarioData.id;
   const usuario = usuarioData.email;
 
+  // Crear la queja o sugerencia en la base de datos
   try {
     const res = await fetch(`${API_URL}/quejassugerencias/Crear`, {
       method: "POST",
@@ -44,6 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Retornar una respuesta exitosa
     return NextResponse.json({
       message: "Queja o Sugerencia Creada Correctamente",
     });

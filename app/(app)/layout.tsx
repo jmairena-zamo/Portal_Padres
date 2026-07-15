@@ -34,6 +34,7 @@ export default function AppLayout({
 
   return (
     <EstudianteProvider>
+      {/* Proveedor de contexto para manejar la información del estudiante y el menú */}
       <MenuProvider>
         {showModal && (
           <ModalSuplantar

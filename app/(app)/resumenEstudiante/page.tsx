@@ -1,23 +1,22 @@
 // Creado por Diego Castro
 // Dashboard que muestra información general del estudiante
+// Sección de resumen del estudiante
 
 "use client";
 import Image from "next/image";
 import user from "../../img/logo-user.png";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FaExclamationTriangle,
   FaExclamationCircle,
   FaExclamation,
   FaClock,
-  FaChevronDown,
   FaUniversity,
   FaBookOpen,
   FaLaptopCode,
 } from "react-icons/fa";
 import { RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import {
-  BtnTab,
   CardCausal,
   ClaseAprenderHaciendo,
   Decanatura,
@@ -29,8 +28,8 @@ import { useEstudiante } from "@/app/hooks/useEstudiante";
 export default function ResumenEstudiante() {
   const [porcentaje, setPorcentaje] = useState(20.88);
   const promedio = 88.88;
-  const horasClinica = 10;
 
+  // Hook personalizado para obtener información del estudiante
   const {
     cargando,
     foto,
@@ -45,9 +44,10 @@ export default function ResumenEstudiante() {
   const [claseAH, setClaseAH] = useState<boolean>(false);
   const [tecnologias, setTecnologias] = useState<boolean>(false);
 
+  // Datos para el gráfico de promedio global
   const data = [{ id: 1, name: "promedio", value: promedio }];
 
-  // if (cargando) return <Loading />;
+  if (cargando) return <Loading />;
 
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
