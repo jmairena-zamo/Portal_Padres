@@ -47,7 +47,7 @@ export default function ResumenEstudiante() {
   // Datos para el gráfico de promedio global
   const data = [{ id: 1, name: "promedio", value: promedio }];
 
-  if (cargando) return <Loading />;
+  // if (cargando) return <Loading />;
 
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
