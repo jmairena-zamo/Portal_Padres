@@ -1,3 +1,7 @@
+// Creado Diego Castro
+// Componente de TextArea
+
+// Props del componenete text ares
 interface Props extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   esValido?: boolean;
 }

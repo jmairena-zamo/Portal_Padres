@@ -413,8 +413,10 @@ export function useAdminMenus(
 
   const confirmarEliminarMenu = async () => {
     if (!confirmModalMenu.menu) return;
-    await eliminarMenu(confirmModalMenu.menu);
+    const menuAEliminar = confirmModalMenu.menu;
+    // Cerrar el modal inmediatamente para evitar que reaparezca durante recargas
     setConfirmModalMenu({ visible: false, menu: null });
+    await eliminarMenu(menuAEliminar);
   };
 
   //----CRUD SUBMENU-------------------------------------------------------
@@ -507,8 +509,10 @@ export function useAdminMenus(
 
   const confirmarEliminarSub = async () => {
     if (!confirmModalSub.sub) return;
-    await eliminarSubMenu(confirmModalSub.sub);
+    const subAEliminar = confirmModalSub.sub;
+    // Cerrar el modal inmediatamente para evitar que reaparezca durante recargas
     setConfirmModalSub({ visible: false, sub: null });
+    await eliminarSubMenu(subAEliminar);
   };
 
   return {

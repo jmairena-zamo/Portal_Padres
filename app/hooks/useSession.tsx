@@ -1,3 +1,6 @@
+// Creado por Diego Castro
+// Contexto y hookk para session
+
 "use client";
 
 import {
@@ -9,12 +12,14 @@ import {
   useState,
 } from "react";
 
+// Información básica de la sesión del usuario
 interface SesionUsuario {
   id: number;
   email: string;
   iD_Rol: number;
 }
 
+// Lo que compartirá el contexto de sesión
 interface SessionContextType {
   sesion: SesionUsuario | null;
   cargando: boolean;
@@ -22,15 +27,20 @@ interface SessionContextType {
   cerrarSesion: () => void;
 }
 
+// Se crea el contexto de sesión
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [sesion, setSesion] = useState<SesionUsuario | null>(null);
   const [cargando, setCargando] = useState(true);
 
+  // Función para traer los datos de sesión desde la API
   const cargarSesion = useCallback(async () => {
     try {
+      // Se consulta la sesión
       const res = await fetch("/api/auth/session");
+
+      // Si no hay sesión, se limpia
       if (!res.ok) {
         setSesion(null);
         return;
@@ -45,15 +55,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Función para cerrar sesión
   const cerrarSesion = () => {
     setSesion(null);
     setCargando(false);
   };
 
+  // Al iniciar el componente, se carga la sesión automáticamente
   useEffect(() => {
     cargarSesion();
   }, []);
 
+  // Se prepara el valor que se compartirá en el contexto
   const value = useMemo(
     () => ({
       sesion,
@@ -64,11 +77,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     [sesion, cargando],
   );
 
+  // Se devuelve el proveedor del contexto
   return (
     <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
   );
 }
 
+// Hook para usar la sesión en cualquier componente
 export function useSession() {
   const context = use(SessionContext);
   if (context === undefined) {

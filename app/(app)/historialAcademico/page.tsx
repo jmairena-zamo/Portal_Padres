@@ -74,32 +74,34 @@ export default function HistorialAcademico() {
   const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
   // Verificamos si hay datos para mostrar
-  const tieneData = historialAcademico.length > 0;
+  const tieneData = datosPaginados && datosPaginados.length > 0;
 
   if (cargandoHistorialAcademico) return <Loading />;
+  // if (cargandoHistorialAcademico && !errorHistorialAcademico)
+  //   return <Loading />;
 
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
       <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-[5px] mb-3.75">
         <Titulo titulo="Historial Academico" alineado={3} />
-        <div className="mt-2.5">
-          <Buscador
-            datos={historialAcademico}
-            campos={CAMPOS_BUSQUEDA}
-            placeholder="Buscar..."
-            onResultado={handleResultadoBusqueda}
-          />
-        </div>
+        {!errorHistorialAcademico && (
+          <div className="mt-2.5">
+            <Buscador
+              datos={historialAcademico}
+              campos={CAMPOS_BUSQUEDA}
+              placeholder="Buscar..."
+              onResultado={handleResultadoBusqueda}
+            />
+          </div>
+        )}
 
         {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
-        {cargandoHistorialAcademico ? (
-          <Loading />
-        ) : errorHistorialAcademico ? (
+        {errorHistorialAcademico ? (
           <Vacio
             titulo="Ocurrio un error"
             descripcion="No se pudo cargar la información"
-            onReintentar={() => reintentarHistorialAcademico}
+            onReintentar={() => reintentarHistorialAcademico()}
           />
         ) : !tieneData ? (
           <Vacio

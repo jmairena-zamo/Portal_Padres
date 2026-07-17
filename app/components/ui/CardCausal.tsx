@@ -2,6 +2,7 @@
 // Componentes para Cards de causales de sancion
 import { IconType } from "react-icons";
 
+// Props para el componente CardCausal
 interface CardCausalProps {
   icono: IconType;
   label: string;

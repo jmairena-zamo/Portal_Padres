@@ -33,6 +33,7 @@ import {
   SpanError,
   ToggleSwitch,
   Titulo,
+  Label,
 } from "@/app/components/ui/";
 
 import {
@@ -315,28 +316,31 @@ export default function Administracion() {
               </BtnPrimario>
             </div>
           </div>
-          <div className="mt-5 w-full flex gap-3.75 max-[420px]:flex-col">
-            <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
-              <Buscador
-                datos={menus}
-                campos={["opcion"]}
-                placeholder="Buscar Menu..."
-                onResultado={handleResultadoBusqueda}
-              />
+          {!errorMenus && (
+            <div className="mt-5 w-full flex gap-3.75 max-[420px]:flex-col">
+              <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
+                <Buscador
+                  datos={menus}
+                  campos={["opcion"]}
+                  placeholder="Buscar Menu..."
+                  onResultado={handleResultadoBusqueda}
+                />
+              </div>
+              <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
+                <h4>Rol:</h4>
+                <ComboBoxFiltro
+                  valor={rolFiltro}
+                  placeholder="Todos los Roles"
+                  opciones={roles.map((rol) => ({
+                    value: rol.iD_Rol,
+                    label: rol.rol,
+                  }))}
+                  onChange={handleCambiarRolFiltro}
+                />
+              </div>
             </div>
-            <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
-              <h4>Rol:</h4>
-              <ComboBoxFiltro
-                valor={rolFiltro}
-                placeholder="Todos los Roles"
-                opciones={roles.map((rol) => ({
-                  value: rol.iD_Rol,
-                  label: rol.rol,
-                }))}
-                onChange={handleCambiarRolFiltro}
-              />
-            </div>
-          </div>
+          )}
+
           {cargando ? (
             <Loading />
           ) : (
@@ -615,7 +619,7 @@ export default function Administracion() {
             >
               {/* Campo: Nombre */}
               <div className="flex flex-col gap-1">
-                <label>Nombre:</label>
+                <Label nombre="Nombre:" />
                 <Input
                   type="text"
                   name="opcion"
@@ -634,7 +638,7 @@ export default function Administracion() {
               {/* Campo: Posición (solo en modo crear) */}
               {modoMenu === "crear" && (
                 <div className="flex flex-col gap-1">
-                  <label>Posición:</label>
+                  <Label nombre="Posición:" />
                   <Input
                     type="number"
                     name="posicion"
@@ -656,7 +660,7 @@ export default function Administracion() {
 
               {/* Campo: Ícono */}
               <div className="flex flex-col gap-1">
-                <label>Ícono:</label>
+                <Label nombre="Ícono:" />
                 <SelectorIconos
                   selectedIcon={formDataMenu.icono}
                   onSelect={handlerOnChangeIcon}
@@ -688,25 +692,21 @@ export default function Administracion() {
               onCancelar={cancelarModalSub}
             >
               {modoSubMenu === "crear" && (
-                <div className="flex flex-col gap-1">
-                  <label>Menú Padre:</label>
-                  <select
-                    value={menuSeleccionado || ""}
-                    onChange={(e) =>
-                      setMenuSeleccionado(Number(e.target.value))
-                    }
-                  >
-                    <option value="">Selecciona un menú</option>
-                    {menus.map((m) => (
-                      <option key={m.iD_Menu} value={m.iD_Menu}>
-                        {m.opcion}
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex flex-col gap-1 mb-4">
+                  <Label nombre="Menú Padre:" />
+                  <ComboBoxFiltro
+                    opciones={menus.map((m) => ({
+                      value: m.iD_Menu,
+                      label: m.opcion,
+                    }))}
+                    valor={menuSeleccionado || ""}
+                    onChange={(value) => setMenuSeleccionado(Number(value))}
+                    placeholder="Selecciona un menú"
+                  />
                 </div>
               )}
               <div className="flex flex-col gap-1">
-                <label>Nombre:</label>
+                <Label nombre="Nombre:" />
                 <Input
                   type="text"
                   name="opcionSub"
@@ -723,7 +723,7 @@ export default function Administracion() {
               </div>
               {modoSubMenu === "crear" && (
                 <div className="flex flex-col gap-1">
-                  <label>Posición:</label>
+                  <Label nombre="Posición:" />
                   <Input
                     type="number"
                     name="posicionSub"
@@ -865,7 +865,7 @@ export default function Administracion() {
               onCancelar={cancelarModalRol}
             >
               <div className="flex flex-col gap-1">
-                <label htmlFor="">Nombre del Rol:</label>
+                <Label nombre="Nombre del Rol:" />
                 <Input
                   type="text"
                   name="rol"

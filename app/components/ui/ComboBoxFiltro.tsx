@@ -4,11 +4,13 @@
 
 import { useRef, useState } from "react";
 
+// Props para el componente Opcion
 interface Opcion {
   value: number | string;
   label: string;
 }
 
+// Props para el componente ComboBoxFiltro
 interface Props {
   opciones: Opcion[];
   valor: number | string | "todos";
@@ -16,12 +18,14 @@ interface Props {
   placeholder?: string;
 }
 
+// Estado interno del componente ComboBoxFiltro
 interface ComboState {
   inputValue: string;
   prevValor: number | string | "todos";
   prevOpciones: Opcion[];
 }
 
+// Función auxiliar para calcular la etiqueta a mostrar en el input del ComboBox
 function calcularLabel(
   valor: number | string | "todos",
   opciones: Opcion[],
@@ -45,10 +49,11 @@ export default function ComboBoxFiltro({
     prevOpciones: opciones,
   }));
   const [abierto, setAbierto] = useState(false);
+
+  // Referencia para manejar el tiempo de espera al perder el foco del input
   const blurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Ajuste de estado derivado del prop durante el render: una sola
-  // llamada a setCombo, sin efectos secundarios anidados.
+  // Actualiza el estado del ComboBox si cambian las opciones o el valor seleccionado
   if (combo.prevValor !== valor || combo.prevOpciones !== opciones) {
     setCombo({
       inputValue: calcularLabel(valor, opciones),
@@ -64,12 +69,14 @@ export default function ComboBoxFiltro({
     o.label.toLowerCase().includes(inputValue.toLowerCase()),
   );
 
+  // Función para seleccionar una opción del ComboBox
   const seleccionarOpcion = (opcion: Opcion) => {
     setCombo((prev) => ({ ...prev, inputValue: opcion.label }));
     onChange(opcion.value);
     setAbierto(false);
   };
 
+  // Función para seleccionar la opción "Todos" del ComboBox
   const seleccionarTodos = () => {
     setCombo((prev) => ({ ...prev, inputValue: "" }));
     onChange("todos");
@@ -78,6 +85,7 @@ export default function ComboBoxFiltro({
 
   return (
     <div className="relative w-full">
+      {/* Input del ComboBox */}
       <input
         type="text"
         className="py-2.25 pr-8 pl-1.25 border border-gray-300 text-[#30545b] rounded-md text-[14px] 
@@ -108,9 +116,11 @@ export default function ComboBoxFiltro({
           }, 150);
         }}
       />
+      {/* Lista desplegable del ComboBox */}
       {abierto && (
         <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto w-full">
           <li>
+            {/* Botón para seleccionar la opción "Todos" */}
             <button
               type="button"
               className="px-2 py-1 cursor-pointer hover:bg-gray-100"
@@ -120,12 +130,14 @@ export default function ComboBoxFiltro({
               {placeholder}
             </button>
           </li>
+          {/* Renderiza las opciones filtradas o un mensaje si no hay resultados */}
           {opcionesFiltradas.length > 0 ? (
             opcionesFiltradas.map((opcion) => (
               <li key={opcion.value}>
+                {/* Botón para seleccionar una opción específica */}
                 <button
                   type="button"
-                  className="px-2 py-1 cursor-pointer hover:bg-gray-100 w-full text-left"
+                  className="px-2 py-1 cursor-pointer font-bold hover:bg-gray-100 w-full text-left"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => seleccionarOpcion(opcion)}
                 >

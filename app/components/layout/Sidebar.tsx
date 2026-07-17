@@ -1,3 +1,7 @@
+// Creado por Diego Castro
+// Componente de sidebar con logo de zamorano
+// Contiene la navegación principal y submenús, así como el botón de logout
+
 "use client";
 
 import Link from "next/link";
@@ -15,6 +19,7 @@ import { iconos, generarRuta, getSubPath } from "@/app/services/menu";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useSession } from "@/app/hooks/useSession";
 
+// Props para el componente Sidebar
 interface Props {
   colapsado: boolean;
   onToggle: () => void;

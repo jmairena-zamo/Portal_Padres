@@ -68,7 +68,7 @@ export default function EstadoCuenta() {
   const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
   // Constante para saber si contiene data, de lo contrario mostrar mensaje de vacío
-  const tieneData = estadoCuenta.length > 0;
+  const tieneData = datosPaginados && datosPaginados.length > 0;
 
   // Si está cargando, mostramos el componente de carga
   if (cargandoEstadoCuenta) return <Loading />;
@@ -81,19 +81,19 @@ export default function EstadoCuenta() {
         <Titulo titulo="Estado de Cuenta" alineado={3} />
 
         {/* Buscador para filtrar registros */}
-        <div className="mt-2.5">
-          <Buscador
-            datos={estadoCuenta}
-            placeholder="Buscar..."
-            campos={["tipo", "categoria", "descripcion"]}
-            onResultado={handleResultadoBusqueda}
-          />
-        </div>
+        {!errorEstadoCuenta && (
+          <div className="mt-2.5">
+            <Buscador
+              datos={estadoCuenta}
+              placeholder="Buscar..."
+              campos={["tipo", "categoria", "descripcion"]}
+              onResultado={handleResultadoBusqueda}
+            />
+          </div>
+        )}
 
         {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
-        {cargandoEstadoCuenta ? (
-          <Loading />
-        ) : errorEstadoCuenta ? (
+        {errorEstadoCuenta ? (
           <Vacio
             titulo="Ocurrió un error"
             descripcion="No se pudo obtener la información"

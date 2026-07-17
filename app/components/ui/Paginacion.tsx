@@ -1,3 +1,7 @@
+// Creado por Edward Sauceda
+// Componente de Paginación
+
+// Props para el componente Paginacion
 interface Props {
   totalRegistros: number;
   registrosPorPagina: number;
@@ -6,6 +10,7 @@ interface Props {
   onCambiarRegistrosPorPagina: (cantidad: number) => void;
 }
 
+// Opciones de filas por página disponibles
 const OPCIONES_FILAS = [5, 10, 25, 50];
 
 export default function Paginacion({
@@ -15,13 +20,17 @@ export default function Paginacion({
   onCambiarPagina,
   onCambiarRegistrosPorPagina,
 }: Props) {
+  // Calcula el total de páginas basado en el total de registros y los registros por página
   const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
 
+  // Si solo hay una página o menos registros que la opción más baja, no se muestra la paginación
   if (totalPaginas <= 1 && totalRegistros <= OPCIONES_FILAS[0]) return null;
 
+  // Genera un array con los números de página
   const paginas = [];
   for (let i = 1; i <= totalPaginas; i++) paginas.push(i);
 
+  // Determina qué páginas mostrar en la barra de paginación, limitando a un máximo de 5 páginas visibles
   let paginasVisibles = paginas;
   if (totalPaginas > 5) {
     const inicio = Math.max(1, paginaActual - 2);

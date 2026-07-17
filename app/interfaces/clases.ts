@@ -1,3 +1,7 @@
+// Creado por Diego Castro
+// Archivo temporal que simula la respuesta del API de clases del periodo actual
+// Reemplazar por el fetch() real cuando el API esté disponible
+
 export interface ClasesPeriodoActual {
   CodigoAsignaturaB: string;
   CodigoActividadAcademica: string;

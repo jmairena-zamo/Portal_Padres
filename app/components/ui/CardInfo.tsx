@@ -1,13 +1,17 @@
-// app/components/quejas/QuejaCard.tsx
+// Componente creado por Diego Castro
+// Componente de CardInfo
+// Muestra la información de una queja en un card
 
 import { Queja } from "@/app/hooks/useQueja";
 
+// Props del componente CardInfo
 interface QuejaCardProps {
   queja: Queja;
   onClick: () => void;
 }
 
 export function CardInfo({ queja, onClick }: QuejaCardProps) {
+  // Formatear la fecha de creación de la queja a un formato legible
   const fecha = new Date(queja.fechaCreacion).toLocaleDateString("es-HN", {
     day: "2-digit",
     month: "short",

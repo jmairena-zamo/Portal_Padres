@@ -1,3 +1,8 @@
+// Creado por Diego Castro
+// Componente de Titulo
+
+// Props para el compoennte de Titulo
+// alineado recibe un numero para especificar a que lado debe ir el titulo
 interface Props {
   titulo: string;
   alineado: number; // 1 centro, 2 derecha, 3 izquierza

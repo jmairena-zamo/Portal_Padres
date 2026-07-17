@@ -114,7 +114,7 @@ export default function HistorialDisciplinario() {
   const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
   // Verificamos si hay datos para mostrar
-  const tieneData = historialDisciplinario.length > 0;
+  const tieneData = datosPaginados && datosPaginados.length > 0;
 
   if (cargandoDisciplinario) return <Loading />;
   return (
@@ -123,36 +123,34 @@ export default function HistorialDisciplinario() {
       <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] ">
         <Titulo titulo="Historial Disciplinario" alineado={3} />
         <div className="mt-2.5"></div>
-        <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
-          <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
-            <Buscador
-              datos={historialDisciplinario}
-              campos={CAMPOS_BUSQUEDA}
-              placeholder="Buscar..."
-              onResultado={handleResultadoBusqueda}
-            />
+        {!errorDisciplinario && (
+          <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
+            <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
+              <Buscador
+                datos={historialDisciplinario}
+                campos={CAMPOS_BUSQUEDA}
+                placeholder="Buscar..."
+                onResultado={handleResultadoBusqueda}
+              />
+            </div>
+            <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
+              <h4>Estado:</h4>
+              <ComboBoxFiltro
+                valor={estadoFiltro}
+                placeholder="Todos"
+                opciones={opcionesEstado}
+                onChange={handleCambiarEstadoFiltro}
+              />
+            </div>
           </div>
-          <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
-            <h4>Estado:</h4>
-            <ComboBoxFiltro
-              valor={estadoFiltro}
-              placeholder="Todos"
-              opciones={opcionesEstado}
-              onChange={handleCambiarEstadoFiltro}
-            />
-          </div>
-        </div>
+        )}
 
         {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
-        {cargandoDisciplinario ? (
-          <Loading />
-        ) : errorDisciplinario ? (
+        {errorDisciplinario ? (
           <Vacio
             titulo="Ocurrio un error"
             descripcion="No se pudo cargar la información"
-            onReintentar={() => {
-              reintentarDisciplinario;
-            }}
+            onReintentar={() => reintentarDisciplinario()}
           />
         ) : !tieneData ? (
           <Vacio
@@ -160,58 +158,59 @@ export default function HistorialDisciplinario() {
             descripcion="No se encontraron registros de Historial Disciplinario para mostrar"
           />
         ) : (
-          <Tabla
-            datos={datosPaginados}
-            keyExtractor={(item) => item.id}
-            columnas={[
-              { header: "Tipo", accessor: "tipo" },
-              { header: "Fecha", accessor: "fecha" },
-              { header: "Periodo", accessor: "periodo" },
-              {
-                header: "Descripción",
-                accessor: "descripcionCorta",
-                width: "400px",
-              },
-              { header: "Reportada Por", accessor: "reportadaPor" },
-              { header: "Num. Faltas", accessor: "numfaltas" },
-              {
-                header: "Estado",
-                accessor: "estado",
-                render: (item) =>
-                  item.estado === "Eliminada" ? (
-                    <span className="text-red-600">{item.estado}</span>
-                  ) : (
-                    <span>{item.estado}</span>
+          <>
+            <Tabla
+              datos={datosPaginados}
+              keyExtractor={(item) => item.id}
+              columnas={[
+                { header: "Tipo", accessor: "tipo" },
+                { header: "Fecha", accessor: "fecha" },
+                { header: "Periodo", accessor: "periodo" },
+                {
+                  header: "Descripción",
+                  accessor: "descripcionCorta",
+                  width: "400px",
+                },
+                { header: "Reportada Por", accessor: "reportadaPor" },
+                { header: "Num. Faltas", accessor: "numfaltas" },
+                {
+                  header: "Estado",
+                  accessor: "estado",
+                  render: (item) =>
+                    item.estado === "Eliminada" ? (
+                      <span className="text-red-600">{item.estado}</span>
+                    ) : (
+                      <span>{item.estado}</span>
+                    ),
+                },
+                {
+                  header: "Detalle",
+                  accessor: "descripcionDetallada",
+                  render: (item) => (
+                    <button
+                      type="button"
+                      onClick={() => setFilaSeleccionada(item)}
+                      className="truncate max-w-50 text-left text-[#007BFF] hover:underline cursor-pointer"
+                      title="Click para ver el detalle completo"
+                    >
+                      Ver más
+                    </button>
                   ),
-              },
-              {
-                header: "Detalle",
-                accessor: "descripcionDetallada",
-                render: (item) => (
-                  <button
-                    type="button"
-                    onClick={() => setFilaSeleccionada(item)}
-                    className="truncate max-w-50 text-left text-[#007BFF] hover:underline cursor-pointer"
-                    title="Click para ver el detalle completo"
-                  >
-                    Ver más
-                  </button>
-                ),
-              },
-            ]}
-          />
+                },
+              ]}
+            />
+            <h2 className="font-bold text-[16px] text-[#173426] mt-3.75 mb-3.75 ml-3.5">
+              Faltas Totales: {faltasTotales}
+            </h2>
+            <Paginacion
+              totalRegistros={datosAMostrar.length}
+              registrosPorPagina={registrosPorPagina}
+              paginaActual={paginaActual}
+              onCambiarPagina={handleCambiarPagina}
+              onCambiarRegistrosPorPagina={handleCambiarRegistros}
+            />
+          </>
         )}
-
-        <h2 className="font-bold text-[16px] text-[#173426] mt-3.75 mb-3.75 ml-3.5">
-          Faltas Totales: {faltasTotales}
-        </h2>
-        <Paginacion
-          totalRegistros={datosAMostrar.length}
-          registrosPorPagina={registrosPorPagina}
-          paginaActual={paginaActual}
-          onCambiarPagina={handleCambiarPagina}
-          onCambiarRegistrosPorPagina={handleCambiarRegistros}
-        />
       </div>
       {filaSeleccionada && (
         <ModalForm

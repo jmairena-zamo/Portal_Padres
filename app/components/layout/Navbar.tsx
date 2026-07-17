@@ -1,6 +1,6 @@
 //Creado por Diego Castro
 //Componente de navbar con logo de zamorano
-//Tiene una opcion de escoger al hiji si tiene más de 1
+//Tiene una opcion de escoger al hijo si tiene más de 1
 
 "use client";
 
@@ -13,6 +13,7 @@ import { BtnPrimario } from "@/app/components/ui/Boton";
 import { useRol } from "@/app/hooks/useRol";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 
+// Props para el componente Navbar
 interface Props {
   colapsado: boolean;
   onSuplantar?: () => void;
@@ -27,7 +28,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
   const esAdmin = rol === 2;
   const tieneVariosHijos = !esAdmin && hijos.length > 1;
 
-  // Cierra el dropdown al hacer clic fuera
+  // Cerrar el dropdown si se hace click fuera de él
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -38,6 +39,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
     return () => document.removeEventListener("mousedown", handler);
   }, [hijoActivo]);
 
+  // Función para seleccionar un hijo y cerrar el dropdown
   const seleccionarHijoAc = async (hijo: (typeof hijos)[0]) => {
     await seleccionarEstudiante(hijo);
     setDropdownAbierto(false);

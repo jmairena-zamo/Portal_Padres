@@ -1,3 +1,8 @@
+// Creado por Diego Castro
+// Componente de error para inputs
+// Muestra un mensaje de error debajo del input, pero no afecta el layout
+
+// Props para el componente SpanError
 interface SpanErrorProps {
   visible: boolean; // controla visibility sin afectar el layout
   mensaje?: string;

@@ -266,7 +266,7 @@ export default function ResumenEstudiante() {
               /> */}
             </button>
             {decanatura && (
-              <div className="border border-[#008237] rounded-b-[5px]">
+              <div className="border border-[#173426] rounded-b-[5px]">
                 <Decanatura />
               </div>
             )}
@@ -286,7 +286,7 @@ export default function ResumenEstudiante() {
               CLASES Y APRENDER HACIENDO
             </button>
             {claseAH && (
-              <div className="border border-blue-600 rounded-b-[5px]">
+              <div className="border border-[#048047] rounded-b-[5px]">
                 <ClaseAprenderHaciendo />
               </div>
             )}
@@ -307,7 +307,7 @@ export default function ResumenEstudiante() {
               TECNOLOGÍAS DE INFORMACIÓN
             </button>
             {tecnologias && (
-              <div className="border border-gray-600 rounded-b-[5px]">
+              <div className="border border-[#74bdca] rounded-b-[5px]">
                 <TecnologiasInformacion />
               </div>
             )}

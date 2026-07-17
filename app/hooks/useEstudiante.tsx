@@ -1,3 +1,6 @@
+// Creado por Diego Castro
+// Contexto y Hook para la información del estudiante/hijo
+
 "use client";
 
 import React, {
@@ -10,11 +13,13 @@ import React, {
 } from "react";
 import { infoEstudiante } from "../interfaces/infoEstudiante";
 
+// Tipo de dato para representar a un hijo
 interface Hijo {
   bannerID: number;
   Nombre: string;
 }
 
+// Tipo de dato que define todo lo que guardará y compartirá el contexto
 interface EstudianteContextType {
   cargando: boolean;
   foto: string | null;
@@ -30,6 +35,7 @@ interface EstudianteContextType {
   cargarEstudiante: () => Promise<void>;
 }
 
+// Se crea el contexto que compartirá la información
 const EstudianteContext = createContext<EstudianteContextType | null>(null);
 
 export const EstudianteProvider = ({
@@ -48,6 +54,7 @@ export const EstudianteProvider = ({
   const [hijos, setHijos] = useState<Hijo[]>([]);
   const [hijoActivo, setHijoActivo] = useState<Hijo | null>(null);
 
+  // Al iniciar, se cargan unos hijos de prueba
   useEffect(() => {
     const hijosMock = [
       { bannerID: 1, Nombre: "Carlos Martínez" },
@@ -57,16 +64,19 @@ export const EstudianteProvider = ({
 
     setHijos(hijosMock);
 
+    // Se selecciona el primer hijo por defecto
     if (hijosMock.length > 0) {
       setHijoActivo(hijosMock[0]);
     }
   }, []);
 
+  // Cada vez que cambia el hijo activo, se cargan sus datos
   useEffect(() => {
     if (!hijoActivo) return;
     cargarEstudiante();
   }, [hijoActivo]);
 
+  // Función para cambiar de hijo y avisar al backend
   const seleccionarEstudiante = async (hijo: Hijo) => {
     await fetch("/api/auth/seleccionarEstudiante", {
       method: "POST",
@@ -76,10 +86,13 @@ export const EstudianteProvider = ({
     setHijoActivo(hijo);
   };
 
+  // Función para traer la información del estudiante desde la API
   const cargarEstudiante = useCallback(async () => {
     setCargando(true);
     try {
       const inicio = Date.now();
+
+      // Se hacen varias peticiones al mismo tiempo
       const [resFoto, resFaltas, resInfo] = await Promise.all([
         fetch("/api/estudiantes/obtenerFoto"),
         fetch("/api/estudiantes/obtenerFaltas"),
@@ -92,6 +105,7 @@ export const EstudianteProvider = ({
         resInfo.json(),
       ]);
 
+      // Se guardan los datos en las variables
       setFoto(dataFoto.foto ?? null);
       setFaltasTotales(dataFaltas.Tfaltas);
       setFaltasTotalesAnio(dataFaltas.TfaltasAnio);
@@ -103,6 +117,7 @@ export const EstudianteProvider = ({
         await new Promise((resolve) => setTimeout(resolve, restante));
       }
     } catch (error) {
+      // Si algo falla, se limpian los datos
       console.log("Error cargando foto:", error);
       setFoto(null);
       setEstudiante(null);
@@ -114,6 +129,7 @@ export const EstudianteProvider = ({
     }
   }, []);
 
+  // Se prepara el valor que se compartirá en el contexto
   const value = useMemo(
     () => ({
       cargando,
@@ -138,6 +154,7 @@ export const EstudianteProvider = ({
     ],
   );
 
+  // Se devuelve el proveedor del contexto
   return (
     <EstudianteContext.Provider value={value}>
       {children}
@@ -145,6 +162,7 @@ export const EstudianteProvider = ({
   );
 };
 
+// Hook para usar el contexto en cualquier componente
 export const useEstudiante = () => {
   const context = use(EstudianteContext);
 

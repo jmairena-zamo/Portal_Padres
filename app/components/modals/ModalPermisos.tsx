@@ -3,6 +3,7 @@
 
 import { Rol } from "@/app/interfaces/menus";
 
+// Props para el componente ModalPermisos
 interface Props {
   titulo: string;
   roles: Rol[];

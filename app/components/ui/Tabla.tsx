@@ -1,5 +1,9 @@
+// Componente creado por Diego Castro
+// Componente de tabla genérica
+
 import React from "react";
 
+// Props para cada columna de la tabla
 interface Columna<Table> {
   header: string; // texto del encabezado de la columna
   accessor?: keyof Table; // clave del objeto
@@ -7,6 +11,7 @@ interface Columna<Table> {
   width?: string; // ancho de la columna
 }
 
+// Props para la tabla genérica
 interface Props<Table> {
   columnas: Columna<Table>[]; // columnas y cómo renderizar cada una
   datos: Table[]; // arreglo de objetos a mostrar

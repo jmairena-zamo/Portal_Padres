@@ -237,7 +237,7 @@ export default function QuejasSugerencias() {
   const datosPaginados = dataAMostrar.slice(indexInicio, indexFin);
 
   // Constante para saber si contiene data, de lo contrario mostrar mensaje de vacío
-  const tieneQuejas = quejas.length > 0;
+  const tieneQuejas = datosPaginados && datosPaginados.length > 0;
 
   if (cargandoQS || cargando) return <Loading />;
 
@@ -268,29 +268,30 @@ export default function QuejasSugerencias() {
       {tabActiva === "ver" && (
         <div className="bg-white rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
           <Titulo titulo="Quejas y Sugerencias" alineado={3} />
-          <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
-            <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
-              <Buscador
-                datos={quejas}
-                campos={["asunto", "mensaje"]}
-                placeholder="Buscar Queja..."
-                onResultado={handleResultadoBusqueda}
-              />
+          {!errorQS && (
+            <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
+              <div className="w-4/5 flex justify-center items-center max-[420px]:w-full">
+                <Buscador
+                  datos={quejas}
+                  campos={["asunto", "mensaje"]}
+                  placeholder="Buscar Queja..."
+                  onResultado={handleResultadoBusqueda}
+                />
+              </div>
+              <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
+                <h4>Tipo:</h4>
+                <ComboBoxFiltro
+                  valor={tipoFiltro}
+                  placeholder="Todos los Tipos"
+                  opciones={opcionesTipo}
+                  onChange={handleCambiarTipoFiltro}
+                />
+              </div>
             </div>
-            <div className="flex items-center text-[#555555] gap-3.75 max-[420px]:gap-1.25">
-              <h4>Tipo:</h4>
-              <ComboBoxFiltro
-                valor={tipoFiltro}
-                placeholder="Todos los Tipos"
-                opciones={opcionesTipo}
-                onChange={handleCambiarTipoFiltro}
-              />
-            </div>
-          </div>
+          )}
+
           {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
-          {cargandoQS ? (
-            <Loading />
-          ) : errorQS ? (
+          {errorQS ? (
             <Vacio
               titulo="Ocurrio un error"
               descripcion="No se pudo cargar la información."

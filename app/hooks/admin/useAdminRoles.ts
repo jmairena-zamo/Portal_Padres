@@ -135,8 +135,10 @@ export function useAdminRoles(
 
   const confirmarEliminar = async () => {
     if (!confirmModalRol.rol) return;
-    await eliminarRol(confirmModalRol.rol);
+    const rolAEliminar = confirmModalRol.rol;
+    // Cerrar el modal inmediatamente para evitar que reaparezca durante recargas
     setConfirmModalRol({ visible: false, rol: null });
+    await eliminarRol(rolAEliminar);
   };
 
   return {

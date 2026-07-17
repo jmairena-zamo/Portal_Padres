@@ -10,6 +10,7 @@ import { useEstudiante } from "@/app/hooks/useEstudiante";
 import { Titulo } from "@/app/components/ui/Titulo";
 
 export const InformacionEstudiante = () => {
+  // Obtenemos la información del estudiante y su foto desde el hook useEstudiante
   const { foto, estudiante } = useEstudiante();
 
   return (

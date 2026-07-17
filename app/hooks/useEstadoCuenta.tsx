@@ -32,6 +32,7 @@ export function useEstadoCuenta() {
   const { data, error, isLoading, mutate } = useSWR<EstadoCuentaResponse>(
     hijoActivo ? "/api/estudiantes/obtenerEstadoCuenta" : null,
     fetcher,
+    { revalidateOnFocus: false, shouldRetryOnError: false },
   );
 
   return {
