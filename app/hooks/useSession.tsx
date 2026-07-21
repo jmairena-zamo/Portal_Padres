@@ -17,6 +17,7 @@ interface SesionUsuario {
   id: number;
   email: string;
   iD_Rol: number;
+  rolNombre?: string | null;
 }
 
 // Lo que compartirá el contexto de sesión

@@ -54,7 +54,7 @@ export default function ResumenEstudiante() {
       {/* fila 1 */}
       <div className="flex flex-wrap gap-4 w-full max-[800px]:flex-col">
         {/* card info estudiante */}
-        <div className="flex-[1_1_300px] bg-[#ffffff] text-[#173426] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+        <div className="flex-[1_1_300px] bg-[#ffffff] text-[#173426] p-4 rounded-lg shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
           <h3 className="text-center font-semibold">INFORMACIÓN ESTUDIANTE</h3>
           <hr className="my-2" />
           <br />
@@ -88,7 +88,7 @@ export default function ResumenEstudiante() {
         <div className="flex flex-col justify-center gap-4 flex-[2_1_400px] max-[800px]:flex-[1_1_auto]">
           {/* promedio global */}
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="flex-[1_1_200px] min-h-45 bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+            <div className="flex-[1_1_200px] min-h-45 bg-[#ffffff] p-4 rounded-lg shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
               <h3 className="font-semibold text-[#173426]">PROMEDIO GLOBAL</h3>
               <hr className="my-2" />
               <div className="flex-1 flex items-center justify-center gap-3">
@@ -116,7 +116,7 @@ export default function ResumenEstudiante() {
             </div>
 
             {/* último periodo */}
-            <div className="flex-[1_1_200px] min-h-45 bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+            <div className="flex-[1_1_200px] min-h-45 bg-[#ffffff] p-4 rounded-lg shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
               <h3 className="font-semibold text-[#173426]">
                 PROMEDIO ÚLTIMO PERIODO
               </h3>
@@ -147,7 +147,7 @@ export default function ResumenEstudiante() {
           </div>
 
           {/* porcentaje carrera */}
-          <div className="flex-[0.5_1_150px] bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
+          <div className="flex-[0.5_1_150px] bg-[#ffffff] p-4 rounded-lg shadow-[0px_3px_5px_rgba(0,0,0,0.2)] text-center max-[420px]:flex-[1_1_100%] flex flex-col">
             <h3 className="font-semibold text-[#173426]">PORCENTAJE CARRERA</h3>
             <hr className="my-2" />
             <div className="flex-1 flex flex-col items-center justify-center gap-2 px-2">
@@ -168,7 +168,7 @@ export default function ResumenEstudiante() {
       {/* fila 2 */}
       <div className="flex flex-wrap gap-4 w-full max-[420px]:flex-col">
         {/* causales de sanción */}
-        <div className="flex-[1_1_300px] bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+        <div className="flex-[1_1_300px] bg-[#ffffff] p-4 rounded-lg shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
           <h3 className="text-center font-semibold text-[#173426]">
             CAUSALES DE SANCIÓN
           </h3>
@@ -243,7 +243,7 @@ export default function ResumenEstudiante() {
         </div>
       </div>
       {/* fila 3 */}
-      <div className="bg-[#ffffff] p-4 rounded-[5px] shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
+      <div className="bg-[#ffffff] p-4 rounded-lg shadow-[0px_3px_5px_rgba(0,0,0,0.2)]">
         <h3 className="text-center font-semibold text-[#173426]">
           CÁPSULAS INFORMATIVAS
         </h3>
@@ -254,7 +254,7 @@ export default function ResumenEstudiante() {
           <div className="mb-3">
             <button
               type="button"
-              className="bg-[#173426] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
+              className="bg-[#173426] h-10 w-full rounded-t-lg text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setDecanatura(!decanatura)}
             >
               <FaUniversity />
@@ -274,7 +274,7 @@ export default function ResumenEstudiante() {
           <div className="mb-3">
             <button
               type="button"
-              className="bg-[#048047] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
+              className="bg-[#048047] h-10 w-full rounded-t-lg text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setClaseAH(!claseAH)}
             >
               {/* <FaChevronDown
@@ -295,7 +295,7 @@ export default function ResumenEstudiante() {
           <div>
             <button
               type="button"
-              className="bg-[#74bdca] h-10 w-full rounded-t-[5px] text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
+              className="bg-[#74bdca] h-10 w-full rounded-t-lg text-[#FFF4E5] text-left px-6 cursor-pointer flex items-center gap-3 max-[420px]:text-[12px]"
               onClick={() => setTecnologias(!tecnologias)}
             >
               {/* <FaChevronDown

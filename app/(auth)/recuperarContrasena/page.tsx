@@ -50,6 +50,10 @@ export default function RecuperarContrasena() {
         body: JSON.stringify({ correo }),
       });
 
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
+
       const data = await res.json();
       setMensaje(data.message);
     } catch (error) {

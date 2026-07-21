@@ -17,15 +17,17 @@ export const InformacionEstudiante = () => {
     <div
       className="
             bg-white flex justify-center items-center gap-36 p-5 
-            shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-md w-full 
-            max-[800px]:flex-wrap max-[800px]:justify-center max-[800px]:gap-6 
+            shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-lg w-full 
+              max-[1000px]:flex-wrap max-[1000px]:justify-center max-[1000px]:gap-6 
+              max-[800px]:flex-wrap max-[800px]:justify-center max-[800px]:gap-6 
             max-[420px]:flex-col max-[420px]:items-center max-[420px]:p-2 max-[420px]:gap-2
         "
     >
       <div
         className="
                 min-w-55 text-start text-[#30545b] 
-                max-[800px]:flex-[1_1_320px] max-[800px]:min-w-70 
+                  max-[1000px]:flex-[1_1_320px] max-[1000px]:min-w-70 
+                  max-[800px]:flex-[1_1_320px] max-[800px]:min-w-70 
                 max-[420px]:w-full max-[420px]:min-w-full max-[420px]:text-left
             "
       >
@@ -52,7 +54,9 @@ export const InformacionEstudiante = () => {
 
       <div
         className="
-                min-w-45 max-[800px]:flex justify-center items-center
+                min-w-45 max-[1000px]:flex justify-center items-center
+                max-[1000px]:-order-1 max-[1000px]:w-full
+                max-[800px]:flex justify-center items-center
                 max-[800px]:-order-1 max-[800px]:w-full max-[420px]:min-w-auto
             "
       >
@@ -63,8 +67,9 @@ export const InformacionEstudiante = () => {
           height={200}
           className="
                         w-40 h-40 object-cover rounded-full shadow-md 
-                        max-[800px]:w-40 max-[800px]:h-40 
-                        max-[420px]:w-30 max-[420px]:h-30
+                          max-[1000px]:w-40 max-[1000px]:h-40 
+                          max-[800px]:w-40 max-[800px]:h-40 
+                          max-[420px]:w-30 max-[420px]:h-30
                     "
         />
       </div>

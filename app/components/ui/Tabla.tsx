@@ -31,15 +31,15 @@ export default function Tabla<Table>({
   claseFilaExtra,
 }: Props<Table>) {
   return (
-    <div className="w-full mt-6.25 max-[800px]:overflow-x-auto max-[800px]:box-border">
-      <table className="w-full border-collapse border border-white max-[800px]:whitespace-nowrap max-[800px]:min-w-125">
+    <div className="w-full mt-6.25 max-[1000px]:overflow-x-auto max-[1000px]:box-border max-[800px]:overflow-x-auto max-[800px]:box-border">
+      <table className="w-full border-collapse border border-white max-[1000px]:whitespace-nowrap max-[1000px]:min-w-125 max-[800px]:whitespace-nowrap max-[800px]:min-w-125">
         <thead>
           <tr>
             {columnas.map((col, i) => (
               <th
                 key={i}
                 style={col.width ? { width: col.width } : {}}
-                className="border border-white text-center bg-[#048047] p-2 rounded-[5px] text-[#FFF4E5]
+                className="border border-white text-center bg-[#048047] p-2 rounded-lg text-[#FFF4E5]
                                 max-[420px]:px-1 max-[420px]:py-1.5 max-[420px]:text-[12px]"
               >
                 {col.header}
@@ -55,8 +55,9 @@ export default function Tabla<Table>({
                 {columnas.map((col, i) => (
                   <td
                     key={i}
-                    className="w-auto text-center p-2.5 border-b border-b-black text-[#30545b]
-                                        max-[420px]:px-1 max-[420px]:py-1.5 max-[420px]:text-[12px]"
+                    className={`w-auto text-center p-2.5 border-b border-b-black
+                                max-[420px]:px-1 max-[420px]:py-1.5 max-[420px]:text-[12px]
+                                ${claseFilaExtra?.(item)?.includes("text-") ? "" : "text-[#30545b]"}`}
                   >
                     {/* render tiene prioridad; si no hay, usa accessor; si no, vacío */}
                     {col.render

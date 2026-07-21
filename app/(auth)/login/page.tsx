@@ -76,11 +76,15 @@ export default function Login() {
         body: JSON.stringify(validate.data),
       });
 
-      const data = await res.json();
       if (!res.ok) {
-        setErrorServidor(data.error);
-        return;
+        throw new Error(`Error ${res.status}`);
       }
+
+      const data = await res.json();
+      // if (!res.ok) {
+      //   setErrorServidor(data.error);
+      //   return;
+      // }
 
       await recargarSesion();
       router.push("/resumenestudiante");

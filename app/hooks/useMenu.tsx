@@ -15,6 +15,7 @@ import { Menu } from "../interfaces/menus";
 interface MenuContextType {
   menus: Menu[]; //Lista de menus cargados para el rol del usuario
   cargarMenus: () => Promise<void>; //cargar menus desde la api
+  cargandoInicial: boolean; //indica si es la carga inicial (para loading global)
 }
 
 const MenuContext = createContext<MenuContextType | null>(null);
@@ -22,10 +23,15 @@ const MenuContext = createContext<MenuContextType | null>(null);
 //Carga los menús al montar y los expone junto a cargarMenus para refrescarlos.
 export const MenuProvider = ({ children }: { children: React.ReactNode }) => {
   const [menus, setMenus] = useState<Menu[]>([]);
+  const [cargandoInicial, setCargandoInicial] = useState<boolean>(true);
 
   const cargarMenus = useCallback(async () => {
     try {
       const res = await fetch("/api/menu/obtenerMenu");
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
 
       const data = await res.json();
 
@@ -39,15 +45,16 @@ export const MenuProvider = ({ children }: { children: React.ReactNode }) => {
 
   //Carga inicial de los menus
   useEffect(() => {
-    cargarMenus();
-  }, []);
+    cargarMenus().finally(() => setCargandoInicial(false));
+  }, [cargarMenus]);
 
   const value = useMemo(
     () => ({
       menus,
       cargarMenus,
+      cargandoInicial,
     }),
-    [menus, cargarMenus],
+    [menus, cargarMenus, cargandoInicial],
   );
 
   return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>;

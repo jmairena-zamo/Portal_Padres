@@ -32,6 +32,9 @@ export function useAdminRoles(
     setErrorRoles(false);
     try {
       const res = await fetch("/api/menu/adminMenuRol");
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
       const data = await res.json();
       setRoles(data.roles);
       return data.roles as Rol[];

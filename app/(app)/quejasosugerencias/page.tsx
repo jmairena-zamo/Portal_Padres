@@ -207,6 +207,10 @@ export default function QuejasSugerencias() {
         body: JSON.stringify(validate.data),
       });
 
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (!res.ok) {
@@ -266,7 +270,7 @@ export default function QuejasSugerencias() {
       </div>
       {/* Renderizamos la sección de ver quejas/sugerencias si la pestaña activa es "ver" */}
       {tabActiva === "ver" && (
-        <div className="bg-white rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
+        <div className="bg-white rounded-lg shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
           <Titulo titulo="Quejas y Sugerencias" alineado={3} />
           {!errorQS && (
             <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">

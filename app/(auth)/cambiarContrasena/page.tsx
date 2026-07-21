@@ -68,6 +68,10 @@ export default function CambiarContrasena() {
           signal: controller.signal,
         });
 
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}`);
+        }
+
         const data = await res.json();
 
         if (controller.signal.aborted) return;
@@ -188,6 +192,10 @@ export default function CambiarContrasena() {
           token: token,
         }),
       });
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
 
       const data = await res.json();
 

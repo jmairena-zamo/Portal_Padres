@@ -120,7 +120,7 @@ export default function HistorialDisciplinario() {
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
-      <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-[5px] ">
+      <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] rounded-lg mb-3.75">
         <Titulo titulo="Historial Disciplinario" alineado={3} />
         <div className="mt-2.5"></div>
         {!errorDisciplinario && (

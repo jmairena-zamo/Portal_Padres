@@ -6,5 +6,12 @@ import { useSession } from "./useSession";
 
 export function useRol() {
   const { sesion, cargando } = useSession();
-  return { rol: sesion?.iD_Rol ?? null, cargando };
+  const rolId = sesion?.iD_Rol ?? null;
+  const rolNombre = sesion?.rolNombre ?? null;
+  const adminNames = ["administrador", "admin"];
+  const esAdmin = Boolean(
+    rolNombre && adminNames.includes(rolNombre.trim().toLowerCase()),
+  );
+
+  return { rol: rolId, rolNombre, cargandoRol: cargando, esAdmin };
 }

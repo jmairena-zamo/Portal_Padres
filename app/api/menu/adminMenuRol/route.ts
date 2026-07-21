@@ -34,6 +34,10 @@ export async function GET() {
               `${API_URL}/submenurol/ListarPorSubMenu/${submenu.iD_SubMenu}`,
             );
 
+            if (!resSubmenuRol.ok) {
+              throw new Error(`Error ${resSubmenuRol.status}`);
+            }
+
             const dataSubmenuRol = await resSubmenuRol.json();
 
             return {

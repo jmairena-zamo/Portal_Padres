@@ -84,7 +84,7 @@ export default function Buscador<T>({
 
       <input
         type="text"
-        className="w-full px-8 py-2 border border-gray-300 rounded-md text-[14px] 
+        className="w-full px-8 py-2 border border-gray-300 rounded-lg text-[14px] 
                  outline-none transition-all duration-200 
                  focus:border-gray-300 focus:shadow-[0_0_0_2px_rgba(0,82,33,0.15)] 
                  placeholder-gray-400"

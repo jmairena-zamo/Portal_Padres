@@ -88,7 +88,7 @@ export default function ComboBoxFiltro({
       {/* Input del ComboBox */}
       <input
         type="text"
-        className="py-2.25 pr-8 pl-1.25 border border-gray-300 text-[#30545b] rounded-md text-[14px] 
+        className="py-2.25 pr-8 pl-1.25 border border-gray-300 text-[#30545b] rounded-lg text-[14px] 
                    bg-white w-full outline-none focus:border-[#005221] focus:shadow-[0_0_0_2px_rgba(0,130,55,0.15)]"
         placeholder={placeholder}
         value={inputValue}
@@ -118,12 +118,12 @@ export default function ComboBoxFiltro({
       />
       {/* Lista desplegable del ComboBox */}
       {abierto && (
-        <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto w-full">
+        <ul className="absolute z-10 bg-white border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto w-full">
           <li>
             {/* Botón para seleccionar la opción "Todos" */}
             <button
               type="button"
-              className="px-2 py-1 cursor-pointer hover:bg-gray-100"
+              className="px-2 py-1 cursor-pointer hover:bg-gray-100 text-gray-400"
               onMouseDown={(e) => e.preventDefault()}
               onClick={seleccionarTodos}
             >

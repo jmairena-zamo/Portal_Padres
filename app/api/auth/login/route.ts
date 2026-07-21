@@ -197,18 +197,33 @@ export async function POST(request: NextRequest) {
 
     let bannerID: number | null;
 
-    // Si es admin el bannerID es nulo
-    // En el modal de suplantar se registra de nuevo
-    if (usuario.iD_Rol === 2) {
-      bannerID = null;
-    } else {
-      bannerID = 1;
+    // Intentamos obtener el nombre del rol desde el API para no depender del id
+    let rolNombre: string | null = null;
+    try {
+      const resRoles = await fetch(`${API_URL}/roles/Listar`);
+      if (resRoles.ok) {
+        const rolesData = await resRoles.json();
+        const rolesList: { iD_Rol: number; rol: string }[] =
+          rolesData.response || [];
+        const match = rolesList.find((r) => r.iD_Rol === usuario.iD_Rol);
+        rolNombre = match ? match.rol : null;
+      }
+    } catch (err) {
+      console.error("[login] No se pudo obtener lista de roles:", err);
     }
+
+    // Si el rol corresponde a administrador (según nombre), bannerID es nulo
+    const adminNames = ["administrador", "admin"];
+    const isAdminRole =
+      rolNombre && adminNames.includes(rolNombre.trim().toLowerCase());
+
+    bannerID = isAdminRole ? null : 1;
 
     const saveData = {
       id: usuario.iD_UserEmail,
       email: usuario.correoElectronico,
       iD_Rol: usuario.iD_Rol,
+      rolNombre: rolNombre,
       bannerID: bannerID,
     };
 
@@ -218,6 +233,8 @@ export async function POST(request: NextRequest) {
       bannerID,
       usuario.correoElectronico,
     );
+
+    // console.log(saveData);
 
     const response = NextResponse.json({ ok: true });
 

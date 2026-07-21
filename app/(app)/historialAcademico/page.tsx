@@ -83,7 +83,7 @@ export default function HistorialAcademico() {
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
-      <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-[5px] mb-3.75">
+      <div className="bg-white p-5 shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-lg mb-3.75">
         <Titulo titulo="Historial Academico" alineado={3} />
         {!errorHistorialAcademico && (
           <div className="mt-2.5">
@@ -114,12 +114,12 @@ export default function HistorialAcademico() {
               datos={datosPaginados}
               keyExtractor={(item) => item.id}
               claseFilaExtra={(item) =>
-                parseFloat(item.nota) < 60 ? "bg-red-300" : ""
+                parseFloat(item.nota) < 60 ? "bg-red-400 text-[#FFF4E5]" : ""
               }
               columnas={[
                 { header: "Código", accessor: "codigo" },
                 { header: "Nombre Materia", accessor: "clase" },
-                { header: "Año", accessor: "anio" },
+                // { header: "Año", accessor: "anio" },
                 { header: "Periodo", accessor: "periodo" },
                 // { header: "Sección", accessor: "seccion" },
                 { header: "Nota Final", accessor: "nota" },

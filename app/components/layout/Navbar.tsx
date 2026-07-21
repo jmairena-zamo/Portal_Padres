@@ -24,8 +24,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
 
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { rol, cargando } = useRol();
-  const esAdmin = rol === 2;
+  const { rol, cargando, esAdmin } = useRol();
   const tieneVariosHijos = !esAdmin && hijos.length > 1;
 
   // Cerrar el dropdown si se hace click fuera de él
@@ -54,23 +53,33 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
         colapsado ? "left-15" : "left-62.5",
         // mobile: siempre full width con padding para el hamburger
         "max-[800px]:left-0! max-[800px]:w-full max-[800px]:h-15 max-[800px]:pl-15 max-[800px]:box-border",
+        // mobile chico: header un poco más bajo y menos padding izquierdo
+        "max-[420px]:h-13 max-[420px]:pl-12.5",
       ].join(" ")}
     >
-      <div className="text-black flex items-center justify-between w-full px-2.5 max-[800px]:pr-3.75 max-[800px]:pl-0">
+      <div className="text-black flex items-center justify-between w-full px-2.5 max-[800px]:pr-3.75 max-[800px]:pl-0 max-[420px]:pr-2">
         {/* Logo */}
         <Image
-          className="object-cover"
+          className="object-cover max-[1000px]:w-40 max-[1000px]:h-auto max-[420px]:w-30"
           src={zamorano}
           alt="Logo Zamorano"
           width={200}
         />
 
         {/* Derecha: selector de hijo + avatar */}
-        <nav className="flex justify-between items-center gap-5 mr-10 max-[800px]:mr-2.5">
-          <div className="relative flex gap-3.75" ref={ref}>
+        <nav className="flex justify-between items-center gap-5 mr-10 max-[800px]:mr-2.5 max-[420px]:gap-2 max-[420px]:mr-0">
+          <div
+            className="relative flex gap-3.75 max-[1000px]:gap-2 max-[420px]:gap-2"
+            ref={ref}
+          >
             {esAdmin && (
-              <div className="flex justify-center items-center mr-9">
-                <BtnPrimario onClick={onSuplantar}>Suplantar</BtnPrimario>
+              <div className="flex justify-center items-center ml-2.5 mr-2.5 max-[420px]:mr-2">
+                <BtnPrimario
+                  onClick={onSuplantar}
+                  // className="max-[420px]:text-[12px] max-[420px]:px-2 max-[420px]:py-1"
+                >
+                  Suplantar
+                </BtnPrimario>
               </div>
             )}
 
@@ -95,7 +104,9 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
                     ].join(" ")}
                   />
                 )}
-                <span>{hijoActivo.Nombre}</span>
+                <span className="max-[1000px]:text-[12px]">
+                  {hijoActivo.Nombre}
+                </span>
               </button>
             )}
 
@@ -106,7 +117,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
               width={40}
               height={40}
               className={[
-                "w-10 h-10 object-cover rounded-full max-[800px]:w-10 max-[800px]:h-10 max-[420px]:w-10 max-[420px]:h-10",
+                "w-10 h-10 object-cover rounded-full max-[800px]:w-10 max-[800px]:h-10 max-[420px]:w-8 max-[420px]:h-8",
                 tieneVariosHijos &&
                   "cursor-pointer transition-opacity duration-150 hover:opacity-80",
               ]
@@ -127,6 +138,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
                                 bg-white border border-[#e2e8f0] rounded-[5px]
                                 shadow-[0_4px_16px_rgba(0,0,0,0.12)]
                                 list-none m-0 py-1 min-w-45
+                                max-[420px]:min-w-37.5 max-[420px]:-right-2
                             "
               >
                 {hijos.map((hijo) => (
@@ -138,6 +150,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
                       className={[
                         "w-full px-4 py-2.5 text-left text-[0.9rem] text-[#374151]",
                         "transition-colors duration-150 hover:bg-[#f3f4f6]",
+                        "max-[1000px]:px-2 max-[1000px]:text-[15px] max-[420px]:text-[13px]",
                         hijoActivo?.bannerID === hijo.bannerID
                           ? "font-semibold text-[#005221]"
                           : "",

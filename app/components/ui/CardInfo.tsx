@@ -22,7 +22,7 @@ export function CardInfo({ queja, onClick }: QuejaCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full rounded-[5px] border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:shadow-md cursor-pointer mt-2"
+      className="w-full rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:shadow-md cursor-pointer mt-2"
     >
       <div className="flex items-center justify-between gap-2">
         <span

@@ -28,6 +28,9 @@ export function useQueja() {
 
     try {
       const res = await fetch(`/api/quejas/obtenerQueja`);
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
       const data = await res.json();
 
       if (!res.ok) {

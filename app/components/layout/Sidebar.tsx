@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaBars,
 } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { iconos, generarRuta, getSubPath } from "@/app/services/menu";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useSession } from "@/app/hooks/useSession";
