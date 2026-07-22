@@ -98,7 +98,7 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
       `${API_URL}/submenurol/ListarPorRol/${idRol}`,
     );
 
-    let rutasSubmenus: string[] = [];
+    const rutasSubmenus: string[] = [];
 
     if (resSubRol.ok) {
       const dataSubRol = await resSubRol.json();

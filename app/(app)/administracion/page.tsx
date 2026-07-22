@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaChevronDown, FaChevronRight, FaEdit, FaTrash } from "react-icons/fa";
 import { useToast } from "@/app/hooks/useToast";
-import { Menu, Rol } from "@/app/interfaces/menus";
+import { Menu } from "@/app/interfaces/menus";
 import ModalForm from "../../components/modals/ModalForm";
 import ModalPermisos from "@/app/components/modals/ModalPermisos";
 import {
@@ -48,10 +48,6 @@ export default function Administracion() {
   //----PAGINACIÓN-----------------------------------------------------------
   const [paginaActualRoles, setPaginaActualRoles] = useState(1);
 
-  const [menusFiltradosBuscador, setMenusFiltradosBuscador] = useState<Menu[]>(
-    [],
-  );
-
   // Estado para manejar la búsqueda (si está activa y qué datos mostrar)
   const [busqueda, setBusqueda] = useState({
     dataFiltrada: [] as Menu[],
@@ -80,7 +76,6 @@ export default function Administracion() {
     setModalRol,
     modoRol,
     setModoRol,
-    rolSeleccionado,
     formDataRol,
     esValidoRol,
     confirmModalRol,
@@ -176,22 +171,10 @@ export default function Administracion() {
   useEffect(() => {
     cargarDatos();
     cargarRoles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   //----Filtros y paginación-------------------------------------
-  const menuFiltrados = menusFiltradosBuscador.filter((menu) =>
-    rolFiltro === "todos"
-      ? true
-      : menu.rolesAsignados.some(
-          (r) => r.rol_ID === rolFiltro && r.habilitado === 1,
-        ) ||
-        menu.submenus?.some((sub) =>
-          sub.rolesAsignados.some(
-            (r) => r.rol_ID === rolFiltro && r.habilitado === 1,
-          ),
-        ),
-  );
-
   // Función que se ejecuta cuando se hace una búsqueda
   const handleResultadoBusqueda = useCallback((resultados: Menu[]) => {
     setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
@@ -765,7 +748,7 @@ export default function Administracion() {
               }
             >
               <p className="text-center text-[15px] text-[#333]">
-                ¿Eliminar el Menú "{confirmModalMenu.menu?.opcion}"?
+                ¿Eliminar el Menú &quot;{confirmModalMenu.menu?.opcion}&quot;?
               </p>
             </ModalForm>
           )}
@@ -779,7 +762,7 @@ export default function Administracion() {
               }
             >
               <p className="text-center text-[15px] text-[#333]">
-                ¿Eliminar el Submenu "{confirmModalSub.sub?.opcion}"?
+                ¿Eliminar el Submenu &quot;{confirmModalSub.sub?.opcion}&quot;?
               </p>
             </ModalForm>
           )}

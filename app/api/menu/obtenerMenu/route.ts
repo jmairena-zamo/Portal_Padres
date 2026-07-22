@@ -3,6 +3,7 @@
 // Se utiliza para crear el sidebar dinamico
 
 import { API_URL } from "@/app/config/api";
+import { SubMenu } from "@/app/interfaces/menus";
 import { NextRequest, NextResponse } from "next/server";
 
 //GET /api/menu/obtenerMenu
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
 
         // Filtrar los submenús que estén habilitados y que pertenezcan al rol
         const submenus = (dataSub.response || []).filter(
-          (sub: any) =>
+          (sub: SubMenu) =>
             submenuIDsSet.has(sub.iD_SubMenu) && sub.habilitado === 1,
         );
 

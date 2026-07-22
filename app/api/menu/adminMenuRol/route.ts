@@ -3,7 +3,8 @@
 // y submenús (cada uno con sus propios roles).
 
 import { API_URL } from "@/app/config/api";
-import { NextResponse, NextRequest } from "next/server";
+import { Menu, SubMenu } from "@/app/interfaces/menus";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -18,7 +19,7 @@ export async function GET() {
 
     // Por cada menú, obtener sus roles asignados y sus submenús en paralelo
     const menus = await Promise.all(
-      datamenus.response.map(async (menu: any) => {
+      datamenus.response.map(async (menu: Menu) => {
         const [resMenuRol, resSubmenu] = await Promise.all([
           fetch(`${API_URL}/menurol/ListarPorMenu/${menu.iD_Menu}`),
           fetch(`${API_URL}/submenu/ListarPorMenu/${menu.iD_Menu}`),
@@ -29,7 +30,7 @@ export async function GET() {
 
         // Por cada submenú, obtener sus roles asignados
         const submenusData = await Promise.all(
-          (dataSubmenu.response || []).map(async (submenu: any) => {
+          (dataSubmenu.response || []).map(async (submenu: SubMenu) => {
             const resSubmenuRol = await fetch(
               `${API_URL}/submenurol/ListarPorSubMenu/${submenu.iD_SubMenu}`,
             );
@@ -58,10 +59,10 @@ export async function GET() {
 
     //Devulve la lista de menus ordenados y de roles
     return NextResponse.json({
-      menus: menus.sort((a: any, b: any) => a.posicion - b.posicion),
+      menus: menus.sort((a: Menu, b: Menu) => a.posicion - b.posicion),
       roles: dataroles.response,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Error de conexion" }, { status: 500 });
   }
 }

@@ -38,7 +38,7 @@ export function useQueja() {
       }
 
       setQuejas(data.response ?? []);
-    } catch (err) {
+    } catch {
       setErrorQS(true);
     } finally {
       // Delay mínimo para evitar parpadeo del loading, igual que en el resto del proyecto
@@ -49,6 +49,7 @@ export function useQueja() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarQuejas();
   }, [cargarQuejas, intento]);
 

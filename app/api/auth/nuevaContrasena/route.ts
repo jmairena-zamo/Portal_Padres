@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       message: "Contraseña actualizada correctamente",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Error al conectar con el servidor" },
       { status: 500 },

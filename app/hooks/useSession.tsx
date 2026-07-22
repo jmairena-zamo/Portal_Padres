@@ -64,7 +64,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   // Al iniciar el componente, se carga la sesión automáticamente
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarSesion();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Se prepara el valor que se compartirá en el contexto
@@ -75,6 +77,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       recargarSesion: cargarSesion,
       cerrarSesion,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sesion, cargando],
   );
 

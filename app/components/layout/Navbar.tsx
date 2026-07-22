@@ -24,7 +24,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
 
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { rol, cargando, esAdmin } = useRol();
+  const { rol, esAdmin } = useRol();
   const tieneVariosHijos = !esAdmin && hijos.length > 1;
 
   // Cerrar el dropdown si se hace click fuera de él

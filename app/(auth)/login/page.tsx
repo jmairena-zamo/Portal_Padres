@@ -81,10 +81,10 @@ export default function Login() {
       }
 
       const data = await res.json();
-      // if (!res.ok) {
-      //   setErrorServidor(data.error);
-      //   return;
-      // }
+      if (!res.ok) {
+        setErrorServidor(data.error);
+        return;
+      }
 
       await recargarSesion();
       router.push("/resumenestudiante");

@@ -62,6 +62,7 @@ export const EstudianteProvider = ({
       { bannerID: 3, Nombre: "Luis Martínez" },
     ];
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHijos(hijosMock);
 
     // Se selecciona el primer hijo por defecto
@@ -73,7 +74,9 @@ export const EstudianteProvider = ({
   // Cada vez que cambia el hijo activo, se cargan sus datos
   useEffect(() => {
     if (!hijoActivo) return;
+    // eslint-disable-next-line react-hooks/immutability
     cargarEstudiante();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hijoActivo]);
 
   // Función para cambiar de hijo y avisar al backend
@@ -87,6 +90,7 @@ export const EstudianteProvider = ({
   };
 
   // Función para traer la información del estudiante desde la API
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const cargarEstudiante = useCallback(async () => {
     setCargando(true);
     try {
@@ -144,6 +148,7 @@ export const EstudianteProvider = ({
       cargarEstudiante,
     }),
     [
+      cargando,
       foto,
       faltasTotales,
       faltasTotalesAnio,
@@ -151,6 +156,7 @@ export const EstudianteProvider = ({
       estudiante,
       hijoActivo,
       hijos,
+      cargarEstudiante,
     ],
   );
 

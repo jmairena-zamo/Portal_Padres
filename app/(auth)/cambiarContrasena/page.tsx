@@ -44,12 +44,13 @@ export default function CambiarContrasena() {
   const [userData, setUserData] = useState<UsuarioRecuperacion | null>(null);
   const [errorNewContras, setErrorNewContras] = useState("");
   const [errorConfirmContras, setErrorConfirmContras] = useState("");
-  const [mostrarNewContras, setMostrarNewContras] = useState(false);
-  const [mostrarConfirmContras, setMostrarConfirmContras] = useState(false);
+  const [mostrarNewContras] = useState(false);
+  const [mostrarConfirmContras] = useState(false);
 
   // Validación inicial del enlace (token + id)
   useEffect(() => {
     if (!id || !token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setErrorServidor("Link inválido o expirado");
       setValidandoLink(false);
       return;
@@ -206,7 +207,7 @@ export default function CambiarContrasena() {
 
       setMensaje(data.message);
       setTimeout(() => route.push("/login"), 3000);
-    } catch (err) {
+    } catch {
       setError("Error de conexión. Intente nuevamente.");
     } finally {
       setCargando(false);

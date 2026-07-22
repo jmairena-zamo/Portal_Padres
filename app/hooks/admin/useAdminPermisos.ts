@@ -9,7 +9,7 @@ type MostrarToast = (msg: string) => void;
 
 export function useAdminPermisos(
   menus: Menu[],
-  recargarDatos: () => Promise<any>,
+  recargarDatos: () => Promise<void>,
   mostrarExito: MostrarToast,
 ) {
   const { cargarMenus } = useMenu();

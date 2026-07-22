@@ -48,16 +48,17 @@ function InnerMenuConsumer({ children }: { children: React.ReactNode }) {
   const { cargandoInicial } = useMenu();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [colapsado, setColapsado] = useState(false);
-  const { cargandoRol, esAdmin } = useRol();
+  const { esAdmin } = useRol();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (esAdmin) setShowModal(true);
   }, [esAdmin]);
 
   if (cargandoInicial)
     return (
       <div className="bg-[#faf9f6] min-h-screen flex items-center justify-center">
-        <Loading texto="Cargando menús..." />
+        <Loading texto="Cargando..." />
       </div>
     );
 

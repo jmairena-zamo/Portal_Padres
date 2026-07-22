@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
     // ── Contraseña incorrecta → contar intento ───────────────────────────────
     if (contrasenaLimpia !== usuario.contrasena) {
       const intentosActuales = registrarIntento(correoLimpio);
-      const intentosRestantes = MAX_INTENTOS - intentosActuales;
+      // const intentosRestantes = MAX_INTENTOS - intentosActuales;
 
       // ── Límite alcanzado: bloquear en BD y enviar correo ───────────────────
       if (intentosActuales >= MAX_INTENTOS) {
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
     // ── Login exitoso ────────────────────────────────────────────────────────
     intentosFallidos.delete(correoLimpio); // limpiar conteo si había intentos previos
 
-    let bannerID: number | null;
+    // let bannerID: number | null;
 
     // Intentamos obtener el nombre del rol desde el API para no depender del id
     let rolNombre: string | null = null;
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
     const isAdminRole =
       rolNombre && adminNames.includes(rolNombre.trim().toLowerCase());
 
-    bannerID = isAdminRole ? null : 1;
+    const bannerID = isAdminRole ? null : 1;
 
     const saveData = {
       id: usuario.iD_UserEmail,

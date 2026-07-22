@@ -20,24 +20,17 @@ import {
   CardCausal,
   ClaseAprenderHaciendo,
   Decanatura,
-  Loading,
   TecnologiasInformacion,
 } from "@/app/components/ui";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 export default function ResumenEstudiante() {
-  const [porcentaje, setPorcentaje] = useState(20.88);
+  const [porcentaje] = useState(20.88);
   const promedio = 88.88;
 
   // Hook personalizado para obtener información del estudiante
-  const {
-    cargando,
-    foto,
-    estudiante,
-    faltasTotales,
-    faltasTotalesAnio,
-    categoriaDisc,
-  } = useEstudiante();
+  const { foto, estudiante, faltasTotales, faltasTotalesAnio, categoriaDisc } =
+    useEstudiante();
 
   // Constantes para capsulas informativas
   const [decanatura, setDecanatura] = useState<boolean>(false);

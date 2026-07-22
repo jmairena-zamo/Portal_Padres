@@ -1,6 +1,7 @@
 // Botones reutilizables del sistema - Diego Castro / PracticanteIT2
 // BtnPrimario: confirmar/aceptar/editar | BtnPeligro: eliminar/cancelar | BtnOutline: acciones secundarias
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 interface BtnTabProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

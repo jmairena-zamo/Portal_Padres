@@ -5,7 +5,7 @@
 
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { quejaData, quejaSchema } from "@/app/utils/validations";
 import Loading from "@/app/components/ui/Loading";
 import { useToast } from "@/app/hooks/useToast";
@@ -227,7 +227,7 @@ export default function QuejasSugerencias() {
       });
 
       reintentar();
-    } catch (error) {
+    } catch {
       setError("Error de conexión. Intenta de nuevo.");
       mostrarError("Error de conexión. Intenta de nuevo.");
     } finally {

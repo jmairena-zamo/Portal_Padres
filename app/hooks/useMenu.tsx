@@ -45,7 +45,20 @@ export const MenuProvider = ({ children }: { children: React.ReactNode }) => {
 
   //Carga inicial de los menus
   useEffect(() => {
-    cargarMenus().finally(() => setCargandoInicial(false));
+    let isMounted = true;
+
+    const initializeMenus = async () => {
+      await cargarMenus();
+      if (isMounted) {
+        setCargandoInicial(false);
+      }
+    };
+
+    initializeMenus();
+
+    return () => {
+      isMounted = false;
+    };
   }, [cargarMenus]);
 
   const value = useMemo(

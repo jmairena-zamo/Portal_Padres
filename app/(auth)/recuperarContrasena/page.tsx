@@ -56,7 +56,7 @@ export default function RecuperarContrasena() {
 
       const data = await res.json();
       setMensaje(data.message);
-    } catch (error) {
+    } catch {
       setMensaje("Error de conexión. Intenta de nuevo.");
     } finally {
       setCargando(false);
