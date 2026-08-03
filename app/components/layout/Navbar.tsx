@@ -24,7 +24,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
 
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { rol, esAdmin } = useRol();
+  const { esAdmin } = useRol();
   const tieneVariosHijos = !esAdmin && hijos.length > 1;
 
   // Cerrar el dropdown si se hace click fuera de él
@@ -47,8 +47,8 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
   return (
     <header
       className={[
-        "shadow-[0_3px_5px_rgba(0,0,0,0.4)] fixed top-0 right-0 h-13.75 z-98",
-        "bg-[#ffffff] flex justify-center items-center transition-transform duration-500 ease-in-out",
+        "shadow-[0px_1px_5px_rgba(0,0,0,0.2)] fixed top-0 right-0 h-13.75 z-98",
+        "bg-[#ffffff] flex justify-center items-center transition-[left] duration-500 ease-in-out",
         // desktop: left depende del estado colapsado
         colapsado ? "left-15" : "left-62.5",
         // mobile: siempre full width con padding para el hamburger

@@ -108,8 +108,9 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
       <div
         className={[
           "bg-[#048047] h-screen fixed left-0 top-0",
-          "shadow-[3px_3px_5px_rgba(0,0,0,0.4)]",
+          "shadow-[1px_0px_5px_rgba(0,0,0,0.2)]",
           "flex flex-col items-center justify-between",
+          "transition-[width] duration-500 ease-in-out",
           // ancho según estado
           colapsado ? "w-15" : "w-62.5",
           // mobile

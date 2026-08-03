@@ -270,7 +270,7 @@ export default function QuejasSugerencias() {
       </div>
       {/* Renderizamos la sección de ver quejas/sugerencias si la pestaña activa es "ver" */}
       {tabActiva === "ver" && (
-        <div className="bg-white rounded-lg shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
+        <div className="bg-white rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.2)] p-4 max-[800px]:overflow-hidden">
           <Titulo titulo="Quejas y Sugerencias" alineado={3} />
           {!errorQS && (
             <div className="mt-2.5 mb-5 w-full flex gap-3.75 max-[420px]:flex-col">
@@ -361,7 +361,7 @@ export default function QuejasSugerencias() {
         <div className="flex items-center justify-center">
           <form
             onSubmit={handleSubmit}
-            className="w-full max-w-187.5 rounded-[5px] bg-white p-5 text-center shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)]"
+            className="w-full max-w-187.5 rounded-lg bg-white p-5 text-center shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)]"
           >
             <Titulo titulo="¡Quejas y Sugerencias!" alineado={1} />
             <h3 className="text-[13px] text-[rgb(41,94,34)]">

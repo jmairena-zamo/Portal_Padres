@@ -42,7 +42,7 @@ export const BtnOutline = ({ children, ...props }: Props) => (
 
 export const BtnTab = ({ activa, children, ...props }: BtnTabProps) => (
   <button
-    className={`bg-white border-none px-2.5 py-1.25 text-[#173426] shadow-[0px_0px_5px_2px_rgba(0,0,0,0.2)]
+    className={`bg-white border-none px-2.5 py-1.25 text-[#173426] shadow-[0px_1px_5px_rgba(0,0,0,0.2)]
       rounded-t-[5px] hover:text-[#006400] cursor-pointer
       max-[420px]:flex-1 max-[420px]:text-[13px] max-[420px]:text-center
       ${activa ? "text-[#43C302] border-b-2 border-[#43C302] font-bold" : ""}`}

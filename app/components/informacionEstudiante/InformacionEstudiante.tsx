@@ -17,7 +17,7 @@ export const InformacionEstudiante = () => {
     <div
       className="
             bg-white flex justify-center items-center gap-36 p-5 
-            shadow-[0px_3px_5px_3px_rgba(0,0,0,0.2)] rounded-lg w-full 
+            shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg w-full 
               max-[1000px]:flex-wrap max-[1000px]:justify-center max-[1000px]:gap-6 
               max-[800px]:flex-wrap max-[800px]:justify-center max-[800px]:gap-6 
             max-[420px]:flex-col max-[420px]:items-center max-[420px]:p-2 max-[420px]:gap-2
@@ -56,7 +56,7 @@ export const InformacionEstudiante = () => {
         className="
                 min-w-45 max-[1000px]:flex justify-center items-center
                 max-[1000px]:-order-1 max-[1000px]:w-full
-                max-[800px]:flex justify-center items-center
+                max-[800px]:flex
                 max-[800px]:-order-1 max-[800px]:w-full max-[420px]:min-w-auto
             "
       >

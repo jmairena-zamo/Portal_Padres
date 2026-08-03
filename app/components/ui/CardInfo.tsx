@@ -26,7 +26,7 @@ export function CardInfo({ queja, onClick }: QuejaCardProps) {
     >
       <div className="flex items-center justify-between gap-2">
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+          className={`rounded-lg px-2.5 py-0.5 text-xs font-medium ${
             queja.tipo === "QUEJA"
               ? "bg-red-100 text-[#a11313]"
               : "bg-green-100 text-[#008237]"

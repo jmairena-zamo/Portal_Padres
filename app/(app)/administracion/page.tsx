@@ -276,7 +276,7 @@ export default function Administracion() {
 
       {/* ── Tab: Menús ── */}
       {tabActiva === "menus" && (
-        <div className="bg-[#ffffff] rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
+        <div className="bg-[#ffffff] rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.2)] p-4 max-[800px]:overflow-hidden">
           <div className="flex justify-between px-4 max-[800px]:flex-col max-[800px]:gap-2.5 max-[800px]:items-start max-[800px]:px-1.25">
             <Titulo titulo="Administración de Menú" alineado={3} />
 
@@ -407,7 +407,6 @@ export default function Administracion() {
                             }}
                           />
                         </td>
-                        {/* estilo para el boton de gestionar roles */}
                         <td
                           className="border border-white flex flex-row justify-center align-center p-2.5 border-b border-b-black 
                                                     max-[420px]:px-1 max-[420px]:py-1.5 max-[420px]:text-[12px]"
@@ -770,7 +769,7 @@ export default function Administracion() {
       )}
       {/* ── Tab: Roles ── */}
       {tabActiva === "roles" && (
-        <div className="bg-white rounded-[5px] shadow-[0px_3px_5px_3px_rgba(0,0,0,0.3)] p-4 max-[800px]:overflow-hidden">
+        <div className="bg-white rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.2)] p-4 max-[800px]:overflow-hidden">
           <div className="flex justify-between px-4 max-[800px]:flex-col max-[800px]:gap-2.5 max-[800px]:items-start max-[800px]:px-1.25">
             <Titulo titulo="Administración de Roles" alineado={3} />
             <div className="flex gap-2.5">

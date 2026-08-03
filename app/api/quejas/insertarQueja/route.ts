@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: "Queja o Sugerencia Creada Correctamente",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Error al conectar con el servidor" },
       { status: 500 },
