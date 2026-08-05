@@ -11,6 +11,12 @@ import {
 
 // Función para obtener las clases del periodo actual desde la API
 const fetcher = async (url: string) => {
+  const MIN_LOADING_MS = 300;
+  const esperar = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  await esperar(MIN_LOADING_MS);
+
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Error ${res.status}`);
   const data = await res.json();
