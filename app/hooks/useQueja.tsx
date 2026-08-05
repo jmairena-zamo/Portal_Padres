@@ -33,10 +33,6 @@ export function useQueja() {
       }
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || "No se pudieron cargar las quejas");
-      }
-
       setQuejas(data.response ?? []);
     } catch {
       setErrorQS(true);

@@ -38,10 +38,18 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
   const cerrarSidebar = () => setSidebarAbierto(false);
 
   // Aplica la clase activa si la ruta actual coincide con el path del link
-  const linkClass = (path: string) =>
-    pathname === path
-      ? "font-bold bg-[#FFF4E5] text-[rgb(40,100,48)] px-2.5 py-[5px] w-full rounded-[5px] flex items-end gap-2 text-xs no-underline"
-      : "font-normal text-[#FFF4E5] px-2.5 py-[5px] flex items-end gap-2 text-xs no-underline";
+  const linkClass = (path: string) => {
+    const activo = pathname === path;
+
+    return [
+      "w-full box-border flex items-center gap-2 px-2.5 py-[5px] rounded-[5px] text-xs no-underline transition-colors duration-200",
+      activo
+        ? "font-bold bg-[#FFF4E5] text-[rgb(40,100,48)]"
+        : "font-normal text-[#FFF4E5] hover:bg-white/10",
+    ]
+      .filter(Boolean)
+      .join(" ");
+  };
 
   // Alterna el submenú abierto; si se presiona el mismo, lo cierra
   const gestionSubmenu = (idMenu: number) => {
@@ -186,7 +194,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
               const Icono = iconos[menu.icono];
 
               return (
-                <div key={menu.iD_Menu}>
+                <div key={menu.iD_Menu} className="w-full">
                   {tieneSubmenus ? (
                     <>
                       {/* Menú con submenús */}
@@ -215,7 +223,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
 
                       {/* Submenús */}
                       {estaAbierto && !colapsado && (
-                        <div className="bg-[#005221] flex flex-col pl-5 border-l border-[#ddd] ml-2.5">
+                        <div className="w-full bg-[#005221] flex flex-col pl-5 border-l border-[#ddd] ml-2.5">
                           {menu.submenus
                             .sort((a, b) => a.posicion - b.posicion)
                             .map((sub) => {

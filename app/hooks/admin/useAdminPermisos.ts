@@ -2,15 +2,27 @@
 // Estados para la administración de permisos
 
 import { useState } from "react";
-import { Menu, SubMenu } from "@/app/interfaces/menus";
+import { Menu, Rol, SubMenu } from "@/app/interfaces/menus";
 import { useMenu } from "@/app/hooks/useMenu";
 
 type MostrarToast = (msg: string) => void;
+
+const normalizarTexto = (texto: string) =>
+  texto
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const esMenuAdministracion = (item: Menu | SubMenu) =>
+  "iD_Menu" in item && normalizarTexto(item.opcion) === "administracion";
 
 export function useAdminPermisos(
   menus: Menu[],
   recargarDatos: () => Promise<void>,
   mostrarExito: MostrarToast,
+  mostrarError: MostrarToast,
+  roles: Rol[],
 ) {
   const { cargarMenus } = useMenu();
 
@@ -18,6 +30,14 @@ export function useAdminPermisos(
   const [itemPermisos, setItemPermisos] = useState<Menu | SubMenu | null>(null);
   const [rolesTemp, setRolesTemp] = useState<number[]>([]);
   const [guardandoPermisos, setGuardandoPermisos] = useState(false);
+
+  const adminRoleIds = new Set(
+    roles
+      .filter((rol) =>
+        ["administrador", "admin"].includes(normalizarTexto(rol.rol)),
+      )
+      .map((rol) => rol.iD_Rol),
+  );
 
   const abrirPermisos = (item: Menu | SubMenu) => {
     setItemPermisos(item);
@@ -29,11 +49,30 @@ export function useAdminPermisos(
       }
     }
 
+    if (esMenuAdministracion(item)) {
+      for (const idRol of adminRoleIds) {
+        if (!rolesHabilitados.includes(idRol)) {
+          rolesHabilitados.push(idRol);
+        }
+      }
+    }
+
     setRolesTemp(rolesHabilitados);
     setModalPermisos(true);
   };
 
   const toggleRolTemp = (idRol: number) => {
+    if (
+      itemPermisos &&
+      esMenuAdministracion(itemPermisos) &&
+      adminRoleIds.has(idRol)
+    ) {
+      mostrarError(
+        "El rol Administrador no puede quitarse del menú Administración.",
+      );
+      return;
+    }
+
     setRolesTemp((prev) =>
       prev.includes(idRol)
         ? prev.filter((id) => id !== idRol)
@@ -57,7 +96,10 @@ export function useAdminPermisos(
 
     const esMenu = "iD_Menu" in itemPermisos;
     const rolesConRegistro = itemPermisos.rolesAsignados;
-    const rolesTempSet = new Set(rolesTemp);
+    const rolesProtegidos = esMenuAdministracion(itemPermisos)
+      ? adminRoleIds
+      : new Set<number>();
+    const rolesTempSet = new Set([...rolesTemp, ...rolesProtegidos]);
 
     const activar = rolesTemp.filter((idRol) => {
       const registro = rolesConRegistro.find((r) => r.rol_ID === idRol);
@@ -65,7 +107,10 @@ export function useAdminPermisos(
     });
 
     const desactivar = rolesConRegistro.filter(
-      (r) => r.habilitado === 1 && !rolesTempSet.has(r.rol_ID),
+      (r) =>
+        r.habilitado === 1 &&
+        !rolesTempSet.has(r.rol_ID) &&
+        !rolesProtegidos.has(r.rol_ID),
     );
 
     const nuevos = activar.filter(
@@ -216,6 +261,10 @@ export function useAdminPermisos(
     itemPermisos,
     rolesTemp,
     guardandoPermisos,
+    rolesBloqueados:
+      itemPermisos && esMenuAdministracion(itemPermisos)
+        ? [...adminRoleIds]
+        : [],
     abrirPermisos,
     toggleRolTemp,
     guardarPermisos,

@@ -199,7 +199,7 @@ export default function HistorialDisciplinario() {
                 },
               ]}
             />
-            <h2 className="font-bold text-[16px] text-[#173426] mt-3.75 mb-3.75 ml-3.5">
+            <h2 className="font-bold text-[16px] text-[#173426] mt-3.75 mb-2 ml-3.5">
               Faltas Totales: {faltasTotales}
             </h2>
             <Paginacion

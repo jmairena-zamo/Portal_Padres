@@ -12,6 +12,7 @@ interface Props {
   onGuardar: () => void;
   onCancelar: () => void;
   guardando: boolean;
+  rolesBloqueados?: number[]; // Agregado para recibir roles bloqueados
 }
 
 // Modal para asignar o quitar roles en un menú o submenú
@@ -23,8 +24,10 @@ export default function ModalPermisos({
   onGuardar,
   onCancelar,
   guardando,
+  rolesBloqueados = [], // Valor por defecto como arreglo vacío
 }: Props) {
   const rolesSeleccionadosSet = new Set(rolesSeleccionados);
+  const rolesBloqueadosSet = new Set(rolesBloqueados); // Conjunto para roles bloqueados
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-1000">
       <div
@@ -60,6 +63,7 @@ export default function ModalPermisos({
                 type="checkbox"
                 checked={rolesSeleccionadosSet.has(rol.iD_Rol)}
                 onChange={() => onToggle(rol.iD_Rol)}
+                disabled={rolesBloqueadosSet.has(rol.iD_Rol)} // Deshabilitar si el rol está bloqueado
               />
             </label>
           ))}

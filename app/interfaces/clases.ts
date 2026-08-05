@@ -27,7 +27,7 @@ export interface FilaClase {
 }
 
 export function mapearClasesPeriodo(curso: ClasesPeriodoActual): FilaClase {
-  const peri = `${curso.Anio} - ${curso.Periodo}`;
+  const peri = `PERIODO ${curso.Anio} - ${curso.Periodo}`;
   return {
     codigo: curso.NRC,
     asignatura: curso.Asignatura.substring(9, curso.Asignatura.length),

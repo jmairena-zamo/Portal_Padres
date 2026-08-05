@@ -21,7 +21,7 @@ export default function Clases() {
   return (
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
-      <div className="bg-white p-5 shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg mb-3.75">
+      <div className="bg-white px-5 pt-5 pb-10 shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg mb-3.75">
         <Titulo
           titulo={`Información academica, Año ${new Date().getFullYear()}, Periodo Actual`}
           alineado={3}

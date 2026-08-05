@@ -1,7 +1,6 @@
 // Creado por Diego Castro
 // hooks useRol para obtener el id del rol del usuario actual
 "use client";
-import { useEffect, useState } from "react";
 import { useSession } from "./useSession";
 
 export function useRol() {

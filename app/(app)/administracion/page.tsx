@@ -44,6 +44,16 @@ import { useAdminRoles } from "@/app/hooks/admin/useAdminRoles";
 import { useAdminMenus } from "@/app/hooks/admin/useAdminMenus";
 import { useAdminPermisos } from "@/app/hooks/admin/useAdminPermisos";
 
+const normalizarTexto = (texto: string) =>
+  texto
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const esMenuProtegido = (texto: string) =>
+  normalizarTexto(texto) === "administracion";
+
 export default function Administracion() {
   //----PAGINACIÓN-----------------------------------------------------------
   const [paginaActualRoles, setPaginaActualRoles] = useState(1);
@@ -155,13 +165,20 @@ export default function Administracion() {
     errorMenus,
   } = adminMenus;
 
-  const adminPermisos = useAdminPermisos(menus, cargarDatos, mostrarExito);
+  const adminPermisos = useAdminPermisos(
+    menus,
+    cargarDatos,
+    mostrarExito,
+    mostrarError,
+    roles,
+  );
   const {
     modalPermisos,
     setModalPermisos,
     itemPermisos,
     rolesTemp,
     guardandoPermisos,
+    rolesBloqueados,
     abrirPermisos,
     toggleRolTemp,
     guardarPermisos,
@@ -535,6 +552,9 @@ export default function Administracion() {
                       render: (menu) => (
                         <ToggleSwitch
                           checked={menu.habilitado === 1}
+                          disabled={
+                            esMenuProtegido(menu.opcion) && menu.habilitado === 1
+                          }
                           onChange={() => Habilitar(menu)}
                         />
                       ),
@@ -731,6 +751,7 @@ export default function Administracion() {
               titulo={itemPermisos.opcion}
               roles={roles}
               rolesSeleccionados={rolesTemp}
+              rolesBloqueados={rolesBloqueados}
               onToggle={toggleRolTemp}
               onGuardar={guardarPermisos}
               onCancelar={() => setModalPermisos(false)}

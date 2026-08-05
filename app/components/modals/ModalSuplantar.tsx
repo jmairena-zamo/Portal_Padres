@@ -7,7 +7,6 @@ import logozamorano from "../../img/Logo-Universidad-Zamorano.png";
 import Image from "next/image";
 import { BtnPrimario, Buscador } from "../ui";
 import { useState } from "react";
-import { registrarIngreso } from "@/app/services/registrarIngreso";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 //Cerrar el modal luego de seleccinar estudiante
@@ -16,7 +15,7 @@ interface ModalProps {
   onSeleccionar: (estudiante: { bannerID: number; Nombre: string }) => void;
 }
 
-export default function ModalSuplantar({ OnClose, onSeleccionar }: ModalProps) {
+export default function ModalSuplantar({ OnClose }: ModalProps) {
   //Array temporal de estudiantes
   const estudiantesIniciales = [
     { bannerID: 1, Nombre: "Diego Sebastian Castro Lagos" },

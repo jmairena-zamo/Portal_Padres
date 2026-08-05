@@ -76,13 +76,10 @@ export default function Login() {
         body: JSON.stringify(validate.data),
       });
 
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}`);
-      }
-
       const data = await res.json();
+
       if (!res.ok) {
-        setErrorServidor(data.error);
+        setErrorServidor(data.error || "Credenciales inválidas");
         return;
       }
 

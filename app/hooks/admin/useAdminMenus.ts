@@ -12,6 +12,15 @@ import {
 
 type MostrarToast = (msg: string) => void;
 
+const normalizarTexto = (texto: string) =>
+  texto
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const esMenuProtegido = (texto: string) => normalizarTexto(texto) === "administracion";
+
 export function useAdminMenus(
   mostrarExito: MostrarToast,
   mostrarError: MostrarToast,
@@ -69,7 +78,7 @@ export function useAdminMenus(
 
   //----Carga inicial----------------------------------------------------------
   /** Carga menús desde la API.*/
-  const cargarDatos = async () => {
+  const cargarDatos = useCallback(async () => {
     const inicio = Date.now();
     setCargando(true);
     setErrorMenus(false);
@@ -95,12 +104,17 @@ export function useAdminMenus(
     } finally {
       setCargando(false);
     }
-  };
+  }, [mostrarError]);
 
   //----HABILITAR Y DESHABILITAR-----------------------------------------------
   const Habilitar = useCallback(
     async (menu: Menu) => {
       const nuevoHabilitado = menu.habilitado === 1 ? 0 : 1;
+
+      if (esMenuProtegido(menu.opcion) && nuevoHabilitado === 0) {
+        mostrarError("El menú Administración no puede desactivarse.");
+        return;
+      }
 
       // Se crean promesas para actualizar el menú y sus submenús (si los tiene) en paralelo
       const promesas: Promise<Response>[] = [
@@ -136,7 +150,7 @@ export function useAdminMenus(
       await cargarDatos();
       await cargarMenus();
     },
-    [mostrarExito, mostrarError, cargarMenus],
+    [mostrarExito, mostrarError, cargarDatos, cargarMenus],
   );
 
   const HabilitarSUB = useCallback(
@@ -176,7 +190,7 @@ export function useAdminMenus(
       await cargarDatos();
       await cargarMenus();
     },
-    [menus, mostrarExito, mostrarError, cargarMenus],
+    [menus, mostrarExito, mostrarError, cargarDatos, cargarMenus],
   );
 
   //----Cambio de posición-------------------------------------------------------
