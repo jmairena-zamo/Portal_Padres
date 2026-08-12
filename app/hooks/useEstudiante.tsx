@@ -23,9 +23,6 @@ interface Hijo {
 interface EstudianteContextType {
   cargando: boolean;
   foto: string | null;
-  faltasTotales: number;
-  faltasTotalesAnio: number;
-  categoriaDisc: string | null;
   estudiante: infoEstudiante | null;
 
   hijos: Hijo[];
@@ -46,9 +43,6 @@ export const EstudianteProvider = ({
   // Constantes Información general
   const [cargando, setCargando] = useState<boolean>(false);
   const [foto, setFoto] = useState<string | null>(null);
-  const [faltasTotales, setFaltasTotales] = useState<number>(0);
-  const [faltasTotalesAnio, setFaltasTotalesAnio] = useState<number>(0);
-  const [categoriaDisc, setCategoriaDisc] = useState<string | null>(null);
   const [estudiante, setEstudiante] = useState<infoEstudiante | null>(null);
 
   const [hijos, setHijos] = useState<Hijo[]>([]);
@@ -57,9 +51,9 @@ export const EstudianteProvider = ({
   // Al iniciar, se cargan unos hijos de prueba
   useEffect(() => {
     const hijosMock = [
-      { bannerID: 1, Nombre: "Carlos Martínez" },
-      { bannerID: 2, Nombre: "Sofía Martínez" },
-      { bannerID: 3, Nombre: "Luis Martínez" },
+      { bannerID: 27027, Nombre: "ISABELA EUGENIA MARENCO GUTIÉRREZ" },
+      { bannerID: 26029, Nombre: "CAMILO GUILLERMO MORALES PALACIOS" },
+      { bannerID: 26024, Nombre: "ARIANA JASMIN REYES PINEDA" },
     ];
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -97,24 +91,25 @@ export const EstudianteProvider = ({
       const inicio = Date.now();
 
       // Se hacen varias peticiones al mismo tiempo
-      const [resFoto, resFaltas, resInfo] = await Promise.all([
+      const [resFoto, resInfo] = await Promise.all([
         fetch("/api/estudiantes/obtenerFoto"),
-        fetch("/api/estudiantes/obtenerFaltas"),
         fetch("/api/estudiantes/obtenerInfoGen"),
       ]);
 
-      const [dataFoto, dataFaltas, dataInfo] = await Promise.all([
+      const [dataFoto, dataInfo] = await Promise.all([
         resFoto.json(),
-        resFaltas.json(),
         resInfo.json(),
       ]);
 
       // Se guardan los datos en las variables
       setFoto(dataFoto.foto ?? null);
-      setFaltasTotales(dataFaltas.Tfaltas);
-      setFaltasTotalesAnio(dataFaltas.TfaltasAnio);
-      setCategoriaDisc(dataFaltas.CATdisc);
-      setEstudiante(dataInfo.response);
+
+      // Procesar respuesta del ResumenEstudiante (contiene toda la info ahora)
+      if (dataInfo.response) {
+        const respuesta = dataInfo.response;
+        setEstudiante(respuesta);
+      }
+
       const transcurrido = Date.now() - inicio;
       const restante = 1000 - transcurrido;
       if (restante > 0) {
@@ -122,12 +117,9 @@ export const EstudianteProvider = ({
       }
     } catch (error) {
       // Si algo falla, se limpian los datos
-      console.log("Error cargando foto:", error);
+      console.log("Error cargando información:", error);
       setFoto(null);
       setEstudiante(null);
-      setFaltasTotales(0);
-      setFaltasTotalesAnio(0);
-      setCategoriaDisc(null);
     } finally {
       setCargando(false);
     }
@@ -138,26 +130,13 @@ export const EstudianteProvider = ({
     () => ({
       cargando,
       foto,
-      faltasTotales,
-      faltasTotalesAnio,
-      categoriaDisc,
       estudiante,
       hijoActivo,
       hijos,
       seleccionarEstudiante,
       cargarEstudiante,
     }),
-    [
-      cargando,
-      foto,
-      faltasTotales,
-      faltasTotalesAnio,
-      categoriaDisc,
-      estudiante,
-      hijoActivo,
-      hijos,
-      cargarEstudiante,
-    ],
+    [cargando, foto, estudiante, hijoActivo, hijos, cargarEstudiante],
   );
 
   // Se devuelve el proveedor del contexto

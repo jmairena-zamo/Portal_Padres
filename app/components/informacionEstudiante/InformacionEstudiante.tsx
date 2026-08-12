@@ -8,69 +8,88 @@ import Image from "next/image";
 import user from "../../img/logo-user.png";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 import { Titulo } from "@/app/components/ui/Titulo";
+import { useEffect, useState } from "react";
 
 export const InformacionEstudiante = () => {
   // Obtenemos la información del estudiante y su foto desde el hook useEstudiante
-  const { foto, estudiante } = useEstudiante();
+  const { estudiante } = useEstudiante();
+  const [fotoError, setFotoError] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFotoError(false);
+  }, [estudiante?.codigoEstudiante]);
 
   return (
     <div
       className="
-            bg-white flex justify-center items-center gap-36 p-5 
-            shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg w-full 
-              max-[1000px]:flex-wrap max-[1000px]:justify-center max-[1000px]:gap-6 
-              max-[800px]:flex-wrap max-[800px]:justify-center max-[800px]:gap-6 
-            max-[420px]:flex-col max-[420px]:items-center max-[420px]:p-2 max-[420px]:gap-2
+            bg-white flex gap-6 p-5 
+            shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg w-full
+            max-[1000px]:flex-col
+            max-[800px]:flex-col
+            max-[420px]:flex-col max-[420px]:p-2
         "
     >
-      <div
-        className="
-                min-w-55 text-start text-[#30545b] 
-                  max-[1000px]:flex-[1_1_320px] max-[1000px]:min-w-70 
-                  max-[800px]:flex-[1_1_320px] max-[800px]:min-w-70 
-                max-[420px]:w-full max-[420px]:min-w-full max-[420px]:text-left
-            "
-      >
+      {/* Contenedor información: Título + Datos */}
+      <div className="flex-1 flex flex-col gap-4">
         <Titulo titulo="Información del Estudiante" alineado={1} />
-        <p className="mt-2.5 mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <span>
-            <strong>Estudiante:</strong>
-          </span>{" "}
-          <span>{estudiante?.Nombre}</span>
-        </p>
-        <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <span>
-            <strong>Código Estudiante:</strong>
-          </span>{" "}
-          <span>{estudiante?.CodigoEstudiante}</span>
-        </p>
-        <p className="mb-2 wrap-break-word max-[420px]:text-sm max-[420px]:mb-1 max-[420px]:leading-[1.3]">
-          <span>
-            <strong>Correo:</strong>
-          </span>{" "}
-          <span>{estudiante?.Correo}</span>
-        </p>
+
+        <div className="grid grid-cols-2 gap-4 gap-y-3">
+          <div className="flex flex-col text-[#30545b]">
+            <span className="font-semibold text-sm">Estudiante</span>
+            <span className="text-sm break-words">
+              {estudiante?.nombreCompleto ?? "N/A"}
+            </span>
+          </div>
+          <div className="flex flex-col text-[#30545b]">
+            <span className="font-semibold text-sm">Código Estudiante</span>
+            <span className="text-sm">
+              {estudiante?.codigoEstudiante ?? "N/A"}
+            </span>
+          </div>
+          <div className="flex flex-col text-[#30545b]">
+            <span className="font-semibold text-sm">Carrera</span>
+            <span className="text-sm break-words">
+              {estudiante?.carreraNombre ?? "N/A"}
+            </span>
+          </div>
+          <div className="flex flex-col text-[#30545b]">
+            <span className="font-semibold text-sm">Código Carrera</span>
+            <span className="text-sm">
+              {estudiante?.carreraCodigo ?? "N/A"}
+            </span>
+          </div>
+          <div className="flex flex-col text-[#30545b]">
+            <span className="font-semibold text-sm">País</span>
+            <span className="text-sm">{estudiante?.pais ?? "N/A"}</span>
+          </div>
+          <div className="flex flex-col text-[#30545b]">
+            <span className="font-semibold text-sm">Año de Carrera</span>
+            <span className="text-sm">{estudiante?.carreraAnio ?? "N/A"}</span>
+          </div>
+        </div>
       </div>
 
-      <div
-        className="
-                min-w-45 max-[1000px]:flex justify-center items-center
-                max-[1000px]:-order-1 max-[1000px]:w-full
-                max-[800px]:flex
-                max-[800px]:-order-1 max-[800px]:w-full max-[420px]:min-w-auto
-            "
-      >
+      {/* Contenedor foto: Lado derecho */}
+      <div className="flex-shrink-0 flex justify-center items-start max-[1000px]:justify-center max-[800px]:justify-center max-[420px]:justify-center">
         <Image
-          src={foto ? `data:image/jpeg;base64,${foto}` : user}
+          src={
+            estudiante?.fotografiaUrl && !fotoError
+              ? `/api/estudiantes/fotoProxy?u=${encodeURIComponent(
+                  estudiante.fotografiaUrl,
+                )}`
+              : user
+          }
           alt="Foto del estudiante"
           width={200}
+          onError={() => setFotoError(true)}
           height={200}
           className="
-                        w-40 h-40 object-cover rounded-full shadow-md 
-                          max-[1000px]:w-40 max-[1000px]:h-40 
-                          max-[800px]:w-40 max-[800px]:h-40 
-                          max-[420px]:w-30 max-[420px]:h-30
-                    "
+            w-40 h-40 object-cover rounded-full shadow-md 
+            max-[1000px]:w-40 max-[1000px]:h-40 
+            max-[800px]:w-40 max-[800px]:h-40 
+            max-[420px]:w-30 max-[420px]:h-30
+          "
         />
       </div>
     </div>

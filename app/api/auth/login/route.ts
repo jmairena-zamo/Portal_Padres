@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
     const isAdminRole =
       rolNombre && adminNames.includes(rolNombre.trim().toLowerCase());
 
-    const bannerID = isAdminRole ? null : 1;
+    const bannerID = isAdminRole ? null : 27027;
 
     const saveData = {
       id: usuario.iD_UserEmail,

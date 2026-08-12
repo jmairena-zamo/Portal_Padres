@@ -57,7 +57,7 @@ export const quejaSchema = z.object({
 export const menuSchema = z.object({
   opcion: z
     .string()
-    .min(5)
+    .min(1)
     .max(40)
     .regex(/^[^<>{}[\]\\|]+$/),
   posicion: z.coerce.number().min(0),

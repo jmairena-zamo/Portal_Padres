@@ -6,7 +6,7 @@ import { IconType } from "react-icons";
 interface CardCausalProps {
   icono: IconType;
   label: string;
-  valor: number;
+  valor?: number | string;
   color: string;
 }
 

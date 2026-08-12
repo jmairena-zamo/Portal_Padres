@@ -20,15 +20,19 @@ interface Props {
 }
 
 export const Navbar = ({ colapsado, onSuplantar }: Props) => {
-  const { hijos, hijoActivo, seleccionarEstudiante, foto } = useEstudiante();
+  const { hijos, hijoActivo, seleccionarEstudiante, estudiante } =
+    useEstudiante();
 
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { esAdmin } = useRol();
   const tieneVariosHijos = !esAdmin && hijos.length > 1;
+  const [fotoError, setFotoError] = useState(false);
 
   // Cerrar el dropdown si se hace click fuera de él
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFotoError(false);
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setDropdownAbierto(false);
@@ -112,9 +116,16 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
 
             {/* Avatar */}
             <Image
-              src={foto ? `data:image/jpeg;base64,${foto}` : user}
+              src={
+                estudiante?.fotografiaUrl && !fotoError
+                  ? `/api/estudiantes/fotoProxy?u=${encodeURIComponent(
+                      estudiante.fotografiaUrl,
+                    )}`
+                  : user
+              }
               alt="Logo usuario"
               width={40}
+              onError={() => setFotoError(true)}
               height={40}
               className={[
                 "w-10 h-10 object-cover rounded-full max-[800px]:w-10 max-[800px]:h-10 max-[420px]:w-8 max-[420px]:h-8",

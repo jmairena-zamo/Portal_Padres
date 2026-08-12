@@ -5,12 +5,12 @@
 "use client";
 import Image from "next/image";
 import user from "../../img/logo-user.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaExclamationTriangle,
-  FaExclamationCircle,
+  // FaExclamationCircle,
   FaExclamation,
-  FaClock,
+  // FaClock,
   FaUniversity,
   FaBookOpen,
   FaLaptopCode,
@@ -20,28 +20,39 @@ import {
   CardCausal,
   ClaseAprenderHaciendo,
   Decanatura,
+  Loading,
   TecnologiasInformacion,
 } from "@/app/components/ui";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 export default function ResumenEstudiante() {
-  const [porcentaje] = useState(20.88);
-  const promedio = 88.88;
-
   // Hook personalizado para obtener información del estudiante
-  const { foto, estudiante, faltasTotales, faltasTotalesAnio, categoriaDisc } =
-    useEstudiante();
+  const { estudiante } = useEstudiante();
 
   // Constantes para capsulas informativas
   const [decanatura, setDecanatura] = useState<boolean>(false);
   const [claseAH, setClaseAH] = useState<boolean>(false);
   const [tecnologias, setTecnologias] = useState<boolean>(false);
 
-  // Datos para el gráfico de promedio global
-  const data = [{ id: 1, name: "promedio", value: promedio }];
-
   // if (cargando) return <Loading />;
+  const [fotoError, setFotoError] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
+  // Mostrar loading de 1 segundo al cambiar de estudiante
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsTransitioning(true);
+
+    setFotoError(false);
+
+    const timer = setTimeout(() => {
+      setIsTransitioning(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [estudiante?.codigoEstudiante]);
+
+  if (isTransitioning) return <Loading />;
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
       {/* fila 1 */}
@@ -53,9 +64,16 @@ export default function ResumenEstudiante() {
           <br />
           <div className="flex justify-center">
             <Image
-              src={foto ? `data:image/jpeg;base64,${foto}` : user}
-              alt="Logo usuario"
+              src={
+                estudiante?.fotografiaUrl && !fotoError
+                  ? `/api/estudiantes/fotoProxy?u=${encodeURIComponent(
+                      estudiante.fotografiaUrl,
+                    )}`
+                  : user
+              }
+              alt={estudiante?.nombreCompleto ?? "Foto estudiante"}
               width={150}
+              onError={() => setFotoError(true)}
               height={150}
               className="
                         w-37.5 h-37.5 object-cover rounded-full shadow-[0px_1px_5px_rgba(0,0,0,0.2)]
@@ -67,13 +85,18 @@ export default function ResumenEstudiante() {
           </div>
           <br />
           <h4>
-            <strong>Estudiante:</strong> {estudiante?.Nombre}
+            <strong>Estudiante:</strong> {estudiante?.nombreCompleto ?? "N/A"}
           </h4>
           <h4>
-            <strong>Codigo Estudiante:</strong> {estudiante?.CodigoEstudiante}
+            <strong>Código Estudiante:</strong>{" "}
+            {estudiante?.codigoEstudiante ?? "N/A"}
           </h4>
           <h4>
-            <strong>Carrera:</strong> {estudiante?.Carrera}
+            <strong>Carrera:</strong> {estudiante?.carreraNombre ?? "N/A"}
+          </h4>
+          <h4>
+            <strong>Código Carrera:</strong>{" "}
+            {estudiante?.carreraCodigo ?? "N/A"}
           </h4>
         </div>
 
@@ -93,7 +116,13 @@ export default function ResumenEstudiante() {
                   innerRadius="70%"
                   outerRadius="100%"
                   barSize={9}
-                  data={data}
+                  data={[
+                    {
+                      id: 1,
+                      name: "promedio",
+                      value: estudiante?.promedioGlobal,
+                    },
+                  ]}
                 >
                   <PolarAngleAxis
                     type="number"
@@ -103,7 +132,10 @@ export default function ResumenEstudiante() {
                   <RadialBar dataKey="value" cornerRadius={10} fill="#048047" />
                 </RadialBarChart>
                 <span className="font-bold text-[24px] text-[#048047]">
-                  {promedio}%
+                  {estudiante?.promedioGlobal
+                    ? estudiante.promedioGlobal
+                    : "N/A"}{" "}
+                  %
                 </span>
               </div>
             </div>
@@ -123,7 +155,13 @@ export default function ResumenEstudiante() {
                   innerRadius="70%"
                   outerRadius="100%"
                   barSize={9}
-                  data={data}
+                  data={[
+                    {
+                      id: 1,
+                      name: "promedio",
+                      value: estudiante?.promedioTrimestre,
+                    },
+                  ]}
                 >
                   <PolarAngleAxis
                     type="number"
@@ -133,7 +171,10 @@ export default function ResumenEstudiante() {
                   <RadialBar dataKey="value" cornerRadius={10} fill="#048047" />
                 </RadialBarChart>
                 <span className="font-bold text-[24px] text-[#048047]">
-                  {promedio}%
+                  {estudiante?.promedioTrimestre
+                    ? estudiante.promedioTrimestre
+                    : "N/A"}{" "}
+                  %
                 </span>
               </div>
             </div>
@@ -147,11 +188,20 @@ export default function ResumenEstudiante() {
               <div className="w-full h-3 bg-[#e5e7eb] rounded-[10px] overflow-hidden">
                 <div
                   className="h-full bg-[#048047] rounded-[10px] transition-[width] duration-400 ease-in-out"
-                  style={{ width: `${porcentaje}%` }}
+                  style={{
+                    width: `${
+                      typeof estudiante?.porcentajeCarrera === "string"
+                        ? parseFloat(estudiante.porcentajeCarrera) || 0
+                        : estudiante?.porcentajeCarrera || 0
+                    }%`,
+                  }}
                 />
               </div>
               <span className="text-[20px] font-bold text-[#048047]">
-                {porcentaje}%
+                {typeof estudiante?.porcentajeCarrera === "string"
+                  ? estudiante.porcentajeCarrera
+                  : estudiante?.porcentajeCarrera || "N/A"}{" "}
+                %
               </span>
             </div>
           </div>
@@ -161,41 +211,41 @@ export default function ResumenEstudiante() {
       {/* fila 2 */}
       <div className="flex flex-wrap gap-4 w-full max-[420px]:flex-col">
         {/* causales de sanción */}
-        <div className="flex-[1_1_300px] bg-[#ffffff] p-4 rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.2)]">
+        <div className="flex-[1_1_200px] bg-[#ffffff] p-4 rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.2)]">
           <h3 className="text-center font-semibold text-[#173426]">
             CAUSALES DE SANCIÓN
           </h3>
           <hr className="my-2" />
-          <div className="grid grid-cols-2 gap-3 mt-4 max-[420px]:grid-cols-1">
+          <div className="grid grid-cols-1 gap-3 mt-4 max-[420px]:grid-cols-1">
             <CardCausal
               icono={FaExclamationTriangle}
               color="#dc2626"
               label="FALTAS TOTALES:"
-              valor={faltasTotales}
+              valor={estudiante?.totalFaltasHistorial ?? "N/A"}
             />
-            <CardCausal
+            {/* <CardCausal
               icono={FaExclamationCircle}
               color="#ea580c"
               label="FALTAS DEL AÑO ACTUAL:"
               valor={faltasTotalesAnio}
-            />
+            /> */}
             <CardCausal
               icono={FaExclamation}
               color="#ca8a04"
               label="FALTAS DEL PERIODO:"
-              valor={0}
+              valor={estudiante?.totalFaltasPeriodo ?? "N/A"}
             />
-            <CardCausal
+            {/* <CardCausal
               icono={FaClock}
               color="#2563eb"
               label="FALTAS EN PROCESO:"
               valor={2}
-            />
+            /> */}
           </div>
         </div>
 
         {/* stats */}
-        <div className="flex-[1_1_200px] bg-[#ffffff] p-4 rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.2)]">
+        <div className="flex-[1_1_300px] bg-[#ffffff] p-4 rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.2)]">
           <h3 className="text-center font-semibold text-[#173426]">
             DATOS ACADÉMICOS AL ÚLTIMO PERIODO
           </h3>
@@ -206,30 +256,45 @@ export default function ResumenEstudiante() {
               <p className="text-[10px]  font-medium leading-tight">
                 POSICIÓN CLASE
               </p>
-              <p className="text-[15px] font-bold mt-1">238/275</p>
+              <p className="text-[15px] font-bold mt-1">
+                {estudiante?.claseRanking ?? 0}/{estudiante?.claseTotal ?? 0}
+              </p>
             </div>
             <div className="text-center bg-linear-to-r from-green-50 via-white to-green-50 shadow-md rounded-lg border border-green-100 p-2">
               <p className="text-[10px] font-medium leading-tight">
                 POSICIÓN CARRERA
               </p>
-              <p className="text-[15px] font-bold mt-1">35/40</p>
+              <p className="text-[15px] font-bold mt-1">
+                {estudiante?.carreraRanking ?? 0}/
+                {estudiante?.carreraTotal ?? 0}
+              </p>
             </div>
             <div className="text-center bg-linear-to-r from-green-50 via-white to-green-50 shadow-md rounded-lg border border-green-100 p-2">
               <p className="text-[10px] font-medium leading-tight">
                 POSICIÓN PAÍS
               </p>
-              <p className="text-[15px] font-bold mt-1">34/36</p>
+              <p className="text-[15px] font-bold mt-1">
+                {estudiante?.paisRanking ?? 0}/{estudiante?.paisTotal ?? 0}
+              </p>
             </div>
           </div>
 
           {/* Categorías disciplinarias */}
-          <div className="flex flex-col justify-center mt-8">
+          <div className="flex flex-col gap-1.5 justify-center mt-5">
             <div className="flex items-center justify-between text-sm">
               <span className="text-[#30545b]">
-                <strong>CAT. DISCIPLINARIA</strong>
+                <strong>CAT. DISCIPLINARIA HISTORIAL</strong>
               </span>
               <span className="font-bold text-[14px] px-2 py-0.5 rounded-full border border-[#43C302] text-[#30545b]">
-                {categoriaDisc}
+                {estudiante?.categoriaDisciplinariaHistorial ?? "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-[#30545b]">
+                <strong>CAT. DISCIPLINARIA PERIODO</strong>
+              </span>
+              <span className="font-bold text-[14px] px-2 py-0.5 rounded-full border border-[#43C302] text-[#30545b]">
+                {estudiante?.categoriaDisciplinariaPeriodo ?? "N/A"}
               </span>
             </div>
           </div>

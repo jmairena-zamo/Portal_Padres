@@ -4,6 +4,33 @@
 // Reemplazar por el fetch() real cuando el API esté disponible
 
 export interface infoEstudiante {
+  codigoEstudiante: string;
+  nombreCompleto: string;
+  carreraCodigo: string;
+  carreraNombre: string;
+  anio: number;
+  periodo: number;
+  carreraAnio?: number;
+  totalFaltasPeriodo?: number;
+  categoriaDisciplinariaPeriodo?: string;
+  totalFaltasHistorial?: number;
+  categoriaDisciplinariaHistorial?: string;
+  porcentajeCarrera: string;
+  promedioGlobal: number;
+  promedioTrimestre: number;
+  clase: number;
+  claseRanking: number;
+  claseTotal: number;
+  carrera: string;
+  carreraRanking: number;
+  carreraTotal: number;
+  pais: string;
+  paisRanking: number;
+  paisTotal: number;
+  fotografiaUrl: string;
+}
+
+export interface inforestud {
   bannerID: number;
   Nombre: string;
   CodigoEstudiante: number;
@@ -17,7 +44,13 @@ export interface InfoEstudianteResponse {
   response: infoEstudiante;
 }
 
-export const inforEstudiante: InfoEstudianteResponse = {
+export interface InfoEstudianteResponse2 {
+  status: number;
+  message: string;
+  response: inforestud;
+}
+
+export const inforEstudiante: InfoEstudianteResponse2 = {
   status: 200,
   message: "Proceso exitoso",
   response: {
@@ -32,7 +65,7 @@ export const inforEstudiante: InfoEstudianteResponse = {
 export interface ListaEstudiantesResponse {
   status: number;
   message: string;
-  response: infoEstudiante[];
+  response: inforestud[];
 }
 
 export const listaEstudiantes: ListaEstudiantesResponse = {
