@@ -23,11 +23,9 @@ export const InformacionEstudiante = () => {
   return (
     <div
       className="
-            bg-white flex gap-6 p-5 
+            bg-white flex flex-col-reverse gap-6 px-2 py-5
             shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg w-full
-            max-[1000px]:flex-col
-            max-[800px]:flex-col
-            max-[420px]:flex-col max-[420px]:p-2
+            sm:flex-col sm:px-35 sm:flex-row
         "
     >
       {/* Contenedor información: Título + Datos */}
@@ -71,7 +69,7 @@ export const InformacionEstudiante = () => {
       </div>
 
       {/* Contenedor foto: Lado derecho */}
-      <div className="flex-shrink-0 flex justify-center items-start max-[1000px]:justify-center max-[800px]:justify-center max-[420px]:justify-center">
+      <div className="flex-shrink-0 flex justify-center items-center max-[1000px]:justify-center max-[800px]:justify-center max-[420px]:justify-center">
         <Image
           src={
             estudiante?.fotografiaUrl && !fotoError

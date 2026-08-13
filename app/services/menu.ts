@@ -55,7 +55,7 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
     "HISTORIAL DISCIPLINARIO": "/historialdisciplinario",
     DOCUMENTOS: "/documentos",
     "QUEJAS O SUGERENCIAS": "/quejasosugerencias",
-    ADMINISTRACION: "/administracion",
+    ADMINISTRACIÓN: "/administracion",
   };
 
   try {

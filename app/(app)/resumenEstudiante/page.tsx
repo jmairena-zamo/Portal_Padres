@@ -85,18 +85,18 @@ export default function ResumenEstudiante() {
           </div>
           <br />
           <h4>
-            <strong>Estudiante:</strong> {estudiante?.nombreCompleto ?? "N/A"}
+            <strong>Estudiante:</strong> {estudiante?.nombreCompleto ?? "N/A"} (
+            {estudiante?.codigoEstudiante ?? "N/A"})
           </h4>
           <h4>
-            <strong>Código Estudiante:</strong>{" "}
-            {estudiante?.codigoEstudiante ?? "N/A"}
+            <strong>Carrera:</strong> {estudiante?.carreraNombre ?? "N/A"} (
+            {estudiante?.carreraCodigo ?? "N/A"})
           </h4>
           <h4>
-            <strong>Carrera:</strong> {estudiante?.carreraNombre ?? "N/A"}
+            <strong>Pais:</strong> {estudiante?.pais ?? "N/A"}
           </h4>
           <h4>
-            <strong>Código Carrera:</strong>{" "}
-            {estudiante?.carreraCodigo ?? "N/A"}
+            <strong>Clase:</strong> {estudiante?.clase ?? "N/A"}
           </h4>
         </div>
 
@@ -129,9 +129,28 @@ export default function ResumenEstudiante() {
                     domain={[0, 100]}
                     tick={false}
                   />
-                  <RadialBar dataKey="value" cornerRadius={10} fill="#048047" />
+                  <RadialBar
+                    dataKey="value"
+                    cornerRadius={10}
+                    fill={
+                      (estudiante?.promedioGlobal ?? 0) >= 70
+                        ? (estudiante?.promedioGlobal ?? 0) >= 85
+                          ? "#048047"
+                          : "#ffd900"
+                        : "#dc2626"
+                    }
+                  />
                 </RadialBarChart>
-                <span className="font-bold text-[24px] text-[#048047]">
+                <span
+                  className={[
+                    "font-bold text-[24px]",
+                    (estudiante?.promedioGlobal ?? 0) >= 70
+                      ? (estudiante?.promedioGlobal ?? 0) >= 85
+                        ? "text-[#048047]"
+                        : "text-[#ffd900]"
+                      : "text-[#dc2626]",
+                  ].join(" ")}
+                >
                   {estudiante?.promedioGlobal
                     ? estudiante.promedioGlobal
                     : "N/A"}{" "}
@@ -168,9 +187,28 @@ export default function ResumenEstudiante() {
                     domain={[0, 100]}
                     tick={false}
                   />
-                  <RadialBar dataKey="value" cornerRadius={10} fill="#048047" />
+                  <RadialBar
+                    dataKey="value"
+                    cornerRadius={10}
+                    fill={
+                      (estudiante?.promedioTrimestre ?? 0) >= 70
+                        ? (estudiante?.promedioTrimestre ?? 0) >= 85
+                          ? "#048047"
+                          : "#ffd900"
+                        : "#dc2626"
+                    }
+                  />
                 </RadialBarChart>
-                <span className="font-bold text-[24px] text-[#048047]">
+                <span
+                  className={[
+                    "font-bold text-[24px]",
+                    (estudiante?.promedioTrimestre ?? 0) >= 70
+                      ? (estudiante?.promedioTrimestre ?? 0) >= 85
+                        ? "text-[#048047]"
+                        : "text-[#ffd900]"
+                      : "text-[#dc2626]",
+                  ].join(" ")}
+                >
                   {estudiante?.promedioTrimestre
                     ? estudiante.promedioTrimestre
                     : "N/A"}{" "}
@@ -283,7 +321,7 @@ export default function ResumenEstudiante() {
           <div className="flex flex-col gap-1.5 justify-center mt-5">
             <div className="flex items-center justify-between text-sm">
               <span className="text-[#30545b]">
-                <strong>CAT. DISCIPLINARIA HISTORIAL</strong>
+                <strong>CAT. DISCIPLINARIA HISTORICA</strong>
               </span>
               <span className="font-bold text-[14px] px-2 py-0.5 rounded-full border border-[#43C302] text-[#30545b]">
                 {estudiante?.categoriaDisciplinariaHistorial ?? "N/A"}

@@ -170,8 +170,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
               />
               {!colapsado && (
                 <>
-                  <p className="text-[10px]">{email}</p>
-                  <p className="text-[10px]">Nombre Usuario</p>
+                  <p className="text-[10px] mt-4">{email}</p>
                 </>
               )}
             </div>
@@ -275,7 +274,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
             onClick={handleLogout}
             title={colapsado ? "Cerrar Sesión" : ""}
             className={[
-              "flex items-end gap-2 p-1.25 bg-transparent border-none text-[#FFF4E5] cursor-pointer",
+              "flex items-end gap-2 p-1.25 bg-transparent border-none text-[#FFF4E5] text-md cursor-pointer",
               "hover:bg-[#FFF4E5] hover:text-[rgb(40,100,48)] hover:w-full hover:px-2.5",
               "hover:justify-center hover:rounded-[5px] hover:font-bold",
               "transition-all duration-200",
@@ -284,7 +283,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
               .filter(Boolean)
               .join(" ")}
           >
-            {!colapsado && "Cerrar Sesion"}
+            {!colapsado && "CERRAR SESIÓN"}
             <FaSignOutAlt size={25} />
           </button>
         </div>
