@@ -27,32 +27,23 @@ import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 export default function ResumenEstudiante() {
   // Hook personalizado para obtener información del estudiante
-  const { estudiante } = useEstudiante();
+  const { estudiante, cargando } = useEstudiante();
 
   // Constantes para capsulas informativas
   const [decanatura, setDecanatura] = useState<boolean>(false);
   const [claseAH, setClaseAH] = useState<boolean>(false);
   const [tecnologias, setTecnologias] = useState<boolean>(false);
-
-  // if (cargando) return <Loading />;
   const [fotoError, setFotoError] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Mostrar loading de 1 segundo al cambiar de estudiante
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsTransitioning(true);
-
     setFotoError(false);
+  }, [estudiante]);
 
-    const timer = setTimeout(() => {
-      setIsTransitioning(false);
-    }, 1000);
+  if (cargando || !estudiante) {
+    return <Loading texto="Cargando estudiante..." />;
+  }
 
-    return () => clearTimeout(timer);
-  }, [estudiante?.codigoEstudiante]);
-
-  if (isTransitioning) return <Loading />;
   return (
     <div className="flex flex-col gap-4 p-4 max-[420px]:p-2">
       {/* fila 1 */}
@@ -73,8 +64,8 @@ export default function ResumenEstudiante() {
               }
               alt={estudiante?.nombreCompleto ?? "Foto estudiante"}
               width={150}
-              onError={() => setFotoError(true)}
               height={150}
+              onError={() => setFotoError(true)}
               className="
                         w-37.5 h-37.5 object-cover rounded-full shadow-[0px_1px_5px_rgba(0,0,0,0.2)]
                         max-[800px]:w-40 max-[800px]:h-40 

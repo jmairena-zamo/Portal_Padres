@@ -54,6 +54,7 @@ export const EstudianteProvider = ({
       { bannerID: 27027, Nombre: "ISABELA EUGENIA MARENCO GUTIÉRREZ" },
       { bannerID: 26029, Nombre: "CAMILO GUILLERMO MORALES PALACIOS" },
       { bannerID: 26024, Nombre: "ARIANA JASMIN REYES PINEDA" },
+      { bannerID: 27030, Nombre: "LUIS EDUARDO LORENZO ESPINAL" },
     ];
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -88,9 +89,6 @@ export const EstudianteProvider = ({
   const cargarEstudiante = useCallback(async () => {
     setCargando(true);
     try {
-      const inicio = Date.now();
-
-      // Se hacen varias peticiones al mismo tiempo
       const [resFoto, resInfo] = await Promise.all([
         fetch("/api/estudiantes/obtenerFoto"),
         fetch("/api/estudiantes/obtenerInfoGen"),
@@ -101,22 +99,12 @@ export const EstudianteProvider = ({
         resInfo.json(),
       ]);
 
-      // Se guardan los datos en las variables
       setFoto(dataFoto.foto ?? null);
 
-      // Procesar respuesta del ResumenEstudiante (contiene toda la info ahora)
-      if (dataInfo.response) {
-        const respuesta = dataInfo.response;
-        setEstudiante(respuesta);
-      }
-
-      const transcurrido = Date.now() - inicio;
-      const restante = 1000 - transcurrido;
-      if (restante > 0) {
-        await new Promise((resolve) => setTimeout(resolve, restante));
+      if (dataInfo?.response) {
+        setEstudiante(dataInfo.response);
       }
     } catch (error) {
-      // Si algo falla, se limpian los datos
       console.log("Error cargando información:", error);
       setFoto(null);
       setEstudiante(null);
