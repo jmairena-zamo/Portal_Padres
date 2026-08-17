@@ -22,12 +22,13 @@ import {
   Decanatura,
   Loading,
   TecnologiasInformacion,
+  Vacio,
 } from "@/app/components/ui";
 import { useEstudiante } from "@/app/hooks/useEstudiante";
 
 export default function ResumenEstudiante() {
   // Hook personalizado para obtener información del estudiante
-  const { estudiante, cargando } = useEstudiante();
+  const { estudiante, cargando, error } = useEstudiante();
 
   // Constantes para capsulas informativas
   const [decanatura, setDecanatura] = useState<boolean>(false);
@@ -40,8 +41,19 @@ export default function ResumenEstudiante() {
     setFotoError(false);
   }, [estudiante]);
 
-  if (cargando || !estudiante) {
+  if (cargando) {
     return <Loading texto="Cargando estudiante..." />;
+  }
+
+  if (error || !estudiante) {
+    return (
+      <Vacio
+        titulo="Ocurrio un error"
+        descripcion={
+          error ?? "No se pudo cargar la información del estudiante."
+        }
+      />
+    );
   }
 
   return (

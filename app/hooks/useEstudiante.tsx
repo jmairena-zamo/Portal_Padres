@@ -22,8 +22,8 @@ interface Hijo {
 // Tipo de dato que define todo lo que guardará y compartirá el contexto
 interface EstudianteContextType {
   cargando: boolean;
-  foto: string | null;
   estudiante: infoEstudiante | null;
+  error: string | null;
 
   hijos: Hijo[];
   hijoActivo: Hijo | null;
@@ -42,11 +42,11 @@ export const EstudianteProvider = ({
 }) => {
   // Constantes Información general
   const [cargando, setCargando] = useState<boolean>(false);
-  const [foto, setFoto] = useState<string | null>(null);
   const [estudiante, setEstudiante] = useState<infoEstudiante | null>(null);
 
   const [hijos, setHijos] = useState<Hijo[]>([]);
   const [hijoActivo, setHijoActivo] = useState<Hijo | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Al iniciar, se cargan unos hijos de prueba
   useEffect(() => {
@@ -89,24 +89,23 @@ export const EstudianteProvider = ({
   const cargarEstudiante = useCallback(async () => {
     setCargando(true);
     try {
-      const [resFoto, resInfo] = await Promise.all([
-        fetch("/api/estudiantes/obtenerFoto"),
-        fetch("/api/estudiantes/obtenerInfoGen"),
-      ]);
+      const resInfo = await fetch("/api/estudiantes/obtenerInfoGen");
 
-      const [dataFoto, dataInfo] = await Promise.all([
-        resFoto.json(),
-        resInfo.json(),
-      ]);
+      const dataInfo = await resInfo.json();
 
-      setFoto(dataFoto.foto ?? null);
-
-      if (dataInfo?.response) {
-        setEstudiante(dataInfo.response);
+      if (
+        !resInfo.ok ||
+        !dataInfo?.response ||
+        typeof dataInfo.response !== "object"
+      ) {
+        setEstudiante(null);
+        setError(dataInfo?.error ?? "Estudiante no encontrado");
+        return;
       }
+
+      setEstudiante(dataInfo.response);
     } catch (error) {
       console.log("Error cargando información:", error);
-      setFoto(null);
       setEstudiante(null);
     } finally {
       setCargando(false);
@@ -117,14 +116,14 @@ export const EstudianteProvider = ({
   const value = useMemo(
     () => ({
       cargando,
-      foto,
       estudiante,
       hijoActivo,
       hijos,
+      error,
       seleccionarEstudiante,
       cargarEstudiante,
     }),
-    [cargando, foto, estudiante, hijoActivo, hijos, cargarEstudiante],
+    [cargando, estudiante, hijoActivo, hijos, error, cargarEstudiante],
   );
 
   // Se devuelve el proveedor del contexto

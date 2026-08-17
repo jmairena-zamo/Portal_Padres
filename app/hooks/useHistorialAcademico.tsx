@@ -22,7 +22,7 @@ const fetcher = async (url: string) => {
   const data = await res.json();
 
   // Se convierte la respuesta en lista de Historial Academico
-  return (data.response as CursoHistorial[]).map(mapearCurso);
+  return data.response as FilaHistorial[];
 };
 
 // Hook personalizado para manejar el historial academico
@@ -33,7 +33,9 @@ export function useHistorialAcademico() {
   // Se quita la validación automatica para que el Loading
   // no aparesca momentaneamente en la pantalla
   const { data, error, isLoading, mutate } = useSWR<FilaHistorial[]>(
-    hijoActivo ? "/api/estudiantes/obtenerHistorialAcademico" : null,
+    hijoActivo
+      ? `/api/estudiantes/obtenerHistorialAcademico?bannerID=${hijoActivo.bannerID}`
+      : null,
     fetcher,
     {
       revalidateOnFocus: false,

@@ -26,10 +26,13 @@ export async function GET(request: NextRequest) {
     const data = await res.json();
     console.log("Respuesta ResumenEstudiante:", data);
 
-    if (!res.ok) {
+    if (!res.ok || !data?.status || data?.status !== 200) {
       return NextResponse.json(
-        { error: data?.message ?? "Error desde API externa" },
-        { status: res.status },
+        {
+          error: data?.message ?? "Error desde API externa",
+          detalle: data?.response,
+        },
+        { status: res.ok ? 404 : res.status },
       );
     }
 

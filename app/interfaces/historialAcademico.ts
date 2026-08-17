@@ -39,25 +39,27 @@ export interface HistorialAcademicoResponse {
 }
 
 export interface FilaHistorial {
-  id: string;
+  codigoEstudiante: string;
   anio: string;
   periodo: string;
-  clase: string;
-  seccion: string;
-  codigo: string;
-  nota: string;
+  cursoCodigo: string;
+  cursoNombre: string;
+  calificacion: string;
+  letra: string;
+  creditos: string;
 }
 
 // Mapear los datos que vienen de la respuesta
-export function mapearCurso(curso: CursoHistorial): FilaHistorial {
+export function mapearCurso(curso: FilaHistorial): FilaHistorial {
   return {
-    id: curso.id,
-    anio: curso.term.slice(0, 4),
-    periodo: curso.termDescription.replace("C", ""), //eliminar la C de cuatrimestre
-    clase: curso.courseLongTitle,
-    seccion: curso.courseReferenceNumber,
-    codigo: curso.activityAcademic,
-    nota: parseFloat(curso.grade).toFixed(2),
+    codigoEstudiante: curso.codigoEstudiante,
+    anio: curso.anio,
+    periodo: curso.periodo,
+    cursoCodigo: curso.cursoCodigo,
+    cursoNombre: curso.cursoNombre,
+    calificacion: curso.calificacion,
+    letra: curso.letra,
+    creditos: curso.creditos,
   };
 }
 
