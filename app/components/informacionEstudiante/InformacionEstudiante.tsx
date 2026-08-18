@@ -25,7 +25,7 @@ export const InformacionEstudiante = () => {
       className="
             bg-white flex flex-col-reverse gap-6 px-2 py-5
             shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg w-full
-            sm:flex-col sm:px-35 sm:flex-row
+            sm:px-35 sm:flex-row
         "
     >
       {/* Contenedor información: Título + Datos */}

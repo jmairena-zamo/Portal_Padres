@@ -6,13 +6,7 @@
 
 import { InformacionEstudiante } from "@/app/components/informacionEstudiante/InformacionEstudiante";
 import { useCallback, useMemo, useState } from "react";
-import {
-  Buscador,
-  Loading,
-  Paginacion,
-  Titulo,
-  Vacio,
-} from "@/app/components/ui";
+import { Agrupar, Buscador, Loading, Titulo, Vacio } from "@/app/components/ui";
 import { FilaHistorial } from "@/app/interfaces/historialAcademico";
 import { useHistorialAcademico } from "@/app/hooks/useHistorialAcademico";
 
@@ -57,14 +51,14 @@ export default function HistorialAcademico() {
   }, []);
 
   // Función para cambiar cuántos registros se muestran por página
-  const handleCambiarRegistros = useCallback((cantidad: number) => {
-    setPaginacion({ registrosPorPagina: cantidad, paginaActual: 1 });
-  }, []);
+  // const handleCambiarRegistros = useCallback((cantidad: number) => {
+  //   setPaginacion({ registrosPorPagina: cantidad, paginaActual: 1 });
+  // }, []);
 
-  // Función para cambiar de página
-  const handleCambiarPagina = useCallback((pagina: number) => {
-    setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
-  }, []);
+  // // Función para cambiar de página
+  // const handleCambiarPagina = useCallback((pagina: number) => {
+  //   setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
+  // }, []);
 
   // Extraemos valores actuales de paginación y búsqueda
   const { paginaActual, registrosPorPagina } = paginacion;
@@ -75,7 +69,7 @@ export default function HistorialAcademico() {
   // Calculamos los índices para la paginación de datos
   const indexInicio = (paginaActual - 1) * registrosPorPagina;
   const indexFin = indexInicio + registrosPorPagina;
-  const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
+  // const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
   // Agrupar siempre sobre el conjunto completo de datos a mostrar
   // (ya sea resultados filtrados por búsqueda o el historial completo),
@@ -148,63 +142,13 @@ export default function HistorialAcademico() {
           <>
             <div className="mt-5 space-y-4">
               {gruposPaginados.map((grupo) => (
-                <section
+                <Agrupar
                   key={`${grupo.anio}-${grupo.periodo}`}
-                  className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 py-3 bg-slate-100 border-b border-slate-200">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                        Año
-                      </p>
-                      <h3 className="text-lg font-bold text-slate-800">
-                        {grupo.anio}
-                      </h3>
-                    </div>
-
-                    <div className="mt-2 sm:mt-0">
-                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                        Periodo
-                      </p>
-                      <span className="inline-flex items-center rounded-full bg-[#0f172a] px-3 py-1 text-sm font-medium text-white">
-                        {grupo.periodo}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="divide-y divide-slate-200">
-                    {grupo.clases.map((clase) => (
-                      <div
-                        key={`${clase.cursoCodigo}-${clase.cursoNombre}`}
-                        className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            {clase.cursoCodigo}
-                          </p>
-                          <p className="mt-1 text-base font-semibold text-slate-800">
-                            {clase.cursoNombre}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-3 sm:justify-end">
-                          <span className="text-sm text-slate-500">
-                            Nota final
-                          </span>
-                          <span
-                            className={`inline-flex min-w-[4.5rem] justify-center rounded-full px-2.5 py-1 text-sm font-bold ${
-                              Number(clase.calificacion) < 60
-                                ? "bg-red-100 text-red-700"
-                                : "bg-emerald-100 text-emerald-700"
-                            }`}
-                          >
-                            {clase.calificacion}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                  anio={grupo.anio}
+                  periodo={grupo.periodo}
+                  clases={grupo.clases}
+                  promedio={70}
+                />
               ))}
             </div>{" "}
           </>

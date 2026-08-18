@@ -137,9 +137,7 @@ export default function ResumenEstudiante() {
                     cornerRadius={10}
                     fill={
                       (estudiante?.promedioGlobal ?? 0) >= 70
-                        ? (estudiante?.promedioGlobal ?? 0) >= 85
-                          ? "#048047"
-                          : "#ffd900"
+                        ? "#048047"
                         : "#dc2626"
                     }
                   />
@@ -148,9 +146,7 @@ export default function ResumenEstudiante() {
                   className={[
                     "font-bold text-[24px]",
                     (estudiante?.promedioGlobal ?? 0) >= 70
-                      ? (estudiante?.promedioGlobal ?? 0) >= 85
-                        ? "text-[#048047]"
-                        : "text-[#ffd900]"
+                      ? "text-[#048047]"
                       : "text-[#dc2626]",
                   ].join(" ")}
                 >
@@ -194,21 +190,30 @@ export default function ResumenEstudiante() {
                     dataKey="value"
                     cornerRadius={10}
                     fill={
+                      // (estudiante?.promedioTrimestre ?? 0) >= 70
+                      //   ? (estudiante?.promedioTrimestre ?? 0) >= 85
+                      //     ? "#048047"
+                      //     : "#ffd900"
+                      //   : "#dc2626"
                       (estudiante?.promedioTrimestre ?? 0) >= 70
-                        ? (estudiante?.promedioTrimestre ?? 0) >= 85
-                          ? "#048047"
-                          : "#ffd900"
+                        ? "#048047"
                         : "#dc2626"
                     }
                   />
                 </RadialBarChart>
                 <span
+                  // className={[
+                  //   "font-bold text-[24px]",
+                  //   (estudiante?.promedioTrimestre ?? 0) >= 70
+                  //     ? (estudiante?.promedioTrimestre ?? 0) >= 85
+                  //       ? "text-[#048047]"
+                  //       : "text-[#ffd900]"
+                  //     : "text-[#dc2626]",
+                  // ].join(" ")}
                   className={[
                     "font-bold text-[24px]",
                     (estudiante?.promedioTrimestre ?? 0) >= 70
-                      ? (estudiante?.promedioTrimestre ?? 0) >= 85
-                        ? "text-[#048047]"
-                        : "text-[#ffd900]"
+                      ? "text-[#048047]"
                       : "text-[#dc2626]",
                   ].join(" ")}
                 >

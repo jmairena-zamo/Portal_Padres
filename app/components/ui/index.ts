@@ -20,6 +20,7 @@ import CardCausal from "./CardCausal";
 import { CardInfo } from "./CardInfo";
 import { Titulo } from "./Titulo";
 import { Label } from "./Label";
+import { Agrupar } from "./Agrupar";
 
 export {
   BtnPrimario,
@@ -45,4 +46,5 @@ export {
   CardInfo,
   Titulo,
   Label,
+  Agrupar,
 };
