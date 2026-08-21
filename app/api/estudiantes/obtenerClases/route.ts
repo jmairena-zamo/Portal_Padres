@@ -1,9 +1,7 @@
 // Creado por Diego Castro
 // Componente para obtener las clases del estudiante
-// Actualmente solo se realiza una simulación de las clases,
-// ya que no se tiene acceso a la API para obtener las clases reales del estudiante.
 
-import { ClasesPeriodo } from "@/app/interfaces/clases";
+import { API_URL_ZAMO } from "@/app/config/api";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -15,8 +13,29 @@ export async function GET(request: NextRequest) {
   }
 
   // Obtener id banner para obtener las clases del estudiante
-  const data = JSON.parse(session.value);
-  const bannerID = data.bannerID;
+  const datasession = JSON.parse(session.value);
+  const bannerID = datasession.bannerID;
 
-  return NextResponse.json(ClasesPeriodo);
+  try {
+    const res = await fetch(
+      `${API_URL_ZAMO}/padres/v1/Estudiante/CalificacionesActuales/${bannerID}`,
+    );
+
+    const data = await res.json();
+    console.log("Respuesta ClasesPeriodoActual:", data);
+
+    if (!res.ok) {
+      return NextResponse.json(
+        {
+          error: data?.message ?? "Error desde API externa",
+        },
+        { status: res.ok ? 404 : res.status },
+      );
+    }
+    // Retornar la respuesta oficial tal cual llega
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    console.error("Error obteniendo clases del periodo actual:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
 }

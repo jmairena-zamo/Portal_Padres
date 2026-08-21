@@ -43,16 +43,17 @@ export default function Clases() {
         ) : (
           <Tabla
             datos={clasesPeriodo}
-            keyExtractor={(item) => item.codigo}
-            claseFilaExtra={(item) =>
-              parseFloat(item.Nota) < 60 ? "bg-red-300" : ""
+            keyExtractor={(item) =>
+              `${item.anio} - ${item.periodo} - ${item.asignatura}`
             }
+            // claseFilaExtra={(item) =>
+            //   parseFloat(item.calificacion) < 60 ? "bg-red-300" : ""
+            // }
             columnas={[
-              { header: "Codigo", accessor: "codigo" },
-              { header: "Nombre Materia", accessor: "asignatura" },
-              { header: "Sección", accessor: "seccion" },
+              { header: "Año", accessor: "anio" },
               { header: "Periodo", accessor: "periodo" },
-              { header: "Nota", accessor: "Nota" },
+              { header: "Nombre Materia", accessor: "asignatura" },
+              { header: "Calificación", accessor: "calificacion" },
             ]}
           />
         )}

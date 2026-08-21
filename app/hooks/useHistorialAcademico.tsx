@@ -2,11 +2,7 @@
 // Estado para obtener el Historial Academico
 
 import useSWR from "swr";
-import {
-  CursoHistorial,
-  FilaHistorial,
-  mapearCurso,
-} from "../interfaces/historialAcademico";
+import { FilaHistorial } from "../interfaces/historialAcademico";
 import { useEstudiante } from "./useEstudiante";
 
 // Función para obtener el historial académico desde la API

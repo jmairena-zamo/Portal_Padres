@@ -1,22 +1,18 @@
 // Creado por Diego Castro
 // Obtener la información del historial academico del estudiante
-// Actualmente solo se realiza una simulación del historial academico,
-// ya que no se tiene acceso a la API para obtener el historial academico real del estudiante.
 
 import { API_URL_ZAMO } from "@/app/config/api";
-import { HistorialAcademico } from "@/app/interfaces/historialAcademico";
 import { NextRequest, NextResponse } from "next/server";
 
-//Aqui tiene que ir la logica real para obtener la información de
-// historial academico desde la api
-//const res = await fetch("URL_API")
 export async function GET(request: NextRequest) {
+  // Validar que exista sesion activa
   const session = request.cookies.get("session");
 
   if (!session) {
     return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
   }
 
+  // Obtener id banner para obtener las clases del estudiante
   const datasession = JSON.parse(session.value);
   const bannerID = datasession.bannerID;
 

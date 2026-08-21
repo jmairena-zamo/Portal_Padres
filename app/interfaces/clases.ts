@@ -19,23 +19,23 @@ export interface ClasesPeriodoResponse {
 }
 
 export interface FilaClase {
-  codigo: string;
-  asignatura: string;
-  seccion: string;
+  codigoEstudiante: string;
+  anio: string;
   periodo: string;
-  Nota: string;
+  asignatura: string;
+  calificacion: string;
 }
 
-export function mapearClasesPeriodo(curso: ClasesPeriodoActual): FilaClase {
-  const peri = `PERIODO ${curso.Anio} - ${curso.Periodo}`;
-  return {
-    codigo: curso.NRC,
-    asignatura: curso.Asignatura.substring(9, curso.Asignatura.length),
-    seccion: curso.CodigoAsignaturaB,
-    periodo: peri,
-    Nota: curso.Nota,
-  };
-}
+// export function mapearClasesPeriodo(curso: ClasesPeriodoActual): FilaClase {
+//   const peri = `PERIODO ${curso.Anio} - ${curso.Periodo}`;
+//   return {
+//     codigo: curso.NRC,
+//     asignatura: curso.Asignatura.substring(9, curso.Asignatura.length),
+//     seccion: curso.CodigoAsignaturaB,
+//     periodo: peri,
+//     Nota: curso.Nota,
+//   };
+// }
 
 export const ClasesPeriodo: ClasesPeriodoResponse = {
   status: 200,
