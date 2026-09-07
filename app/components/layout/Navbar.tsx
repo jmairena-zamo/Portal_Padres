@@ -109,7 +109,7 @@ export const Navbar = ({ colapsado, onSuplantar }: Props) => {
                   />
                 )}
                 <span className="max-[1000px]:text-[12px]">
-                  {hijoActivo.Nombre}
+                  {estudiante?.nombreCompleto ?? "N/A"}
                 </span>
               </button>
             )}

@@ -13,11 +13,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
   }
 
-  const datasession = JSON.parse(session.value);
-  console.log(datasession);
+  let bannerID: string;
+  try {
+    const usuarioData = JSON.parse(session.value);
+    bannerID = usuarioData.bannerID;
 
-  const bannerID = datasession.bannerID;
-  console.log(bannerID);
+    if (!bannerID) {
+      throw new Error("Datos de sesión incompletos");
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Sesión inválida o corrupta" },
+      { status: 401 },
+    );
+  }
+
   try {
     const res = await fetch(
       `${API_URL_ZAMO}/padres/v1/Estudiante/ResumenEstudiante/${bannerID}`,

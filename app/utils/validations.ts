@@ -64,9 +64,51 @@ export const menuSchema = z.object({
   icono: z.string().regex(/^[^<>{}[\]\\|]+$/),
 });
 
+export const updateMenuSchema = menuSchema.extend({
+  iD_Menu: z.number().min(1),
+  habilitado: z.number().min(0).max(1),
+});
+
 export const subMenuSchema = z.object({
   opcion: z.string().min(1),
   posicion: z.number().min(1),
+});
+
+export const updateSubMenuSchema = subMenuSchema.extend({
+  iD_SubMenu: z.number().min(1),
+  menu_ID: z.number().min(1),
+  habilitado: z.number().min(0).max(1),
+  estado: z.number().min(0).max(1),
+  icono: z.string().regex(/^[^<>{}[\]\\|]+$/),
+});
+
+export const asignarMenuRolSchema = z.object({
+  menu_ID: z.number().min(1),
+  rol_ID: z.number().min(1),
+});
+
+export const actualizarMenuRolSchema = z.object({
+  iD_Menu_Rol: z.number().min(1),
+  habilitado: z.number().min(0).max(1),
+});
+
+export const asignarsubMenuRolSchema = z.object({
+  subMenu_ID: z.number().min(1),
+  rol_ID: z.number().min(1),
+});
+
+export const eliminarMenuSchema = z.object({
+  iD_Menu: z
+    .number()
+    .min(1)
+    .positive("El ID del menú debe ser un número positivo"),
+});
+
+export const eliminarsubMenuSchema = z.object({
+  iD_SubMenu: z
+    .number()
+    .min(1)
+    .positive("El ID del submenu debe ser un número positivo"),
 });
 
 export const rolSchema = z.object({

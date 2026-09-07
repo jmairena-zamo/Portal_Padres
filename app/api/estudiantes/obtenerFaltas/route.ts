@@ -16,9 +16,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
   }
 
-  const data = JSON.parse(session.value);
+  let bannerID: string;
+  try {
+    const usuarioData = JSON.parse(session.value);
+    bannerID = usuarioData.bannerID;
 
-  const bannerID = data.bannerID;
+    if (!bannerID) {
+      throw new Error("Datos de sesión incompletos");
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Sesión inválida o corrupta" },
+      { status: 401 },
+    );
+  }
 
   const dataF = FaltasEstudiante;
   const categoriaDisciplinaria = dataF.response.categoriaDisciplinaria;

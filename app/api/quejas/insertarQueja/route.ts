@@ -20,12 +20,26 @@ export async function POST(request: NextRequest) {
   const session = request.cookies.get("session");
 
   if (!session) {
-    return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
+    return NextResponse.json({ error: "No hay sesion" }, { status: 401 });
   }
 
-  const usuarioData = JSON.parse(session.value);
-  const ID_UserEmail = usuarioData.id;
-  const usuario = usuarioData.email;
+  let ID_UserEmail: string;
+  let usuario: string;
+
+  try {
+    const usuarioData = JSON.parse(session.value);
+    ID_UserEmail = usuarioData.id;
+    usuario = usuarioData.email;
+
+    if (!ID_UserEmail || !usuario) {
+      throw new Error("Datos de sesión incompletos");
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Sesión inválida o corrupta" },
+      { status: 401 },
+    );
+  }
 
   // Crear la queja o sugerencia en la base de datos
   try {

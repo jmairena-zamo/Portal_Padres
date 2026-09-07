@@ -2,6 +2,7 @@
 // Actualiza los datos de un submenu existente
 
 import { API_URL } from "@/app/config/api";
+import { updateSubMenuSchema } from "@/app/utils/validations";
 import { NextResponse, NextRequest } from "next/server";
 
 //PUT /api/menu/actualizarSubMenu
@@ -19,8 +20,15 @@ export async function PUT(request: NextRequest) {
 
   //Se obtiene la peticion y se desestructura el body
   const body = await request.json();
+  const parsed = updateSubMenuSchema.safeParse(body);
+
+  if (!parsed.success) {
+    console.log("Error Zod:", parsed.error);
+    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+  }
+
   const { iD_SubMenu, opcion, posicion, menu_ID, habilitado, estado, icono } =
-    body;
+    parsed.data;
 
   //Se hace el llamado al endpoint de actualizar submenu
   const res = await fetch(`${API_URL}/submenu/Actualizar/${iD_SubMenu}`, {

@@ -13,8 +13,20 @@ export async function GET(request: NextRequest) {
   }
 
   // Obtener id banner para obtener las clases del estudiante
-  const datasession = JSON.parse(session.value);
-  const bannerID = datasession.bannerID;
+  let bannerID: string;
+  try {
+    const usuarioData = JSON.parse(session.value);
+    bannerID = usuarioData.bannerID;
+
+    if (!bannerID) {
+      throw new Error("Datos de sesión incompletos");
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Sesión inválida o corrupta" },
+      { status: 401 },
+    );
+  }
 
   try {
     const res = await fetch(

@@ -12,11 +12,23 @@ export async function POST(request: NextRequest) {
   const session = request.cookies.get("session");
 
   if (!session) {
-    return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
+    return NextResponse.json({ error: "No hay sesion" }, { status: 401 });
   }
 
-  const usuarioData = JSON.parse(session.value);
-  const usuario = usuarioData.email;
+  let usuario: string;
+  try {
+    const usuarioData = JSON.parse(session.value);
+    usuario = usuarioData.email;
+
+    if (!usuario) {
+      throw new Error("Datos de sesión incompletos");
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Sesión inválida o corrupta" },
+      { status: 401 },
+    );
+  }
 
   const body = await request.json();
 

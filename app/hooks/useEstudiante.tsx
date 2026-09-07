@@ -50,20 +50,24 @@ export const EstudianteProvider = ({
 
   // Al iniciar, se cargan unos hijos de prueba
   useEffect(() => {
-    const hijosMock = [
-      { bannerID: 27027, Nombre: "ISABELA EUGENIA MARENCO GUTIÉRREZ" },
-      { bannerID: 26029, Nombre: "CAMILO GUILLERMO MORALES PALACIOS" },
-      { bannerID: 26024, Nombre: "ARIANA JASMIN REYES PINEDA" },
-      { bannerID: 27030, Nombre: "LUIS EDUARDO LORENZO ESPINAL" },
-    ];
+    const inicializar = async () => {
+      const hijosMock = [
+        { bannerID: 27027, Nombre: "ISABELA EUGENIA MARENCO GUTIÉRREZ" },
+        { bannerID: 26029, Nombre: "CAMILO GUILLERMO MORALES PALACIOS" },
+        { bannerID: 26024, Nombre: "ARIANA JASMIN REYES PINEDA" },
+        { bannerID: 27030, Nombre: "LUIS EDUARDO LORENZO ESPINAL" },
+      ];
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHijos(hijosMock);
+      setHijos(hijosMock);
+      const session = await fetch("api/auth/session").then((res) => res.json());
+      const activo = hijosMock.find(
+        (hijo) => hijo.bannerID === session?.bannerID,
+      );
 
-    // Se selecciona el primer hijo por defecto
-    if (hijosMock.length > 0) {
-      setHijoActivo(hijosMock[0]);
-    }
+      // Se carga el primer hijo activo si no hay ninguno en sesión
+      setHijoActivo(activo ?? hijosMock[0]);
+    };
+    inicializar();
   }, []);
 
   // Cada vez que cambia el hijo activo, se cargan sus datos

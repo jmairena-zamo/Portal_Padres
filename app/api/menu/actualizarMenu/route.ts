@@ -2,6 +2,7 @@
 // Actualiza los datos de un menu existente
 
 import { API_URL } from "@/app/config/api";
+import { updateMenuSchema } from "@/app/utils/validations";
 import { NextResponse, NextRequest } from "next/server";
 
 //PUT /api/menu/actualizarMenu
@@ -11,15 +12,35 @@ export async function PUT(request: NextRequest) {
   const session = request.cookies.get("session");
 
   if (!session) {
-    return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
+    return NextResponse.json({ error: "No hay sesion" }, { status: 401 });
   }
 
-  const usuarioData = JSON.parse(session.value);
-  const usuario = usuarioData.email;
+  let usuario: string;
+  try {
+    const usuarioData = JSON.parse(session.value);
+    usuario = usuarioData.email;
+
+    if (!usuario) {
+      throw new Error("Datos de sesión incompletos");
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Sesión inválida o corrupta" },
+      { status: 401 },
+    );
+  }
 
   //Se obtiene la peticion y se desestructura el body
   const body = await request.json();
-  const { iD_Menu, opcion, posicion, habilitado, estado, icono } = body;
+
+  const parsed = updateMenuSchema.safeParse(body);
+
+  if (!parsed.success) {
+    console.log("Error Zod:", parsed.error);
+    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+  }
+
+  const { iD_Menu, opcion, posicion, habilitado, icono } = parsed.data;
 
   //Se hace el llamado al endpoint de actualizar menu
   const res = await fetch(`${API_URL}/menu/Actualizar/${iD_Menu}`, {
