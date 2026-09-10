@@ -199,17 +199,40 @@ export async function POST(request: NextRequest) {
 
     // Intentamos obtener el nombre del rol desde el API para no depender del id
     let rolNombre: string | null = null;
-    try {
-      const resRoles = await fetch(`${API_URL}/roles/Listar`);
-      if (resRoles.ok) {
-        const rolesData = await resRoles.json();
+    let bannerIDs: number[] = [];
+    const [rolList, hijosList] = await Promise.allSettled([
+      fetch(`${API_URL}/roles/Listar`),
+      fetch(`${API_URL}/intdetalle/ListarPorUsuario/${usuario.iD_UserEmail}`),
+    ]);
+    if (rolList.status === "fulfilled" && rolList.value.ok) {
+      try {
+        const rolesData = await rolList.value.json();
         const rolesList: { iD_Rol: number; rol: string }[] =
           rolesData.response || [];
         const match = rolesList.find((r) => r.iD_Rol === usuario.iD_Rol);
         rolNombre = match ? match.rol : null;
+      } catch (error) {
+        console.error("[login] Error parseando lista de roles:", error);
       }
-    } catch (err) {
-      console.error("[login] No se pudo obtener lista de roles:", err);
+    } else {
+      console.error("[login] No se pudo obtener lista de roles");
+    }
+
+    if (hijosList.status === "fulfilled" && hijosList.value.ok) {
+      try {
+        const hijosData = await hijosList.value.json();
+        if (Array.isArray(hijosData?.response)) {
+          bannerIDs = hijosData.response.map(
+            (item: { bannerID: number }) => item.bannerID,
+          );
+        }
+      } catch (err) {
+        console.error("[login] Error parseando ListarPorUsuario:", err);
+      }
+    } else {
+      console.error(
+        `[login] No se pudo obtener bannerIDs para el usuario ${usuario.iD_UserEmail}`,
+      );
     }
 
     // Si el rol corresponde a administrador (según nombre), bannerID es nulo
@@ -217,7 +240,7 @@ export async function POST(request: NextRequest) {
     const isAdminRole =
       rolNombre && adminNames.includes(rolNombre.trim().toLowerCase());
 
-    const bannerID = isAdminRole ? null : 27027;
+    const bannerID = isAdminRole ? null : (bannerIDs[0] ?? null);
 
     const saveData = {
       id: usuario.iD_UserEmail,

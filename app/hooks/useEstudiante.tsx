@@ -51,21 +51,32 @@ export const EstudianteProvider = ({
   // Al iniciar, se cargan unos hijos de prueba
   useEffect(() => {
     const inicializar = async () => {
-      const hijosMock = [
-        { bannerID: 27027, Nombre: "ISABELA EUGENIA MARENCO GUTIÉRREZ" },
-        { bannerID: 26029, Nombre: "CAMILO GUILLERMO MORALES PALACIOS" },
-        { bannerID: 26024, Nombre: "ARIANA JASMIN REYES PINEDA" },
-        { bannerID: 27030, Nombre: "LUIS EDUARDO LORENZO ESPINAL" },
-      ];
+      try {
+        const [resHijos, session] = await Promise.all([
+          fetch("/api/estudiantes/listarHijos").then((res) => res.json()),
+          fetch("api/auth/session").then((res) => res.json()),
+        ]);
 
-      setHijos(hijosMock);
-      const session = await fetch("api/auth/session").then((res) => res.json());
-      const activo = hijosMock.find(
-        (hijo) => hijo.bannerID === session?.bannerID,
-      );
+        if (!resHijos?.response || !Array.isArray(resHijos.response)) {
+          setError(resHijos?.error ?? "No se pudo cargar la lista de hijos");
+          setHijos([]);
+          setHijoActivo(null);
+          return;
+        }
 
-      // Se carga el primer hijo activo si no hay ninguno en sesión
-      setHijoActivo(activo ?? hijosMock[0]);
+        const hijosObtenidos: Hijo[] = resHijos.response;
+        setHijos(hijosObtenidos);
+
+        const activo = hijosObtenidos.find(
+          (hijo) => hijo.bannerID === session?.bannerID,
+        );
+
+        // Se carga el primer hijo activo si no hay ninguno en sesión
+        setHijoActivo(activo ?? hijosObtenidos[0] ?? null);
+      } catch (error) {
+        console.error("Error inicializando hijos:", error);
+        setError("No se pudo cargar la lista de hijos");
+      }
     };
     inicializar();
   }, []);
