@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
   }
 
+  // Validar y extraer los datos de la sesión
   let usuario: string;
   try {
     const usuarioData = JSON.parse(session.value);
@@ -32,8 +33,9 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const parsed = asignarMenuRolSchema.safeParse(body);
 
+  // Revalidación de los datos del body usando zod
+  const parsed = asignarMenuRolSchema.safeParse(body);
   if (!parsed.success) {
     console.log("Error Zod:", parsed.error);
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });

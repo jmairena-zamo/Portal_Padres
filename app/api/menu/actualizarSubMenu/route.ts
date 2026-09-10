@@ -15,13 +15,27 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "No hay sesion" }, { status: 400 });
   }
 
-  const usuarioData = JSON.parse(session.value);
-  const usuario = usuarioData.email;
+  // Validar y extraer los datos de la sesión
+  let usuario: string;
+  try {
+    const usuarioData = JSON.parse(session.value);
+    usuario = usuarioData.email;
 
-  //Se obtiene la peticion y se desestructura el body
+    if (!usuario) {
+      throw new Error("Datos de sesión incompletos");
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Sesión inválida o corrupta" },
+      { status: 401 },
+    );
+  }
+
+  //Se obtiene la peticion
   const body = await request.json();
-  const parsed = updateSubMenuSchema.safeParse(body);
 
+  // Revalidación de los datos del body usando zod
+  const parsed = updateSubMenuSchema.safeParse(body);
   if (!parsed.success) {
     console.log("Error Zod:", parsed.error);
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });

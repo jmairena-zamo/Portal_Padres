@@ -22,7 +22,7 @@ export default function Clases() {
     <div className="flex flex-col mt-3.75 mx-3.75 gap-3.75">
       <InformacionEstudiante />
       <div className="bg-white px-5 pt-5 pb-10 shadow-[0px_1px_5px_rgba(0,0,0,0.2)] rounded-lg mb-3.75">
-        <Titulo titulo={`Información academica, periodo actual`} alineado={3} />
+        <Titulo titulo={`Información académica, período actual`} alineado={3} />
         {/* Si hay error, mostramos mensaje; si no, mostramos la tabla */}
         {cargandoClases ? (
           <Loading />
@@ -48,7 +48,7 @@ export default function Clases() {
             // }
             columnas={[
               { header: "Año", accessor: "anio" },
-              { header: "Periodo", accessor: "periodo" },
+              { header: "Período", accessor: "periodo" },
               { header: "Nombre Materia", accessor: "asignatura" },
               { header: "Calificación", accessor: "calificacion" },
             ]}

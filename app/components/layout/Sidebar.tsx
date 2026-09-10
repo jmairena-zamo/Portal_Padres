@@ -15,7 +15,12 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { useState } from "react";
-import { iconos, generarRuta, getSubPath } from "@/app/services/menu";
+import {
+  iconos,
+  generarRuta,
+  getSubPath,
+  formatearNombre,
+} from "@/app/services/menu";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useSession } from "@/app/hooks/useSession";
 
@@ -42,7 +47,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
     const activo = pathname === path;
 
     return [
-      "w-full box-border flex items-center gap-2 px-2.5 py-[5px] rounded-[5px] text-xs no-underline transition-colors duration-200",
+      "w-full box-border flex items-center gap-2 px-2.5 py-[5px] rounded-[5px] text-md no-underline transition-colors duration-200",
       activo
         ? "font-bold bg-[#FFF4E5] text-[rgb(40,100,48)]"
         : "font-normal text-[#FFF4E5] hover:bg-white/10",
@@ -170,7 +175,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
               />
               {!colapsado && (
                 <>
-                  <p className="text-[10px] mt-4">{email}</p>
+                  <p className="text-[11px] mt-4">{email}</p>
                 </>
               )}
             </div>
@@ -204,14 +209,14 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                         className={[
                           "w-full bg-transparent border-none cursor-pointer",
                           "flex items-center gap-2 font-normal text-[#FFF4E5]",
-                          "px-2.5 py-1.25 text-xs",
+                          "px-2.5 py-1.25 text-md",
                           colapsado && "justify-center px-0 w-10",
                         ]
                           .filter(Boolean)
                           .join(" ")}
                       >
                         {Icono && <Icono size={20} />}
-                        {!colapsado && menu.opcion}
+                        {!colapsado && formatearNombre(menu.opcion)}
                         {!colapsado &&
                           (estaAbierto ? (
                             <FaChevronDown size={12} />
@@ -237,7 +242,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                                   onClick={cerrarSidebar}
                                   className={linkClass(subPath)}
                                 >
-                                  {sub.opcion}
+                                  {formatearNombre(sub.opcion)}
                                 </Link>
                               );
                             })}
@@ -253,7 +258,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
                       title={colapsado ? menu.opcion : ""}
                     >
                       {Icono && <Icono size={20} />}
-                      {!colapsado && menu.opcion}
+                      {!colapsado && formatearNombre(menu.opcion)}
                     </Link>
                   )}
                 </div>
@@ -283,7 +288,7 @@ export const Sidebar = ({ colapsado, onToggle }: Props) => {
               .filter(Boolean)
               .join(" ")}
           >
-            {!colapsado && "CERRAR SESIÓN"}
+            {!colapsado && "Cerrar Sesión"}
             <FaSignOutAlt size={25} />
           </button>
         </div>

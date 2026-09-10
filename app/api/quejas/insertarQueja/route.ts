@@ -8,6 +8,8 @@ import { API_URL } from "@/app/config/api";
 export async function POST(request: NextRequest) {
   // Obtener los datos del body de la solicitud
   const body = await request.json();
+
+  // Revalidación de los datos del body usando zod
   const parsed = quejaSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -26,6 +28,7 @@ export async function POST(request: NextRequest) {
   let ID_UserEmail: string;
   let usuario: string;
 
+  // Validar y extraer los datos de la sesión
   try {
     const usuarioData = JSON.parse(session.value);
     ID_UserEmail = usuarioData.id;

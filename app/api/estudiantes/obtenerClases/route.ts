@@ -33,8 +33,20 @@ export async function GET(request: NextRequest) {
       `${API_URL_ZAMO}/padres/v1/Estudiante/CalificacionesActuales/${bannerID}`,
     );
 
-    const data = await res.json();
-    console.log("Respuesta ClasesPeriodoActual:", data);
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      const textResponse = await res.text();
+      console.error("Error parsing JSON. Raw response:", textResponse);
+      return NextResponse.json(
+        {
+          error: "La API externa retornó una respuesta inválida",
+          detalle: textResponse,
+        },
+        { status: 502 },
+      );
+    }
 
     if (!res.ok) {
       return NextResponse.json(

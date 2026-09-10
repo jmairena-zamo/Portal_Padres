@@ -71,10 +71,10 @@ export function Agrupar(grupo: AgruparProps) {
             className={`inline-flex min-w-18 justify-center rounded-full px-2.5 py-1 text-sm font-bold ${
               grupo.promedio < 60
                 ? "bg-red-100 text-red-700"
-                : "bg-emerald-100 text-emerald-700"
+                : "bg-emerald-100 text-[#30545B]"
             }`}
           >
-            {grupo.promedio.toFixed(2)}
+            {grupo.promedio.toFixed(2)}%
           </span>
         </div>
       </div>

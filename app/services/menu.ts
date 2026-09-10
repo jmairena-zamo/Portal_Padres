@@ -40,6 +40,34 @@ export const iconos: Record<string, React.ElementType> = {
   FaUsers,
 };
 
+// Función auxiliar para buscar en el diccionario de manera case-insensitive
+const obtenerRuta = (
+  diccionario: Record<string, string>,
+  clave: string,
+): string | undefined => {
+  const claveLower = clave.toLowerCase();
+  for (const [key, value] of Object.entries(diccionario)) {
+    if (key.toLowerCase() === claveLower) {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+// Función auxiliar para convertir texto a Title Case
+// Convierte "RESUMEN ESTUDIANTE" a "Resumen Estudiante"
+export const formatearNombre = (texto: string): string => {
+  return texto
+    .toLowerCase()
+    .split(" ")
+    .map((palabra) =>
+      palabra.length > 2
+        ? palabra.charAt(0).toUpperCase() + palabra.slice(1)
+        : palabra,
+    )
+    .join(" ");
+};
+
 // Obtiene las rutas permitidas para un rol específico.
 // 1. Consulta los menús habilitados para el rol.
 // 2. Consulta los submenús habilitados.
@@ -51,7 +79,7 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
     "RESUMEN ESTUDIANTE": "/resumenestudiante",
     CLASES: "/clases",
     "ESTADO DE CUENTA": "/estadodecuenta",
-    "HISTORIAL ACADEMICO": "/historialacademico",
+    "HISTORIAL ACADÉMICO": "/historialacademico",
     "HISTORIAL DISCIPLINARIO": "/historialdisciplinario",
     DOCUMENTOS: "/documentos",
     "QUEJAS O SUGERENCIAS": "/quejasosugerencias",
@@ -87,7 +115,7 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
     for (const m of menus) {
       if (!m || m.habilitado !== 1) continue;
 
-      const ruta = rutasPorNombre[m.opcion.toUpperCase()];
+      const ruta = obtenerRuta(rutasPorNombre, m.opcion);
 
       if (ruta) {
         rutasMenus.push(ruta);
@@ -131,7 +159,7 @@ export const getRutasPermitidas = async (idRol: number): Promise<string[]> => {
         const menuPadre = menusMap.get(s.menu_ID);
         if (!menuPadre) continue;
 
-        const rutaPadre = rutasPorNombre[menuPadre.opcion.toUpperCase()];
+        const rutaPadre = obtenerRuta(rutasPorNombre, menuPadre.opcion);
         if (!rutaPadre) continue;
 
         rutasSubmenus.push(

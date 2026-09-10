@@ -25,10 +25,10 @@ const obtenerNumeroPeriodo = (periodo: string) => {
 
 export default function HistorialAcademico() {
   // Estado para manejar la paginación (qué página y cuántos registros mostrar)
-  const [paginacion, setPaginacion] = useState({
-    paginaActual: 1,
-    registrosPorPagina: 10,
-  });
+  // const [paginacion, setPaginacion] = useState({
+  //   paginaActual: 1,
+  //   registrosPorPagina: 10,
+  // });
 
   // Estado para manejar la búsqueda (si está activa y qué datos mostrar)
   const [busqueda, setBusqueda] = useState({
@@ -47,28 +47,18 @@ export default function HistorialAcademico() {
   // Función que se ejecuta cuando se hace una búsqueda
   const handleResultadoBusqueda = useCallback((resultados: FilaHistorial[]) => {
     setBusqueda({ dataFiltrada: resultados, busquedaActiva: true });
-    setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
+    // setPaginacion((prev) => ({ ...prev, paginaActual: 1 }));
   }, []);
 
-  // Función para cambiar cuántos registros se muestran por página
-  // const handleCambiarRegistros = useCallback((cantidad: number) => {
-  //   setPaginacion({ registrosPorPagina: cantidad, paginaActual: 1 });
-  // }, []);
-
-  // // Función para cambiar de página
-  // const handleCambiarPagina = useCallback((pagina: number) => {
-  //   setPaginacion((prev) => ({ ...prev, paginaActual: pagina }));
-  // }, []);
-
   // Extraemos valores actuales de paginación y búsqueda
-  const { paginaActual, registrosPorPagina } = paginacion;
+  // const { paginaActual, registrosPorPagina } = paginacion;
   const { dataFiltrada, busquedaActiva } = busqueda;
 
   const datosAMostrar = busquedaActiva ? dataFiltrada : historialAcademico;
 
   // Calculamos los índices para la paginación de datos
-  const indexInicio = (paginaActual - 1) * registrosPorPagina;
-  const indexFin = indexInicio + registrosPorPagina;
+  // const indexInicio = (paginaActual - 1) * registrosPorPagina;
+  // const indexFin = indexInicio + registrosPorPagina;
   // const datosPaginados = datosAMostrar.slice(indexInicio, indexFin);
 
   // Agrupar siempre sobre el conjunto completo de datos a mostrar
@@ -77,7 +67,7 @@ export default function HistorialAcademico() {
   const gruposPorAnioPeriodo = useMemo(() => {
     const grupos = new Map<
       string,
-      { anio: string; periodo: string; clases: FilaHistorial[] }
+      { anio: string; periodo: string; clases: FilaHistorial[]; promedio: number }
     >();
 
     datosAMostrar.forEach((fila) => {
@@ -93,18 +83,29 @@ export default function HistorialAcademico() {
         anio: fila.anio,
         periodo: fila.periodo,
         clases: [fila],
+        promedio: 0,
       });
     });
 
-    return [...grupos.values()].sort((a, b) => {
-      const anioDiferencia = Number(b.anio) - Number(a.anio);
-      if (anioDiferencia !== 0) return anioDiferencia;
-      return obtenerNumeroPeriodo(b.periodo) - obtenerNumeroPeriodo(a.periodo);
-    });
+    return [...grupos.values()]
+      .map((grupo) => ({
+        ...grupo,
+        promedio: grupo.clases.length
+          ? grupo.clases.reduce(
+              (suma, fila) => suma + Number(fila.calificacion || 0),
+              0,
+            ) / grupo.clases.length
+          : 0,
+      }))
+      .sort((a, b) => {
+        const anioDiferencia = Number(b.anio) - Number(a.anio);
+        if (anioDiferencia !== 0) return anioDiferencia;
+        return obtenerNumeroPeriodo(b.periodo) - obtenerNumeroPeriodo(a.periodo);
+      });
   }, [datosAMostrar]);
 
   // Paginar los grupos (en lugar de paginar filas antes de agrupar)
-  const gruposPaginados = gruposPorAnioPeriodo.slice(indexInicio, indexFin);
+  const gruposPaginados = gruposPorAnioPeriodo;
 
   // Verificamos si hay datos para mostrar
   const tieneData = datosAMostrar && datosAMostrar.length > 0;
@@ -147,7 +148,7 @@ export default function HistorialAcademico() {
                   anio={grupo.anio}
                   periodo={grupo.periodo}
                   clases={grupo.clases}
-                  promedio={70}
+                  promedio={grupo.promedio}
                 />
               ))}
             </div>{" "}

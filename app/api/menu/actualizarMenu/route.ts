@@ -15,6 +15,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "No hay sesion" }, { status: 401 });
   }
 
+  // Validar y extraer los datos de la sesión
   let usuario: string;
   try {
     const usuarioData = JSON.parse(session.value);
@@ -30,9 +31,10 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  //Se obtiene la peticion y se desestructura el body
+  //Se obtiene la peticion
   const body = await request.json();
 
+  // Revalidación de los datos del body usando zod
   const parsed = updateMenuSchema.safeParse(body);
 
   if (!parsed.success) {
